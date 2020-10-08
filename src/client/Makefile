@@ -1,7 +1,7 @@
 all: client
-	echo 'Beans'
+
 client:
-	gcc -o client client.c client.h 
+	gcc -o client client.c utils-client.c 
 	
 modmac: 
 	gcc -o modmac
