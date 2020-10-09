@@ -18,7 +18,8 @@ int change_mac(uint8_t * newMac)
 	ifr.ifr_hwaddr.sa_data[4] = newMac[4];
 	ifr.ifr_hwaddr.sa_data[5] = newMac[5];
 	ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
-	assert(ioctl(s, SIOCSIFHWADDR, &ifr) != -1);
+	if(ioctl(s, SIOCSIFHWADDR, &ifr) == -1)
+		perror('IOCTL')
 
 	return EXIT_SUCCESS;
 }
