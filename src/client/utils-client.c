@@ -2,12 +2,8 @@
 
 // Found on https://www.linuxquestions.org/questions/programming-9/how-to-change-mac-addres-via-c-code-801613/
 
-char * parse_mac
-
-
-int change_mac(char * newMac)
+int change_mac(uint8_t * newMac)
 {
-	int main(int argc, char **argv) {
 	struct ifreq ifr;
 	int s;
 

@@ -7,12 +7,13 @@
 #include <sys/types.h>
 #include <net/if_arp.h>
 #include <net/if.h>
+#include <assert.h>
 
 /**
 *   Changes your current mac address
 *   Returns 0 on success, -1 otherwise
 **/
-int change_mac(char * newMac);
+int change_mac(uint8_t * newMac);
 
 /**
 *	Gets the MAC Address 
