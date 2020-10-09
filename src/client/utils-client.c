@@ -1,16 +1,33 @@
 #include "utils-client.h"
 
+// Found on https://www.linuxquestions.org/questions/programming-9/how-to-change-mac-addres-via-c-code-801613/
+
+char * parse_mac
+
+
 int change_mac(char * newMac)
 {
-	return 0;
+	int main(int argc, char **argv) {
+	struct ifreq ifr;
+	int s;
+
+	s = socket(AF_INET, SOCK_DGRAM, 0);
+	assert(s != -1);
+
+	strcpy(ifr.ifr_name, "eth0");
+	ifr.ifr_hwaddr.sa_data[0] = newMac[0];
+	ifr.ifr_hwaddr.sa_data[1] = newMac[1];
+	ifr.ifr_hwaddr.sa_data[2] = newMac[2];
+	ifr.ifr_hwaddr.sa_data[3] = newMac[3];
+	ifr.ifr_hwaddr.sa_data[4] = newMac[4];
+	ifr.ifr_hwaddr.sa_data[5] = newMac[5];
+	ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
+	assert(ioctl(s, SIOCSIFHWADDR, &ifr) != -1);
+
+	return EXIT_SUCCESS;
 }
 
 //Modified from https://www.binarytides.com/c-program-to-get-mac-address-from-interface-name-on-linux/
-/**
-*	Gets the MAC Address 
-*
-*
-**/
 unsigned char * get_mac(char * iface)
 {
 	int fd;
@@ -27,8 +44,8 @@ unsigned char * get_mac(char * iface)
 	close(fd);
 	
 	mac = (unsigned char *)ifr.ifr_hwaddr.sa_data;
-	unsigned char * ret = malloc(12);
-	memcpy((void *)ret,(void *)mac,12);
+	unsigned char * ret = malloc(6);
+	memcpy((void *)ret,(void *)mac,6);
 	return ret;	
 }
 
