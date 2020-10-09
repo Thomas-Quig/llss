@@ -14,7 +14,7 @@ int change_mac(char * newMac)
 	s = socket(AF_INET, SOCK_DGRAM, 0);
 	assert(s != -1);
 
-	strcpy(ifr.ifr_name, "eth0");
+	strcpy(ifr.ifr_name, "wlan0");
 	ifr.ifr_hwaddr.sa_data[0] = newMac[0];
 	ifr.ifr_hwaddr.sa_data[1] = newMac[1];
 	ifr.ifr_hwaddr.sa_data[2] = newMac[2];
@@ -51,7 +51,7 @@ unsigned char * get_mac(char * iface)
 
 char * format_mac(unsigned char * mac)
 {
-	char * ret = malloc(18);
+	char * ret = malloc(13);
 	sprintf(ret,"%.2x:%.2x:%.2x:%.2x:%.2x:%.2x" , mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	return ret;
 }
