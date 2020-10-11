@@ -1,6 +1,6 @@
 #include "client.h"
 
-int main(int argc, char ** argv)
+int client_main(int argc, char ** argv)
 {
 	print_mac();
 	printf("\n");
@@ -14,4 +14,9 @@ int main(int argc, char ** argv)
 	print_mac();
 	printf("");
 	return 0;
+}
+
+int main(int argc, char ** argv)
+{
+	client_main(argc,argv);
 }
