@@ -13,6 +13,6 @@ int client_main(int argc, char ** argv)
 	//If you were on ssh, ssh gets hella bonked
 	change_mac(_newmac); 
 	print_mac();
-	printf("");
+	printf("\n");
 	return 0;
 }
