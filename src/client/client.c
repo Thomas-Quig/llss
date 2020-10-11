@@ -1,5 +1,4 @@
 #include "client.h"
-
 int client_main(int argc, char ** argv)
 {
 	print_mac();
