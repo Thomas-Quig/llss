@@ -28,9 +28,15 @@ char * format_mac(unsigned char * mac)
 	return ret;
 }
 
-void print_mac()
+void newline()
 {
-	unsigned char * mac = get_mac("wlan0");
+	puts("\n");
+	fflush();
+}
+
+void print_mac(char * iface)
+{
+	unsigned char * mac = get_mac(iface);
 	char * formatted = format_mac(mac);
 	printf("%s",formatted);
 	free(mac);

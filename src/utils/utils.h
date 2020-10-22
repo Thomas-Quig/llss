@@ -21,7 +21,13 @@ unsigned char * get_mac(char * iface);
 char * format_mac(unsigned char * mac);
 
 /**
-*	Prints the mac address
+* Instant newline function. Why i made this i dont know.
+*
+**/
+void newline();
+
+/**
+*	Prints the mac address for the given interface
 *	Frees all memory at the end.
 **/
-void print_mac();
+void print_mac(char * iface);
