@@ -31,7 +31,7 @@ char * format_mac(unsigned char * mac)
 void newline()
 {
 	puts("\n");
-	fflush();
+	fflush(stdout);
 }
 
 void print_mac(char * iface)
