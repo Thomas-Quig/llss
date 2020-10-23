@@ -1,13 +1,13 @@
-#Creating an Ad-Hoc Network On Raspberry pi (raspbian)
+# Creating an Ad-Hoc Network On Raspberry pi (raspbian)
 I will refine this later so you can have a virtual network, that way you dont need the ugly ethernet setup.
 
-##Requirements
+## Requirements
 You need the following to do this
 1. An ethernet cable for every raspberry pi you have
 2. An n + 2 port ethernet switch (for n pi's)
 3. A laptop/desktop hub station for control
 
-##Setup
+## Setup
 Follow these steps
 1. Edit `/etc/network/interfaces` as root
 2. Add the following into interfaces at the bottom of the file
