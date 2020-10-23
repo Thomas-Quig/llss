@@ -2,10 +2,10 @@
 I will refine this later so you can have a virtual network, that way you dont need the ugly ethernet setup.
 
 ## Requirements
-You need the following to do this If you want to have the pi's connected to the internet.
+You need the following to do this If you want to have the pi's connected to the internet. You can use SSH over the ad-hoc network (which was suprising).
 1. An ethernet cable for every raspberry pi you have
-2. An n + 2 port ethernet switch (for n pi's)
-3. A laptop/desktop hub station for control
+2. An n + 2 port ethernet switch (for n pi's, 1 to your laptop, 1 to the router/internet)
+3. A laptop/desktop hub station for control (You can also use one of your Pi's for the control node)
 
 ## Setup
 Follow these steps
@@ -32,3 +32,8 @@ You are now on an ad-hoc network. But as mentioned above, the device is now acti
 5. edit `/etc/rc.local`, insert `dhclient -v eth0`
 
 This will re-enable eth0 so you can connect via eth
+
+If you are using a git repo and want to pull, you have two options.
+
+1. Pull from the internet (Requires some ethernet connection)
+2. Host a local gitserver (I havent gotten this to work yet, but google `git serve`)
