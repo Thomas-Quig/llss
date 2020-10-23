@@ -2,7 +2,7 @@
 I will refine this later so you can have a virtual network, that way you dont need the ugly ethernet setup.
 
 ## Requirements
-You need the following to do this
+You need the following to do this If you want to have the pi's connected to the internet.
 1. An ethernet cable for every raspberry pi you have
 2. An n + 2 port ethernet switch (for n pi's)
 3. A laptop/desktop hub station for control
