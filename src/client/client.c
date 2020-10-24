@@ -9,23 +9,90 @@ void print_wizard_options()
 	printf("4. Change Mac Address (Conf File, Pregen)");
 }
 
-int client_main(int argc, char ** argv)
-{	
-	printf("Original Mac: ");
-	print_mac("wlan0"); nl();
-	while(getc(stdin) == 'y')
+void mac_change_loop()
+{
+	do
 	{
 		uint8_t _newmac[6];
 		char _newmac_pretty[13];
-		scanf("%c:%c:%c:%c:%c:%c",_newmac,_newmac + 1,_newmac + 2,_newmac + 3,_newmac + 4,_newmac + 5);
+		scanf("%"SCNd8":%"SCNd8":%"SCNd8":%"SCNd8":%"SCNd8":%"SCNd8,_newmac,_newmac + 1,_newmac + 2,_newmac + 3,_newmac + 4,_newmac + 5);
 		sprintf(_newmac_pretty,"%x:%x:%x:%x:%x:%x",_newmac[0],_newmac[1],_newmac[2],_newmac[3],_newmac[4],_newmac[5]);
 		printf("New Mac: %s\n",_newmac_pretty);
 
 		//If you were on ssh, ssh gets hella bonked
-		change_mac(_newmac); 
+		change_mac("wlan0",_newmac); 
 		print_mac("wlan0"); nl();
-		system("ifconfig | grep -B 5 'wlan0'");
+		system("ifconfig | grep -A 5 'wlan0'");
+		printf("Exit? (y/n): ");
 	}
+	while(getc(stdin) != 'y');
+}
+
+void send_content_loop(int sockfd, struct sockaddr_in servaddr)
+{
+	uint8_t _currmac[6] = {0x00,0x00,0x00,0x00,0x00,0x11};
+	while(1)
+	{
+		char buf[1024];
+		memset(buf,0,1024);
+		printf("==========Message[1024]==========");
+		size_t size = fread(buf,1024,1,stdin);
+		printf("===========End Message===========");
+		int n, len; 
+      
+		sendto(sockfd, (const char *)buf, size, 
+			MSG_CONFIRM, (const struct sockaddr *) &servaddr,  
+				sizeof(servaddr)); 
+		printf("Hello message sent.\n"); 
+			
+		n = recvfrom(sockfd, (char *)buf, sizeof(buf),  
+					MSG_WAITALL, (struct sockaddr *) &servaddr, 
+					&len); 
+		buf[n] = '\0'; 
+		printf("Server Response: %s\n", buf); 
+		char cont;
+		printf("Continue? (y/n):");
+		scanf("%c",&cont);
+		if(cont != 'y' && cont != 'Y')
+		{
+			break;
+		}
+		else
+		{
+			continue;
+		}
+		
+	}
+	close(sockfd); 
+}
+
+void send_user_content(int port)
+{
+	int sockfd; 
+    struct sockaddr_in     servaddr; 
+  
+    // Creating socket file descriptor 
+    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+  
+    memset(&servaddr, 0, sizeof(servaddr)); 
+      
+    // Filling server information 
+    servaddr.sin_family = AF_INET; 
+    servaddr.sin_port = htons(port); 
+    servaddr.sin_addr.s_addr = INADDR_ANY; 
+	send_content_loop(sockfd,servaddr);
+    return 0; 
+}
+
+
+int client_main(int argc, char ** argv)
+{	
+	printf("Original Mac: ");
+	
+	
 	
 
 	return 0;

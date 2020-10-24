@@ -8,6 +8,7 @@
 #include <net/if_arp.h>
 #include <net/if.h>
 #include <assert.h>
+#include <inttypes.h> 
 /**
 *	Gets the MAC Address 
 *	It does the thing, creates 12B of space on the heap

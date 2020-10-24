@@ -17,7 +17,7 @@ typedef struct _arp_packet{
 *   Changes your current mac address
 *   Returns 0 on success, -1 otherwise
 **/
-int change_mac(uint8_t * newMac);
+int change_mac(char * iface, uint8_t * newMac);
 
 
 /**

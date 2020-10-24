@@ -2,7 +2,7 @@
 
 // Found on https://www.linuxquestions.org/questions/programming-9/how-to-change-mac-addres-via-c-code-801613/
 
-int change_mac(uint8_t * newMac)
+int change_mac(char * iface, uint8_t * newMac)
 {
 	struct ifreq ifr;
 	int s;
@@ -10,7 +10,7 @@ int change_mac(uint8_t * newMac)
 	s = socket(AF_INET, SOCK_DGRAM, 0);
 	assert(s != -1);
 
-	strcpy(ifr.ifr_name, "wlan0");
+	strcpy(ifr.ifr_name, iface);
 	ifr.ifr_hwaddr.sa_data[0] = newMac[0];
 	ifr.ifr_hwaddr.sa_data[1] = newMac[1];
 	ifr.ifr_hwaddr.sa_data[2] = newMac[2];
