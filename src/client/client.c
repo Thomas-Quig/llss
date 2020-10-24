@@ -59,6 +59,8 @@ void send_content_loop(int sockfd, struct sockaddr_in servaddr)
 		}
 		else
 		{
+			_currmac[5] += 17;
+			change_mac("wlan0",_currmac);
 			continue;
 		}
 		
@@ -90,6 +92,7 @@ void send_user_content(char * ip,int port)
 int client_main(int argc, char ** argv)
 {	
 	printf("Original Mac: ");
+	print_mac("wlan0");nl();
 	send_user_content(argv[2],atoi(argv[3]));
 
 	return 0;

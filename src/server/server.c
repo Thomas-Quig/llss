@@ -32,16 +32,17 @@ int server_main(int argc, char ** argv)
     int len, n; 
   
     len = sizeof(cliaddr);  //len is value/resuslt 
-  
-    n = recvfrom(sockfd, (char *)buffer, 1024,  
+	while(strncmp(buffer,"_KILL",6))
+	{
+		n = recvfrom(sockfd, (char *)buffer, 1024,  
                 MSG_WAITALL, ( struct sockaddr *) &cliaddr, 
                 &len); 
-    buffer[n] = '\0'; 
-    printf("Client : %s\n", buffer); 
-    sendto(sockfd, (const char *)hello, strlen(hello),  
-        MSG_CONFIRM, (const struct sockaddr *) &cliaddr, 
-            len); 
-    printf("Hello message sent.\n");  
-      
+		buffer[n] = '\0'; 
+		printf("Client : %s\n", buffer); 
+		sendto(sockfd, (const char *)hello, strlen(hello),  
+			MSG_CONFIRM, (const struct sockaddr *) &cliaddr, 
+				len); 
+		printf("Response sent.\n"); 
+	} 
     return 0; 
 }
