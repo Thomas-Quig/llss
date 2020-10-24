@@ -35,15 +35,15 @@ void send_content_loop(int sockfd, struct sockaddr_in servaddr)
 	{
 		char buf[1024];
 		memset(buf,0,1024);
-		printf("==========Message[1024]==========");
-		size_t size = fread(buf,1024,1,stdin);
-		printf("===========End Message===========");
+		printf("==========Message[1024]==========\n");fflush(stdout);
+		size_t size = read(STDIN_FILENO,buf,1024);
+		printf("===========End Message===========\n");fflush(stdout);
+		
 		int n, len; 
-      
-		sendto(sockfd, (const char *)buf, size, 
+		ssize_t bytes_sent = sendto(sockfd, (const char *)buf, size, 
 			MSG_CONFIRM, (const struct sockaddr *) &servaddr,  
 				sizeof(servaddr)); 
-		printf("Hello message sent.\n"); 
+		printf("%zd bytes sent.\n",bytes_sent); 
 			
 		n = recvfrom(sockfd, (char *)buf, sizeof(buf),  
 					MSG_WAITALL, (struct sockaddr *) &servaddr, 
