@@ -66,7 +66,7 @@ void send_content_loop(int sockfd, struct sockaddr_in servaddr)
 	close(sockfd); 
 }
 
-void send_user_content(int port)
+void send_user_content(char * ip,int port)
 {
 	int sockfd; 
     struct sockaddr_in     servaddr; 
@@ -82,7 +82,7 @@ void send_user_content(int port)
     // Filling server information 
     servaddr.sin_family = AF_INET; 
     servaddr.sin_port = htons(port); 
-    servaddr.sin_addr.s_addr = INADDR_ANY; 
+    servaddr.sin_addr.s_addr = inet_addr(ip); 
 	send_content_loop(sockfd,servaddr);
 }
 
@@ -90,7 +90,7 @@ void send_user_content(int port)
 int client_main(int argc, char ** argv)
 {	
 	printf("Original Mac: ");
-	send_user_content(atoi(argv[2]));
+	send_user_content(argv[2],atoi(argv[3]));
 
 	return 0;
 }
