@@ -1,6 +1,6 @@
 #include "client.h"
 #define nl newline
-
+#define __IFACE "wlan0"
 void print_wizard_options()
 {
 	printf("1. Get Current Mac Address");
@@ -27,8 +27,8 @@ void mac_change_loop()
 		printf("New Mac: %s\n",_newmac_pretty);
 
 		//If you were on ssh, ssh gets hella bonked
-		change_mac("wlan0",_newmac); 
-		print_mac("wlan0"); nl();
+		change_mac(__IFACE,_newmac); 
+		print_mac(__IFACE); nl();
 		system("ifconfig | grep -A 5 'wlan0'");
 		printf("Exit? (y/n): ");
 	}
@@ -69,14 +69,18 @@ void user_send_content_loop(connection * conn)
 		fgets(cont,2,stdin);
 		cont[0] = toupper(cont[0]);
 		printf("Cont:[%x][%x]",cont[0],cont[1]);
-		if(cont[0] != 'Y')
+
+		//TODO Change this you idiot lol Stop being stubborn
+		if(0 == 1)
 		{
 			break;
 		}
 		else
 		{
 			_currmac[5] += 17;
-			change_mac("wlan0",_currmac);
+			change_mac(__IFACE,_currmac);
+			printf("New Mac: ");
+			print_mac(__IFACE);nl();
 			continue;
 		}
 		
@@ -95,7 +99,7 @@ void send_user_content(char * ip,int port)
 int client_main(int argc, char ** argv)
 {	
 	printf("Original Mac: ");
-	print_mac("wlan0");nl();
+	print_mac(__IFACE);nl();
 	custom_test_code(argc,argv);
 
 	return 0;
