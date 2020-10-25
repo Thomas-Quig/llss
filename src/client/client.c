@@ -53,6 +53,7 @@ void send_content_loop(int sockfd, struct sockaddr_in servaddr)
 		char cont;
 		printf("Continue? (y/n):");
 		scanf("%c",&cont);
+		printf("Char: %c\n",cont);
 		if(cont != 'y' && cont != 'Y')
 		{
 			break;
