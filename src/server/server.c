@@ -36,7 +36,7 @@ int server_main(int argc, char ** argv)
 	{
 		n = recvfrom(sockfd, (char *)buffer, 1024,  
                 MSG_WAITALL, ( struct sockaddr *) &cliaddr, 
-                &len); 
+                (socklen_t *)&len); 
 		buffer[n] = '\0'; 
 		printf("Client : %s\n", buffer); 
 		sendto(sockfd, (const char *)hello, strlen(hello),  

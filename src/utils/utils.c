@@ -1,5 +1,29 @@
 #include "utils.h"
 //Modified from https://www.binarytides.com/c-program-to-get-mac-address-from-interface-name-on-linux/
+
+connection * establish_connection(char * addr, int port)
+{
+	connection * ret = malloc(sizeof(connection));
+	strncpy(addr,ret -> ip,strlen(addr));
+	(ret -> ip)[strlen(addr)] = '\0';
+	ret -> port = port;
+    struct sockaddr_in     recvaddr; 
+  
+    // Creating socket file descriptor 
+    if ((ret -> fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+		free(ret);
+        return NULL;
+    }
+    memset(&(ret ->s_addr), 0, sizeof(ret -> s_addr)); 
+      
+    // Filling server information 
+    (ret -> s_addr).sin_family = AF_INET; 
+    (ret -> s_addr).sin_port = htons(port); 
+    (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip); 
+	return ret;
+}
+
 unsigned char * get_mac(char * iface)
 {
 	int fd;
