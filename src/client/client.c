@@ -51,6 +51,11 @@ void user_send_content_loop(connection * conn)
 		ssize_t bytes_sent = sendto(conn -> fd, (const char *)buf, size, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
 				sizeof(conn -> s_addr)); 
+		if(bytes_sent == -1)
+		{
+			perror("What:");
+			exit(1);
+		}
 		printf("%zd bytes sent.\n",bytes_sent); 
 			
 		n = recvfrom(conn -> fd, (char *)buf, sizeof(buf),  
