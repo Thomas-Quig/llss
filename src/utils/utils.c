@@ -4,7 +4,7 @@
 connection * establish_connection(char * addr, int port)
 {
 	connection * ret = malloc(sizeof(connection));
-	strncpy(addr,ret -> ip,strlen(addr));
+	strncpy(ret -> ip,addr,strlen(addr));
 	(ret -> ip)[strlen(addr)] = '\0';
 	ret -> port = port;
     struct sockaddr_in     recvaddr; 
