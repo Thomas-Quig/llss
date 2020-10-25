@@ -53,7 +53,7 @@ void user_send_content_loop(connection * conn)
 				sizeof(conn -> s_addr)); 
 		if(bytes_sent == -1)
 		{
-			perror("What:");
+			perror("What");
 			exit(1);
 		}
 		printf("%zd bytes sent.\n",bytes_sent); 
