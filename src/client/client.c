@@ -68,6 +68,7 @@ void user_send_content_loop(connection * conn)
 		fflush(stdin);
 		fgets(cont,2,stdin);
 		cont[0] = toupper(cont[0]);
+		printf("Cont:[%x][%x]",cont[0],cont[1]);
 		if(cont[0] != 'Y')
 		{
 			break;
