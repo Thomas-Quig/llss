@@ -27,7 +27,7 @@ void mac_change_loop()
 		printf("New Mac: %s\n",_newmac_pretty);
 
 		//If you were on ssh, ssh gets hella bonked
-		change_mac(__IFACE,_newmac); 
+		set_mac(__IFACE,_newmac);
 		print_mac(__IFACE); nl();
 		system("ifconfig | grep -A 5 'wlan0'");
 		printf("Exit? (y/n): ");
@@ -78,7 +78,7 @@ void user_send_content_loop(connection * conn)
 		else
 		{
 			_currmac[5] += 17;
-			change_mac(__IFACE,_currmac);
+			set_mac(__IFACE,_currmac);
 			printf("New Mac: ");
 			print_mac(__IFACE);nl();
 			continue;
@@ -95,12 +95,20 @@ void send_user_content(char * ip,int port)
 	user_send_content_loop(conn);
 }
 
+void cleanup(uint8_t * orig, char * ip)
+{
+	set_mac(__IFACE,orig);
+	char cmd[64];
+	sprintf(cmd,"arp -d %s",ip);
+	system(cmd);
+}
 
 int client_main(int argc, char ** argv)
 {	
 	printf("Original Mac: ");
+	uint8_t _orig_mac[6] = get_mac(__IFACE);
 	print_mac(__IFACE);nl();
 	custom_test_code(argc,argv);
-
+	cleanup(argv[2],_orig_mac);
 	return 0;
 }

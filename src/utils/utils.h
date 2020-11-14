@@ -12,8 +12,20 @@
 #include <assert.h>
 #include <inttypes.h> 
 #include <ctype.h>
+#include <netinet/in.h>       // IPPROTO_RAW
+#include <netinet/ip.h>       // IP_MAXPACKET (which is 65535)
+#include <bits/ioctls.h>      // defines values for argument "request" of ioctl.
+#include <net/if.h>           // struct ifreq
+#include <linux/if_ether.h>   // ETH_P_ARP = 0x0806
+#include <linux/if_packet.h>  // struct sockaddr_ll (see man 7 packet)
+#include <net/ethernet.h>
 
 #pragma once
+
+#define __CLIENT_MAIN 0
+#define __CLIENT_SEND 1
+#define __CLIENT_RECEIVE 2
+#define __CLIENT_CHAT 3
 
 /**
  *  A UDP "Connection" consists of the IP (for easy printing), the port (for easy printing), the socket fd (so it can be used), 

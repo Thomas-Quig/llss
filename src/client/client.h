@@ -1,6 +1,4 @@
 #include "utils-client.h"
-#include "../utils/utils.h"
-
 /**
 *   Prints the client options
 *   
@@ -11,4 +9,5 @@ void user_send_content_loop(connection * conn);
 void mac_change_loop();
 void print_wizard_options();
 int handle_client_options();
+void cleanup(uint8_t orig, char * ip);
 int client_main(int argc, char ** argv);
