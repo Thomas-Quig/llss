@@ -1,7 +1,7 @@
 #include "utils.h"
 //Modified from https://www.binarytides.com/c-program-to-get-mac-address-from-interface-name-on-linux/
 
-connection * establish_connection(char * addr, int port)
+connection * establish_connection(char * addr, int port, int mode)
 {
 	connection * ret = malloc(sizeof(connection));
 	strncpy(ret -> ip,addr,strlen(addr));
@@ -20,7 +20,8 @@ connection * establish_connection(char * addr, int port)
     // Filling server information 
     (ret -> s_addr).sin_family = AF_INET; 
     (ret -> s_addr).sin_port = htons(port); 
-    (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip); 
+    (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
+    ret -> secret = establish_shared_secret(ret,mode);
 	return ret;
 }
 
@@ -65,4 +66,81 @@ void print_mac(char * iface)
 	printf("%s",formatted);
 	free(mac);
 	free(formatted);
+}
+
+
+// Based on https://wiki.openssl.org/index.php/Diffie_Hellman
+char * estab_shared_secret(connection * conn, int mode)
+{
+    DH *mykey;
+    int codes;
+    int secret_size;
+
+    /* Generate the parameters to be used */
+    if(NULL == (mykey = DH_new())) handleErrors();
+    if(1 != DH_generate_parameters_ex(mykey, 2048, DH_GENERATOR_2, NULL)) handleErrors();
+
+    if(1 != DH_check(mykey, &codes)) handleErrors();
+    if(codes != 0)
+    {
+        /* Problems have been found with the generated parameters */
+        /* Handle these here - we'll just abort for this example */
+        printf("DH_check failed\n");
+        abort();
+    }
+
+    /* Generate the public and private key pair */
+    if(1 != DH_generate_key(mykey)) handleErrors();
+
+    /* Send the public key to the peer.
+    * How this occurs will be specific to your situation (see main text below) */
+    int keysize = BN_num_bytes(mykey -> public_key);
+    char * ohost = malloc(keysize);
+    int len;
+
+    //Yes this is repetitive code I dont give a shit how else do i do it.
+    if(mode == __CLIENT_SEND)
+    {
+        char pubbuf[keysize];
+        if(NULL == BN_bn2bin(mykey -> public_key,pubbuf)) handleErrors();
+
+        ssize_t key_sent = sendto(conn -> fd,pubbuf, keysize, 
+			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
+			sizeof(conn -> s_addr));
+        
+        ssize_t key_recv = recvfrom(conn -> fd, ohost, keysize,  
+					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
+					(socklen_t * )&len); 
+    }
+    else if(mode == __CLIENT_RECV)
+    {
+        ssize_t key_recv = recvfrom(conn -> fd, ohost, keysize,  
+					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
+					(socklen_t * )&len);
+
+        char pubbuf[keysize];
+        if(NULL == BN_bn2bin(mykey -> public_key,pubbuf)) handleErrors();
+
+        ssize_t key_sent = sendto(conn -> fd,pubbuf, keysize, 
+			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
+			sizeof(conn -> s_addr)); 
+    }
+    
+    /* Receive the public key from the peer. In this example we're just hard coding a value */
+    
+    BIGNUM *ohostkey = NULL;
+    if(0 == (BN_dec2bn(&ohostkey, ohost))) handleErrors();
+
+    /* Compute the shared secret */
+    unsigned char *secret;
+    if(NULL == (secret = OPENSSL_malloc(sizeof(unsigned char) * (DH_size(mykey))))) handleErrors();
+
+    if(0 > (secret_size = DH_compute_key(secret, ohostkey, mykey))) handleErrors();
+
+    /* Do something with the shared secret */
+    /* Note secret_size may be less than DH_size(mykey) */
+    printf("The shared secret is:\n");
+    BIO_dump_fp(stdout, secret, secret_size);
+
+    return secret;
 }

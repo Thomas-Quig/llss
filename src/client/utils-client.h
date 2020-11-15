@@ -8,6 +8,7 @@
 #include <net/if_arp.h>
 #include <net/if.h>
 #include <assert.h>
+#include <pthread.h>
 #include "../utils/utils.h"
 
 /**
@@ -16,18 +17,14 @@
 **/
 int set_mac(char * iface, uint8_t * newMac);
 
-
-/**
-*   Given a new mac address, sends a gratuitious arp request to tell all services the new mac address.
-*   This is an INSECURE option, and can be tracked easily with proper wireshark filtering.
-*   This is also a costly option, as sending a gratuitious arp every packet is super costly.
-**/
-int send_garp(uint8_t * newMac);
-
 void set_arp_cache(char * ip, uint8_t _new_mac);
+
 
 /**
  *  Generates next mac address for given ip address and the shared secret.
  *  
  **/
 uint8_t * get_next_mac(char * ip, char shared_secret[32]);
+
+void seed_mac_adv(char shared_secret[32]);
+int advance_macs(char ** ips, int mode);

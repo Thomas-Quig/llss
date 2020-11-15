@@ -19,12 +19,14 @@
 #include <linux/if_ether.h>   // ETH_P_ARP = 0x0806
 #include <linux/if_packet.h>  // struct sockaddr_ll (see man 7 packet)
 #include <net/ethernet.h>
+#include <openssl/dh.h>
+#include <openssl/bn.h>
 
 #pragma once
 
 #define __CLIENT_MAIN 0
 #define __CLIENT_SEND 1
-#define __CLIENT_RECEIVE 2
+#define __CLIENT_RECV 2
 #define __CLIENT_CHAT 3
 
 /**
@@ -35,21 +37,27 @@
  * @param port the port you want to send UDP packets to.
  * @param fd the file descriptor connected to the socket
  * @param s_addr the socket address that you be sending packets to.
+ * @param secret 256 bit shared secret key created by the diffie hellman process when establishing a "connection" between two hosts.
  **/
 typedef struct _connection{
     char ip[16];
     int port;
     int fd;
     struct sockaddr_in s_addr;
+    char secret[32];
 } connection;
 
 /**
  * Establishes a "connection" with the given address and port, passes ip and port into the connection if it is needed.
  * Returns on the heap, so it needs to be freed.
  * 
+ * @param addr the ip address you are connecting to
+ * @param port the port you are connecting to
+ * @param mode 1 for sender (send pub key, then recieve pub key)
+ *
  **/
-connection * establish_connection(char * addr, int port);
-
+connection * establish_connection(char * addr, int port, int mode);
+char * estab_shared_secret(connection * conn,int mode);
 /**
 *	Gets the MAC Address 
 *	It does the thing, creates 12B of space on the heap

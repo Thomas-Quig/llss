@@ -26,7 +26,8 @@ int server_main(int argc, char ** argv)
             sizeof(servaddr)) < 0 ) 
     { 
         perror("bind failed"); 
-        exit(EXIT_FAILURE); 
+        
+        exit(EXIT_FAILURE); // Bonk
     } 
       
     int len, n; 

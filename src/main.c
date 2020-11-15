@@ -24,13 +24,13 @@ int main(int argc, char ** argv){
         {
             //Run the server given argc and argv
             printf("Running in client receive mode...\n");
-            return client_main(argc, argv, __CLIENT_RECEIVE);
+            return client_main(argc, argv, __CLIENT_RECV);
         }
         else if((!strncmp(argv[1],"svr",4)) || (!strncmp(argv[1],"server",7))))
         {
             //Run the server given argc and argv
             printf("Server is depracated, setting up client in explicit recieve mode.")
-            return server_main(argc, argv);
+            return client_main(argc, argv, __CLIENT_RECV);
         }
         else if(argc == 2 && (!strncmp(argv[1],"help",5) || !strncmp(argv[1],"-h",3) || !strncmp(argv[1],"--help",7)))
         {
