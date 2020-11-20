@@ -11,6 +11,7 @@
 #include <pthread.h>
 #include "../utils/utils.h"
 
+#define __IFACE "wlan0"
 /**
 *   Changes your current mac address
 *   Returns 0 on success, -1 otherwise

@@ -73,4 +73,5 @@ int advance_macs(char ** ips, int mode)
     }
     printf("LOC|%x:%x:%x:%x:%x:%x\nOTH|%x:%x:%x:%x:%x:%x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
+    set_mac(__IFACE)
 }

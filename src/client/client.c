@@ -1,6 +1,5 @@
 #include "client.h"
 #define nl newline
-#define __IFACE "wlan0"
 #define __MAX_BUFFER_SIZE 16384
 
 static pthread_t chat_threads[2];
