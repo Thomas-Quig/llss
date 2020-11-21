@@ -50,7 +50,7 @@ void send_content(char * ip, int port, char * arg, int mode)
 
     if(mode == __SEND_FILE)
     {
-        FILE * infile = fopen("arg","r");
+        FILE * infile = fopen(arg,"r");
         if(infile == NULL)
         {
             printf("Coult not open file");
@@ -58,6 +58,7 @@ void send_content(char * ip, int port, char * arg, int mode)
         }
         else
         {
+            printf("Sending file \"%s\" to %s\n",arg,conn -> ip);
             //http://www.fundza.com/c4serious/fileIO_reading_all/index.html
             fseek(infile, 0L, SEEK_END);
             long file_size = ftell(infile);
