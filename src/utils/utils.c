@@ -91,7 +91,7 @@ char * estab_shared_secret(connection * conn, int mode)
 
     /* Generate the parameters to be used */
     if(NULL == (mykey = DH_new())) handleErrors();
-    if(1 != DH_generate_parameters_ex(mykey, 2048, DH_GENERATOR_2, NULL)) handleErrors();
+    if(1 != DH_generate_parameters_ex(mykey, 1024, DH_GENERATOR_2, NULL)) handleErrors();
 
     if(1 != DH_check(mykey, &codes)) handleErrors();
     if(codes != 0)
