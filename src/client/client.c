@@ -4,7 +4,6 @@
 
 static pthread_t chat_threads[2];
 
-//Test
 void print_wizard_options()
 {
 	printf("1. Get Current Mac Address");
