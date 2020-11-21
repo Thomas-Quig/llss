@@ -23,7 +23,7 @@ connection * establish_connection(char * addr, int port, int mode)
     if(mode == __CLIENT_RECV){
         (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
         if(bind(ret -> fd, (const struct sockaddr *)&(ret -> s_addr),
-            sizeof(ret -> s_addr)) < 0);
+            sizeof(ret -> s_addr)) == -1);
         {
             perror("rcv-bind failed");
             printf("errno: %i",errno);
