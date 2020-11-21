@@ -50,7 +50,7 @@ void seed_mac_adv(char shared_secret[32])
     printf("Pairing Code: %i\n",rand() % 1000000);
 }
 
-int advance_macs(char ** ips, int mode)
+int advance_macs(char * ip, int mode)
 {
     uint8_t my_new_mac[6];
     uint8_t ot_new_mac[6];
@@ -74,4 +74,5 @@ int advance_macs(char ** ips, int mode)
     printf("LOC|%x:%x:%x:%x:%x:%x\nOTH|%x:%x:%x:%x:%x:%x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
     set_mac(__IFACE,my_new_mac);
+    set_arp_cache(ip,ot_new_mac);
 }

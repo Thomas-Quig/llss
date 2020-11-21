@@ -111,10 +111,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
             acked = 1;
         }
 
-        char *ips[2];
-        ips[0] = get_ip(__IFACE);
-        ips[1] = conn -> ip;
-        advance_macs(ips,__CLIENT_SEND);
+        advance_macs(conn -> ip,__CLIENT_SEND);
     }
 }
 
@@ -197,6 +194,17 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
+    char buf[1024];
+    ssize_t bytes_rcvd;
+    int len;
+    do
+    {
+        bytes_rcvd = recvfrom(conn -> fd,(char *)buf, 1024,
+        MSG_WAITALL,(struct sockaddr *)&(conn -> s_addr),(socklen_t *)&len);
+        printf("---Response---\n");
+        write(STDOUT_FILENO,buf,bytes_rcvd);
+        advance_macs(conn -> ip,__CLIENT_RECV);
+    } while (strncmp(buf,"ENDMSG",6));
     
 }
 

@@ -28,4 +28,4 @@ void set_arp_cache(char * ip, uint8_t * _new_mac);
 uint8_t * get_next_mac(char * ip, char shared_secret[32]);
 
 void seed_mac_adv(char shared_secret[32]);
-int advance_macs(char ** ips, int mode);
+int advance_macs(char * ip, int mode);
