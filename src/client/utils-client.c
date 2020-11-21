@@ -58,20 +58,20 @@ int advance_macs(char * ip, int mode)
     {
         if(mode == __CLIENT_SEND)
         {
-            my_new_mac[i] = rand() % 255;
-            ot_new_mac[i] = rand() % 255;
+            my_new_mac[i] = (uint8_t)(rand() % 255);
+            ot_new_mac[i] = (uint8_t)(rand() % 255);
         }
         else if(mode == __CLIENT_RECV)
         {
-            ot_new_mac[i] = rand() % 255;
-            my_new_mac[i] = rand() % 255;
+            ot_new_mac[i] = (uint8_t)(rand() % 255);
+            my_new_mac[i] = (uint8_t)(rand() % 255);
         }
         else
         {
             return -1; //This should be impossible but whatever.
         }
     }
-    printf("LOC|%x:%x:%x:%x:%x:%x\nOTH|%x:%x:%x:%x:%x:%x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
+    printf("LOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
     set_mac(__IFACE,my_new_mac);
     set_arp_cache(ip,ot_new_mac);
