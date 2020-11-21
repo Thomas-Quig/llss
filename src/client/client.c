@@ -196,6 +196,7 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
+    printConnection(conn);
     char buf[1024];
     ssize_t bytes_rcvd;
     int len;

@@ -98,4 +98,6 @@ void newline();
 **/
 void print_mac(char * iface);
 
+void printConnection(connection * conn);
+
 void handleErrors();

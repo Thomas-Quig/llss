@@ -162,6 +162,17 @@ char * estab_shared_secret(connection * conn, int mode)
     return secret;
 }
 
+void printConnection(connection * conn)
+{
+    printf("Connection %p\n",conn);
+    printf("Addr: %s\n",conn -> ip);
+    printf("Port: %i\n",conn ->port);
+    printf("FD: %i\n",conn -> fd);
+    printf("Secret: %.*s\n",32,conn ->secret);
+    printf("Saddr: %p\n",conn -> s_addr);
+}
+
+
 void handleErrors()
 {
     printf("OPENSSL ERROR, EXITING\n");
