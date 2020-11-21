@@ -201,6 +201,7 @@ int recv_loop(connection * conn)
     int len;
     do
     {
+        printf("Waiting on data...\n");
         bytes_rcvd = recvfrom(conn -> fd,(char *)buf, 1024,
         MSG_WAITALL,(struct sockaddr *)&(conn -> s_addr),(socklen_t *)&len);
         printf("---Response---\n");
