@@ -87,7 +87,7 @@ char * estab_shared_secret(connection * conn, int mode)
 {
     char * ret = malloc(32);
     strncpy(ret,"0123456789ABCDEF0123456789ABCDEF",32);
-    printf("Shared Secret: %32c",ret);
+    printf("Shared Secret: %.*s\n",32,ret);
     return ret;
     DH *mykey;
     int codes;
