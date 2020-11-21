@@ -41,7 +41,7 @@ void mac_change_loop()
 void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
-    
+    printConnection(conn);    
     if(conn == NULL)
     {
         printf("Error: Connection could not be established\n");
@@ -95,8 +95,8 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         printf("\n---------Packet--------\n");
         write(STDOUT_FILENO,(content + tot_sent),min(content_size - tot_sent,1024));
         fflush(stdout);
-        printf("\n-------End Packet------\n");
-        tmp_sent = sendto(conn -> fd, (const char *)(content + tot_sent), min(content_size - tot_sent,1024), 
+        printf("\n-------End Packet------\n\n");
+        tmp_sent = sendto(conn -> fd, (const char *)(content + tot_sent), to_send, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
 				sizeof(conn -> s_addr));
         printf("Packet sent, code %d\n",tmp_sent);
@@ -109,7 +109,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
 					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
 					(socklen_t * )&len);
             response[rf_resp] = '\0';
-            printf("Response: %s",response);
+            printf("Response: \"%s\"\n",response);
             acked = 1;
         }
 
@@ -188,6 +188,7 @@ void * chat_recv(void * arg){
 
 void recv_content(char * ip, int port)
 {
+    //The IP here is technicall unneccesary
     connection * conn = establish_connection(ip,port,__CLIENT_RECV);
 	recv_loop(conn);
 	close(conn -> fd); 
@@ -199,14 +200,20 @@ int recv_loop(connection * conn)
     printConnection(conn);
     char buf[1024];
     ssize_t bytes_rcvd;
+    ssize_t bytes_rspd;
+    struct sockaddr_in cli_addr;
     int len;
     do
     {
         printf("Waiting on data...\n");
         bytes_rcvd = recvfrom(conn -> fd,(char *)buf, 1024,
-        MSG_WAITALL,(struct sockaddr *)&(conn -> s_addr),(socklen_t *)&len);
+        MSG_WAITALL,(struct sockaddr *)&cli_addr,(socklen_t *)&len);
         printf("---Response---\n");
         write(STDOUT_FILENO,buf,bytes_rcvd);
+        char sendbuf[32];
+        sprintf(sendbuf,"ACK %i",*((int *)buf));
+        bytes_rspd = sendto(conn -> fd, sendbuf,strlen(sendbuf) + 1, 
+            MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
         advance_macs(conn -> ip,__CLIENT_RECV);
     } while (strncmp(buf,"ENDMSG",6));
     

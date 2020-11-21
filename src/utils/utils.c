@@ -19,8 +19,14 @@ connection * establish_connection(char * addr, int port, int mode)
       
     // Filling server information 
     (ret -> s_addr).sin_family = AF_INET; 
-    (ret -> s_addr).sin_port = htons(port); 
-    (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
+    (ret -> s_addr).sin_port = htons(port);
+    if(mode == __CLIENT_RECV){
+        (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
+    }
+    else{
+        (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
+    }
+    
     strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
 	return ret;
 }
