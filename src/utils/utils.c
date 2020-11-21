@@ -7,7 +7,7 @@ connection * establish_connection(char * addr, int port, int mode)
 	strncpy(ret -> ip,addr,strlen(addr));
 	(ret -> ip)[strlen(addr)] = '\0';
 	ret -> port = port;
-    struct sockaddr_in     recvaddr; 
+    memset(&(ret -> s_addr),0,sizeof(ret -> s_addr));
   
     // Creating socket file descriptor 
     if ((ret -> fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 

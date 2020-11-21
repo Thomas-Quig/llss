@@ -202,14 +202,16 @@ int recv_loop(connection * conn)
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
     struct sockaddr_in cli_addr;
-    int len;
+    memset(&cli_addr, 0, sizeof(cli_addr));
+    int len = sizeof(cli_addr);
     do
     {
         printf("Waiting on data...\n");
         bytes_rcvd = recvfrom(conn -> fd,(char *)buf, 1024,
         MSG_WAITALL,(struct sockaddr *)&cli_addr,(socklen_t *)&len);
-        printf("---Response---\n");
+        printf("\n---RCVD---\n");
         write(STDOUT_FILENO,buf,bytes_rcvd);
+        printf("\n---ERCV---\n\n");
         char sendbuf[32];
         sprintf(sendbuf,"ACK %i",*((int *)buf));
         bytes_rspd = sendto(conn -> fd, sendbuf,strlen(sendbuf) + 1, 
