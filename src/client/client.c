@@ -92,12 +92,14 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     {
         ssize_t tmp_sent = 0;
         size_t to_send = min(content_size - tot_sent,1024);
+        printf("\n---------Packet--------\n");
         write(STDOUT_FILENO,(content + tot_sent),min(content_size - tot_sent,1024));
         fflush(stdout);
+        printf("\n-------End Packet------\n");
         tmp_sent = sendto(conn -> fd, (const char *)(content + tot_sent), min(content_size - tot_sent,1024), 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
 				sizeof(conn -> s_addr));
-
+        printf("Packet sent, code %d\n",tmp_sent);
         int acked = 0;
         while(!(acked))
         {
