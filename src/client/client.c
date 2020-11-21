@@ -67,13 +67,15 @@ void send_content(char * ip, int port, char * arg, int mode)
             {
                 size_t content_size = min(__MAX_BUFFER_SIZE,file_size - tot_bytes_sent);
                 char content[content_size];
-                send_content_loop(conn,content,content_size);
+                fread(content,content_size,1,infile);
+                send_loop(conn,content,content_size);
+                tot_bytes_sent += content_size;
             }
         }
     }
     else if(mode == __SEND_MESSAGE)
     {
-        send_content_loop(conn,arg,strlen(arg));
+        send_loop(conn,arg,strlen(arg));
     }
     else
     {
@@ -117,7 +119,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
 
 void chat(char * ip,int port)
 {
-	connection * conn = establish_connection(ip,port);
+	connection * conn = establish_connection(ip,port,__CLIENT_CHAT);
 	chat_loop(conn);
 	close(conn -> fd); 
 	free(conn);
@@ -129,7 +131,8 @@ int chat_loop(connection * conn)
 	uint8_t _currmac[6] = {0x00,0x00,0x00,0x00,0x00,0x11};
 	while(1)
 	{
-		int n, len; 
+        break;
+		/**int n, len; 
 		ssize_t bytes_sent = sendto(conn -> fd, (const char *)buf, size, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
 				sizeof(conn -> s_addr)); 
@@ -164,10 +167,10 @@ int chat_loop(connection * conn)
 			printf("New Mac: ");
 			print_mac(__IFACE);nl();
 			continue;
-		}
+		}**/
 		
 	}
-	return;
+	return 0;
 }
 
 void * chat_send(void * arg){
@@ -207,7 +210,8 @@ void cleanup(uint8_t * orig, char * ip)
 int client_main(int argc, char ** argv, int mode)
 {	
 	printf("Original Mac: ");
-	uint8_t _orig_mac[6] = get_mac(__IFACE);
+	uint8_t _orig_mac[6];
+    memcpy(_orig_mac,get_mac(__IFACE),12);
 	print_mac(__IFACE);nl();
 	switch(mode){
         case __CLIENT_MAIN:
@@ -217,7 +221,14 @@ int client_main(int argc, char ** argv, int mode)
             recv_content(argv[2],atoi(argv[3]));
             break;
         case __CLIENT_SEND:
-            send_content(argv[2],atoi(argv[3]));
+            if(access(argv[4],F_OK) -1)
+            {
+                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_FILE);
+            }
+            else
+            {
+                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_MESSAGE);
+            }
             break;
         case __CLIENT_CHAT:
             chat(argv[2],atoi(argv[3]));

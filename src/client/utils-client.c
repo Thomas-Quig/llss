@@ -26,7 +26,7 @@ int set_mac(char * iface, uint8_t * newMac)
 	  
 }
 
-void set_arp_cache(char * ip, uint8_t _new_mac)
+void set_arp_cache(char * ip, uint8_t * _new_mac)
 {
 	char cmd[64];
 	sprintf(cmd,"arp -s %s %x:%x:%x:%x:%x:%x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
@@ -73,5 +73,5 @@ int advance_macs(char ** ips, int mode)
     }
     printf("LOC|%x:%x:%x:%x:%x:%x\nOTH|%x:%x:%x:%x:%x:%x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
-    set_mac(__IFACE)
+    set_mac(__IFACE,my_new_mac);
 }

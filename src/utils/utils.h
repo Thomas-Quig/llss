@@ -21,6 +21,9 @@
 #include <net/ethernet.h>
 #include <openssl/dh.h>
 #include <openssl/bn.h>
+#include <openssl/err.h>
+#include <openssl/crypto.h>
+#include <openssl/cryptoerr.h>
 
 #pragma once
 
@@ -28,6 +31,16 @@
 #define __CLIENT_SEND 1
 #define __CLIENT_RECV 2
 #define __CLIENT_CHAT 3
+
+#define max(a,b) \
+    ({__typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b); \
+        _a > _b ? a : _b;})
+
+#define min(a,b) \
+    ({__typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b); \
+        _a < _b ? a : _b;})
 
 /**
  *  A UDP "Connection" consists of the IP (for easy printing), the port (for easy printing), the socket fd (so it can be used), 
@@ -58,11 +71,14 @@ typedef struct _connection{
  **/
 connection * establish_connection(char * addr, int port, int mode);
 char * estab_shared_secret(connection * conn,int mode);
+
 /**
 *	Gets the MAC Address 
 *	It does the thing, creates 12B of space on the heap
 **/
 unsigned char * get_mac(char * iface);
+
+char * get_ip(char * iface);
 
 /**
 *	Formats the mac address
@@ -81,3 +97,5 @@ void newline();
 *	Frees all memory at the end.
 **/
 void print_mac(char * iface);
+
+void handleErrors();

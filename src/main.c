@@ -20,16 +20,16 @@ int main(int argc, char ** argv){
             printf("Running in client send mode...\n");
             return client_main(argc, argv, __CLIENT_SEND);
         }
-        else if((!strncmp(argv[1],"rcv",4)) || || (!strncmp(argv[1],"receive",8)))
+        else if((!strncmp(argv[1],"rcv",4)) || (!strncmp(argv[1],"receive",8)))
         {
             //Run the server given argc and argv
             printf("Running in client receive mode...\n");
             return client_main(argc, argv, __CLIENT_RECV);
         }
-        else if((!strncmp(argv[1],"svr",4)) || (!strncmp(argv[1],"server",7))))
+        else if((!strncmp(argv[1],"svr",4)) || (!strncmp(argv[1],"server",7)))
         {
             //Run the server given argc and argv
-            printf("Server is depracated, setting up client in explicit recieve mode.")
+            printf("Server is depracated, setting up client in explicit recieve mode.");
             return client_main(argc, argv, __CLIENT_RECV);
         }
         else if(argc == 2 && (!strncmp(argv[1],"help",5) || !strncmp(argv[1],"-h",3) || !strncmp(argv[1],"--help",7)))

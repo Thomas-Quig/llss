@@ -18,7 +18,7 @@
 **/
 int set_mac(char * iface, uint8_t * newMac);
 
-void set_arp_cache(char * ip, uint8_t _new_mac);
+void set_arp_cache(char * ip, uint8_t * _new_mac);
 
 
 /**

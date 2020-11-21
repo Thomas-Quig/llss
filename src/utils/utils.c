@@ -21,7 +21,7 @@ connection * establish_connection(char * addr, int port, int mode)
     (ret -> s_addr).sin_family = AF_INET; 
     (ret -> s_addr).sin_port = htons(port); 
     (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
-    ret -> secret = establish_shared_secret(ret,mode);
+    strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
 	return ret;
 }
 
@@ -44,6 +44,19 @@ unsigned char * get_mac(char * iface)
 	unsigned char * ret = malloc(6);
 	memcpy((void *)ret,(void *)mac,6);
 	return ret;	
+}
+
+char * get_ip(char * iface)
+{
+    int fd;
+    struct ifreq ifr;
+    fd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    ifr.ifr_addr.sa_family = AF_INET;
+    strncpy(ifr.ifr_name, iface, IFNAMSIZ-1);
+    ioctl(fd, SIOCGIFADDR, &ifr);
+    close(fd);
+    return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 }
 
 char * format_mac(unsigned char * mac)
@@ -94,15 +107,15 @@ char * estab_shared_secret(connection * conn, int mode)
 
     /* Send the public key to the peer.
     * How this occurs will be specific to your situation (see main text below) */
-    int keysize = BN_num_bytes(mykey -> public_key);
-    char * ohost = malloc(keysize);
+    int keysize = BN_num_bytes(DH_get0_pub_key(mykey));
+    char * ohost = malloc(keysize);  
     int len;
 
     //Yes this is repetitive code I dont give a shit how else do i do it.
     if(mode == __CLIENT_SEND)
     {
         char pubbuf[keysize];
-        if(NULL == BN_bn2bin(mykey -> public_key,pubbuf)) handleErrors();
+        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors();
 
         ssize_t key_sent = sendto(conn -> fd,pubbuf, keysize, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
@@ -119,7 +132,7 @@ char * estab_shared_secret(connection * conn, int mode)
 					(socklen_t * )&len);
 
         char pubbuf[keysize];
-        if(NULL == BN_bn2bin(mykey -> public_key,pubbuf)) handleErrors();
+        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors();
 
         ssize_t key_sent = sendto(conn -> fd,pubbuf, keysize, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
@@ -143,4 +156,10 @@ char * estab_shared_secret(connection * conn, int mode)
     BIO_dump_fp(stdout, secret, secret_size);
 
     return secret;
+}
+
+void handleErrors()
+{
+    printf("OPENSSL ERROR, EXITING\n");
+    perror("OSSL-ERRNO");
 }
