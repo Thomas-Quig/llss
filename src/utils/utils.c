@@ -26,6 +26,7 @@ connection * establish_connection(char * addr, int port, int mode)
             sizeof(ret -> s_addr)) < 0);
         {
             perror("rcv-bind failed");
+            printf("errno: %i",errno);
             exit(EXIT_FAILURE);
         }
     }
