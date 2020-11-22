@@ -54,7 +54,7 @@ int advance_macs(char * ip, int mode)
 {
     uint8_t my_new_mac[6];
     uint8_t ot_new_mac[6];
-    for(int i = 1; i < 6; i++)
+    for(int i = 0; i < 6; i++)
     {
         if(mode == __CLIENT_SEND)
         {

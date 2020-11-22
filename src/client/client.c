@@ -188,7 +188,7 @@ void * chat_recv(void * arg){
 
 void recv_content(char * ip, int port)
 {
-    //The IP here is technicall unneccesary
+    //The IP here is technically unneccesary
     connection * conn = establish_connection(ip,port,__CLIENT_RECV);
 	recv_loop(conn);
 	close(conn -> fd); 
