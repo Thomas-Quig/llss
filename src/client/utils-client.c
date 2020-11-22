@@ -4,7 +4,7 @@
 
 int set_mac(char * iface, uint8_t * newMac)
 {
-    printf("Setting own MAC to %hhx:%hhx:%hhx:%hhx:%hhx:%hhx",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
+    printf("set_mac(%s,%hhx:%hhx:%hhx:%hhx:%hhx:%hhx)",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     struct ifreq ifr;
     int s;
 
@@ -20,8 +20,8 @@ int set_mac(char * iface, uint8_t * newMac)
     ifr.ifr_hwaddr.sa_data[5] = newMac[5];
     ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
     if(ioctl(s, SIOCSIFHWADDR, &ifr) == -1){
-        perror("IOCTL");
-        printf("ioctl-errno: %i\n",ioctl);
+        perror("sm-IOCTL");
+        printf("ioctl-errno: %i\n",errno);
         return EXIT_FAILURE;
 	  }
 
@@ -30,9 +30,10 @@ int set_mac(char * iface, uint8_t * newMac)
 
 void set_arp_cache(char * ip, uint8_t * _new_mac)
 {
+    printf("set_arp_cache(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n");
 	char cmd[64];
 	sprintf(cmd,"arp -s %s %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
-	printf("cmd \"%s\"\n",cmd);
+	//printf("cmd \"%s\"\n",cmd);
 	system(cmd);
   
 }
@@ -54,6 +55,7 @@ void seed_mac_adv(char shared_secret[32])
 
 int advance_macs(char * ip, int mode)
 {
+    printf("advance_macs(%s,%i)\n",ip,mode);
     uint8_t my_new_mac[6];
     uint8_t ot_new_mac[6];
     for(int i = 0; i < 6; i++)

@@ -47,6 +47,11 @@
         __typeof__ (b) _b = (b); \
         _a < _b ? a : _b;})
 
+#define __DEBUG__ 1
+#define dbprintf \
+    if(__DEBUG__)printf
+
+
 /**
  *  A UDP "Connection" consists of the IP (for easy printing), the port (for easy printing), the socket fd (so it can be used), 
  * and the sockaddr_in for actually sending stuff. Its not actually a connection as this is UDP, but I am calling it a connection because it has all the
