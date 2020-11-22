@@ -8,3 +8,4 @@ debug: main.c
 
 clean: 
 	rm -f runllss
+	rm -f debugllss

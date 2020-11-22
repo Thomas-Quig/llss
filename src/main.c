@@ -4,7 +4,7 @@
 int main(int argc, char ** argv){
     if(argc == 1)
     {
-        printf("usage: llss (cli,rcv,snd,svr) <args>\n");
+        printf("usage: llss (cli,rcv,snd,svr) <ip> <port> [args]\n");
         return 0;
     }
     if(argc >= 2)
