@@ -4,6 +4,7 @@
 
 int set_mac(char * iface, uint8_t * newMac)
 {
+    printf("Setting own MAC to %hhx:%hhx:%hhx:%hhx:%hhx:%hhx",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     struct ifreq ifr;
     int s;
 
@@ -20,6 +21,7 @@ int set_mac(char * iface, uint8_t * newMac)
     ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
     if(ioctl(s, SIOCSIFHWADDR, &ifr) == -1){
         perror("IOCTL");
+        printf("ioctl-errno: %i\n",ioctl);
         return EXIT_FAILURE;
 	  }
 
