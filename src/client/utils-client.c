@@ -20,7 +20,7 @@ int set_mac(char * iface, uint8_t * newMac)
     ifr.ifr_hwaddr.sa_data[5] = newMac[5];
     ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
     if(ioctl(s, SIOCSIFHWADDR, &ifr) == -1){
-        perror("sm-IOCTL");
+        //perror("sm-IOCTL");
         printf("ioctl-errno: %i\n",errno);
         return EXIT_FAILURE;
 	  }
@@ -30,7 +30,7 @@ int set_mac(char * iface, uint8_t * newMac)
 
 void set_arp_cache(char * ip, uint8_t * _new_mac)
 {
-    printf("set_arp_cache(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n");
+    printf("set_arp_cache(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	char cmd[64];
 	sprintf(cmd,"arp -s %s %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	//printf("cmd \"%s\"\n",cmd);
