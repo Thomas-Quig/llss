@@ -247,10 +247,16 @@ void cleanup(uint8_t * orig, char * ip)
 
 int client_main(int argc, char ** argv, int mode)
 {	
+    memset(_ohost_ip,0,16);
+    strncpy(_ohost_ip,argv[2],min(strlen(argv[2]),15));
+
 	printf("Original Mac: ");
 	uint8_t _orig_mac[6];
     memcpy(_orig_mac,get_mac(__IFACE),12);
 	print_mac(__IFACE);nl();
+
+    signal(SIGINT,sig_handler);
+
 	switch(mode){
         case __CLIENT_MAIN:
             custom_test_code(argc,argv);
