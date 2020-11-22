@@ -29,7 +29,7 @@ int set_mac(char * iface, uint8_t * newMac)
 void set_arp_cache(char * ip, uint8_t * _new_mac)
 {
 	char cmd[64];
-	sprintf(cmd,"arp -s %s %x:%x:%x:%x:%x:%x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
+	sprintf(cmd,"arp -s %s %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	printf("%s",cmd);
 	system(cmd);
   

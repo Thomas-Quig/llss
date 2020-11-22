@@ -3,6 +3,22 @@
 #define __MAX_BUFFER_SIZE 16384
 
 static pthread_t chat_threads[2];
+static char _ohost_ip[16];
+
+void sig_handler(int signo)
+{
+    if (signo == SIGINT)
+    {
+        printf("\nReceived user interrupt via ^C, safely exiting...\n");
+        char cmd[32];
+        memset(cmd,0,32);
+        sprintf(cmd,"arp -d %s",_ohost_ip);
+        system(cmd);
+        sprintf(cmd,"ping -c 1 %s",_ohost_ip);
+        printf("Ensure arp has recovered with 'arp %s'\n",_ohost_ip);
+        exit(0);
+    }
+}
 
 void print_wizard_options()
 {
