@@ -23,4 +23,4 @@ int set_mac(char * iface, char * newMac);
 
 void set_arp_cache(char * ip, char * _new_mac);
 
-int advance_macs(char * ip, int mode);
+int advance_macs(connection * conn, int mode);
