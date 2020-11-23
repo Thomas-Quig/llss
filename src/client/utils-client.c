@@ -51,12 +51,11 @@ void set_arp_cache(char * ip, char * _new_mac)
 	system(cmd);
   
 }
-char safe_rand()
+char safe_rand(int i)
 {
     char c = (char)(rand() % 255);
-    if(c % 2 == 1)
-    {
-        c -= 1;
+    if(i == 0){
+        c &= 0xFE;
     }
     return c;
 }
@@ -69,13 +68,13 @@ char * get_next_macs(int mode)
     {
         if(mode == __CLIENT_SEND)
         {
-            my_new_mac[i] = safe_rand();
-            ot_new_mac[i] = safe_rand();
+            my_new_mac[i] = safe_rand(i);
+            ot_new_mac[i] = safe_rand(i);
         }
         else if(mode == __CLIENT_RECV)
         {
-            ot_new_mac[i] = safe_rand();
-            my_new_mac[i] = safe_rand();
+            ot_new_mac[i] = safe_rand(i);
+            my_new_mac[i] = safe_rand(i);
         }
         else
         {
