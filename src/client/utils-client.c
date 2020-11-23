@@ -74,6 +74,6 @@ int advance_macs(connection * conn, int mode)
     printf("\nLOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
     set_mac(__IFACE,my_new_mac);
-    conn -> fd = socket(AF_INET, SOCK_DGRAM, 0; //Reopen the socket
+    conn -> fd = socket(AF_INET, SOCK_DGRAM, 0); //Reopen the socket
     set_arp_cache(ip,ot_new_mac);
 }
