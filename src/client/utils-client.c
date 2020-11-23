@@ -12,7 +12,12 @@ ssize_t ssend(connection * conn, char * data, size_t size)
 
 int set_mac(char * iface, char * newMac)
 {
+    char cmd[64];
+    memset(cmd,0,64);
+    sprintf(cmd,"ifconfig %s hw ether %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
+    system(cmd);
     dbprintf("set_mac(%s,%x:%x:%x:%x:%x:%x)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
+    return EXIT_SUCCESS;
     //printf("%d:%d:%d:%d:%d:%d\n",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     struct ifreq ifr;
     int s;
@@ -20,7 +25,7 @@ int set_mac(char * iface, char * newMac)
     s = socket(AF_INET, SOCK_DGRAM, 0);
     assert(s != -1);
 
-    strcpy(ifr.ifr_name, iface);
+    strncpy(ifr.ifr_name, iface,min(strlen(iface),5));
     ifr.ifr_hwaddr.sa_data[0] = newMac[0];
     ifr.ifr_hwaddr.sa_data[1] = newMac[1];
     ifr.ifr_hwaddr.sa_data[2] = newMac[2];
