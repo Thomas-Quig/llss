@@ -1,6 +1,7 @@
 #include "client.h"
 #define nl newline
 #define __MAX_BUFFER_SIZE 16384
+#define __FRAGMENT_SIZE 16
 
 static pthread_t chat_threads[2];
 static char _ohost_ip[16];
@@ -20,6 +21,53 @@ void sig_handler(int signo)
     }
 }
 
+int client_main(int argc, char ** argv, int mode)
+{	
+    memset(_ohost_ip,0,16);
+    if(argc > 2)
+        strncpy(_ohost_ip,argv[2],min(strlen(argv[2]),15));
+
+	printf("Original Mac: ");
+	char _orig_mac[6];
+    memcpy(_orig_mac,get_mac(__IFACE),12);
+	print_mac(__IFACE);nl();
+
+    signal(SIGINT,sig_handler);
+
+	switch(mode){
+        case __CLIENT_MAIN:
+            custom_test_code(argc,argv);
+            break;
+        case __CLIENT_RECV:
+            recv_content(argv[2],atoi(argv[3]));
+            break;
+        case __CLIENT_SEND:
+            if(access(argv[4],F_OK) != -1)
+            {
+                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_FILE);
+            }
+            else
+            {
+                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_MESSAGE);
+            }
+            break;
+        case __CLIENT_CHAT:
+            chat(argv[2],atoi(argv[3]));
+            break;
+        default:
+            printf("How\n");
+            break;
+    };
+    if(strcmp(argv[argc - 1],"-c"))
+	    cleanup(_orig_mac,argv[2]);
+    else
+    {
+        dbprintf("[SYS] No Cleanup, do it yourself :(\n");
+    }
+    
+	return 0;
+}
+
 void print_wizard_options()
 {
 	printf("1. Get Current Mac Address");
@@ -31,7 +79,7 @@ void print_wizard_options()
 
 int custom_test_code(int argc, char ** argv)
 {
-	send_content(argv[2],atoi(argv[3]),"./testfiles/test.txt",__SEND_FILE);
+	mac_change_loop();
 	return 0;
 }
 
@@ -88,16 +136,16 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     while(tot_sent < content_size)
     {
         ssize_t tmp_sent = 0;
-        size_t to_send = min(content_size - tot_sent,1024);
+        size_t to_send = min(content_size - tot_sent,__FRAGMENT_SIZE);
         /**printf("\n---------Packet--------\n");
         write(STDOUT_FILENO,(content + tot_sent),to_send);
         fflush(stdout);
         printf("\n-------End Packet------\n\n");**/
 
-        //tmp_sent = ssend(conn,content + tot_sent, to_send);
+        tmp_sent = ssend(conn,content + tot_sent, to_send);
         printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
         tot_sent += tmp_sent;
-        int acked = 1;
+        int acked = 0;
         while(!(acked))
         {
             int len;
@@ -142,6 +190,7 @@ int recv_loop(connection * conn)
         write(STDOUT_FILENO,buf,bytes_rcvd);
         printf("\n---ERCV---\n\n");
         char sendbuf[32];
+        memset(sendbuf,0,32);
         sprintf(sendbuf,"ACK %i",*((int *)buf));
         bytes_rspd = sendto(conn -> fd, sendbuf,strlen(sendbuf) + 1, 
             MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
@@ -227,48 +276,18 @@ void * chat_recv(void * arg){
 }
 
 
-int client_main(int argc, char ** argv, int mode)
-{	
-    memset(_ohost_ip,0,16);
-    strncpy(_ohost_ip,argv[2],min(strlen(argv[2]),15));
-
-	printf("Original Mac: ");
-	char _orig_mac[6];
-    memcpy(_orig_mac,get_mac(__IFACE),12);
-	print_mac(__IFACE);nl();
-
-    signal(SIGINT,sig_handler);
-
-	switch(mode){
-        case __CLIENT_MAIN:
-            custom_test_code(argc,argv);
-            break;
-        case __CLIENT_RECV:
-            recv_content(argv[2],atoi(argv[3]));
-            break;
-        case __CLIENT_SEND:
-            if(access(argv[4],F_OK) -1)
-            {
-                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_FILE);
-            }
-            else
-            {
-                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_MESSAGE);
-            }
-            break;
-        case __CLIENT_CHAT:
-            chat(argv[2],atoi(argv[3]));
-            break;
-        default:
-            printf("How\n");
-            break;
-    };
-    if(strcmp(argv[argc - 1],"-c"))
-	    cleanup(_orig_mac,argv[2]);
-    else
-    {
-        dbprintf("[SYS] No Cleanup, do it yourself :(\n");
-    }
-    
-	return 0;
+void mac_change_loop()
+{
+	while(1){
+		char _newmac[6];
+        printf("Enter Mac: ");
+		scanf("%x:%x:%x:%x:%x:%x",_newmac,_newmac + 1,_newmac + 2,_newmac + 3,_newmac + 4,_newmac + 5);
+		printf("New Mac:%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",_newmac[0],_newmac[1],_newmac[2],_newmac[3],_newmac[4],_newmac[5]);
+		//If you were on ssh, ssh gets hella bonked
+		set_mac(__IFACE,_newmac);
+        printf("Confirm New: ");
+		print_mac(__IFACE); nl();
+		//system("ifconfig | grep -A 5 'wlan0'");
+		//printf("Exit? (y/n): ");
+	}
 }
