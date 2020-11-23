@@ -35,25 +35,6 @@ int custom_test_code(int argc, char ** argv)
 	return 0;
 }
 
-void mac_change_loop()
-{
-	do
-	{
-		uint8_t _newmac[6];
-		char _newmac_pretty[13];
-		scanf("%"SCNd8":%"SCNd8":%"SCNd8":%"SCNd8":%"SCNd8":%"SCNd8,_newmac,_newmac + 1,_newmac + 2,_newmac + 3,_newmac + 4,_newmac + 5);
-		sprintf(_newmac_pretty,"%x:%x:%x:%x:%x:%x",_newmac[0],_newmac[1],_newmac[2],_newmac[3],_newmac[4],_newmac[5]);
-		printf("New Mac: %s\n",_newmac_pretty);
-
-		//If you were on ssh, ssh gets hella bonked
-		set_mac(__IFACE,_newmac);
-		print_mac(__IFACE); nl();
-		system("ifconfig | grep -A 5 'wlan0'");
-		printf("Exit? (y/n): ");
-	}
-	while(getc(stdin) != 'y');
-}
-
 void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
@@ -113,10 +94,10 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         fflush(stdout);
         printf("\n-------End Packet------\n\n");**/
 
-        tmp_sent = ssend(conn,content + tot_sent, to_send);
+        //tmp_sent = ssend(conn,content + tot_sent, to_send);
         printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
         tot_sent += tmp_sent;
-        int acked = 0;
+        int acked = 1;
         while(!(acked))
         {
             int len;
@@ -169,9 +150,9 @@ int recv_loop(connection * conn)
     
 }
 
-void cleanup(uint8_t * orig, char * ip)
+void cleanup(char * orig_mac, char * ip)
 {
-	set_mac(__IFACE,orig);
+	set_mac(__IFACE,orig_mac);
 	char cmd[64];
 	sprintf(cmd,"arp -d %s",ip);
 	system(cmd);
@@ -188,7 +169,7 @@ void chat(char * ip,int port)
 int chat_loop(connection * conn)
 {
 	
-	uint8_t _currmac[6] = {0x00,0x00,0x00,0x00,0x00,0x11};
+	char _currmac[6] = {0x00,0x00,0x00,0x00,0x00,0x11};
 	while(1)
 	{
         break;
@@ -252,7 +233,7 @@ int client_main(int argc, char ** argv, int mode)
     strncpy(_ohost_ip,argv[2],min(strlen(argv[2]),15));
 
 	printf("Original Mac: ");
-	uint8_t _orig_mac[6];
+	char _orig_mac[6];
     memcpy(_orig_mac,get_mac(__IFACE),12);
 	print_mac(__IFACE);nl();
 
@@ -282,6 +263,12 @@ int client_main(int argc, char ** argv, int mode)
             printf("How\n");
             break;
     };
-	cleanup(_orig_mac,argv[2]);
+    if(strcmp(argv[argc - 1],"-c"))
+	    cleanup(_orig_mac,argv[2]);
+    else
+    {
+        dbprintf("[SYS] No Cleanup, do it yourself :(\n");
+    }
+    
 	return 0;
 }

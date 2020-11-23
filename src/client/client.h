@@ -16,5 +16,5 @@ int recv_loop(connection * conn);
 void mac_change_loop();
 void print_wizard_options();
 int handle_client_options();
-void cleanup(uint8_t * orig, char * ip);
+void cleanup(char * orig, char * ip);
 int client_main(int argc, char ** argv, int mode);

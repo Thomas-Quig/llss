@@ -10,7 +10,7 @@ ssize_t ssend(connection * conn, char * data, size_t size)
 				sizeof(conn -> s_addr));
 }
 
-int set_mac(char * iface, uint8_t * newMac)
+int set_mac(char * iface, char * newMac)
 {
     dbprintf("set_mac(%s,%hhx:%hhx:%hhx:%hhx:%hhx:%hhx)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     //printf("%d:%d:%d:%d:%d:%d\n",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
@@ -37,7 +37,7 @@ int set_mac(char * iface, uint8_t * newMac)
 	  
 }
 
-void set_arp_cache(char * ip, uint8_t * _new_mac)
+void set_arp_cache(char * ip, char * _new_mac)
 {
     dbprintf("set_arp_cache(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	char cmd[64];
@@ -47,37 +47,22 @@ void set_arp_cache(char * ip, uint8_t * _new_mac)
   
 }
 
-uint8_t * get_next_mac(char * ip, char shared_secret[32])
-{
-
-}
-
-void seed_mac_adv(char shared_secret[32])
-{
-    unsigned int * sec_int = (unsigned int *)shared_secret;
-
-    //DEBUG, REMOVE LATER
-    for(int i = 0; i < 8; i++){printf("%i -> %i\n",i,sec_int[i]);}
-    srand(sec_int[0]);
-    printf("Pairing Code: %i\n",rand() % 1000000);
-}
-
 int advance_macs(char * ip, int mode)
 {
     dbprintf("advance_macs(%s,%i)\n",ip,mode);
-    uint8_t my_new_mac[6];
-    uint8_t ot_new_mac[6];
+    char my_new_mac[6];
+    char ot_new_mac[6];
     for(int i = 0; i < 6; i++)
     {
         if(mode == __CLIENT_SEND)
         {
-            my_new_mac[i] = (uint8_t)(rand() % 255);
-            ot_new_mac[i] = (uint8_t)(rand() % 255);
+            my_new_mac[i] = (char)(rand() % 255);
+            ot_new_mac[i] = (char)(rand() % 255);
         }
         else if(mode == __CLIENT_RECV)
         {
-            ot_new_mac[i] = (uint8_t)(rand() % 255);
-            my_new_mac[i] = (uint8_t)(rand() % 255);
+            ot_new_mac[i] = (char)(rand() % 255);
+            my_new_mac[i] = (char)(rand() % 255);
         }
         else
         {

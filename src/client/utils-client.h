@@ -19,16 +19,8 @@ ssize_t ssend(connection * conn, char * data, size_t size);
 *   Changes your current mac address
 *   Returns 0 on success, -1 otherwise
 **/
-int set_mac(char * iface, uint8_t * newMac);
+int set_mac(char * iface, char * newMac);
 
-void set_arp_cache(char * ip, uint8_t * _new_mac);
+void set_arp_cache(char * ip, char * _new_mac);
 
-
-/**
- *  Generates next mac address for given ip address and the shared secret.
- *  
- **/
-uint8_t * get_next_mac(char * ip, char shared_secret[32]);
-
-void seed_mac_adv(char shared_secret[32]);
 int advance_macs(char * ip, int mode);
