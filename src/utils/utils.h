@@ -29,6 +29,7 @@
 #include <openssl/err.h>
 #include <openssl/crypto.h>
 #include <openssl/cryptoerr.h>
+#include <libexplain/ioctl.h>
 
 #pragma once
 

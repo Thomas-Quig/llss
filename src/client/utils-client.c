@@ -21,7 +21,7 @@ int set_mac(char * iface, uint8_t * newMac)
     ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
     if(ioctl(s, SIOCSIFHWADDR, &ifr) == -1){
         //perror("sm-IOCTL");
-        printf("ioctl-errno: %i\n",errno);
+        printf("explain-ioctl: %s\n",explain_errno_ioctl(errno,s,SIOCSIFHWADDR, &ifr));
         return EXIT_FAILURE;
 	  }
 
