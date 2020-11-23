@@ -51,7 +51,15 @@ void set_arp_cache(char * ip, char * _new_mac)
 	system(cmd);
   
 }
-
+char safe_rand()
+{
+    char c = (char)(rand() % 255);
+    if(c % 2 == 1)
+    {
+        c -= 1;
+    }
+    return c;
+}
 char * get_next_macs(int mode)
 {
     char * new_macs = malloc(12);
@@ -61,13 +69,13 @@ char * get_next_macs(int mode)
     {
         if(mode == __CLIENT_SEND)
         {
-            my_new_mac[i] = (char)(rand() % 255);
-            ot_new_mac[i] = (char)(rand() % 255);
+            my_new_mac[i] = safe_rand();
+            ot_new_mac[i] = safe_rand();
         }
         else if(mode == __CLIENT_RECV)
         {
-            ot_new_mac[i] = (char)(rand() % 255);
-            my_new_mac[i] = (char)(rand() % 255);
+            ot_new_mac[i] = safe_rand();
+            my_new_mac[i] = safe_rand();
         }
         else
         {
@@ -88,7 +96,7 @@ int advance_mac(connection * conn, char *macs, int who)
     
     if(who == __ADV_SELF)
     {
-        shutdown(conn -> fd,SHUT_RDWR);
+        close(conn -> fd);
         set_mac(__IFACE,my_new_mac);
         conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
     }
