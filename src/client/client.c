@@ -159,7 +159,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
                 acked = 1;
         }
 
-        advance_macs(conn -> ip,__CLIENT_SEND);
+        advance_macs(conn,__CLIENT_SEND);
     }
 }
 
@@ -194,7 +194,7 @@ int recv_loop(connection * conn)
         sprintf(sendbuf,"ACK %i",*((int *)buf));
         bytes_rspd = sendto(conn -> fd, sendbuf,strlen(sendbuf) + 1, 
             MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
-        advance_macs(conn -> ip,__CLIENT_RECV);
+        advance_macs(conn,__CLIENT_RECV);
     } while (strncmp(buf,"ENDMSG",6));
     
 }
