@@ -47,13 +47,11 @@ void set_arp_cache(char * ip, char * _new_mac)
   
 }
 
-int advance_macs(connection * conn, int mode)
+char * get_next_macs(int mode)
 {
-    char * ip = conn -> ip;
-    close(conn -> fd);
-    dbprintf("advance_macs(%s,%i)\n",ip,mode);
-    char my_new_mac[6];
-    char ot_new_mac[6];
+    char * new_macs = malloc(12);
+    char * my_new_mac = new_macs;
+    char * ot_new_mac = new_macs + 6;
     for(int i = 0; i < 6; i++)
     {
         if(mode == __CLIENT_SEND)
@@ -68,12 +66,31 @@ int advance_macs(connection * conn, int mode)
         }
         else
         {
-            return -1; //This should be impossible but whatever.
+            return NULL; //This should be impossible but whatever.
         }
     }
     printf("\nLOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
-    set_mac(__IFACE,my_new_mac);
-    conn -> fd = socket(AF_INET, SOCK_DGRAM, 0); //Reopen the socket
-    set_arp_cache(ip,ot_new_mac);
+    return new_macs;
+}
+
+int advance_mac(connection * conn, char *macs, int who)
+{
+    char *my_new_mac = macs;
+    char *ot_new_mac = macs + 6;
+    dbprintf("advance_mac(%p,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x %.2x:%.2x:%.2x:%.2x:%.2x:%.2x,%i)\n",conn,my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
+                                                            ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5],who);
+    
+    if(who == __ADV_SELF)
+    {
+        shutdown(conn -> fd,SHUT_RDWR);
+        set_mac(__IFACE,my_new_mac);
+        conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
+    }
+    else if(who == __ADV_OTHR)
+    {
+         char * ip = conn -> ip;
+        set_arp_cache(ip,ot_new_mac);
+    }
+   
 }

@@ -135,16 +135,16 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     size_t tot_sent = 0;
     while(tot_sent < content_size)
     {
+        char * next_macs = get_next_macs(__CLIENT_SEND);
+
         ssize_t tmp_sent = 0;
         size_t to_send = min(content_size - tot_sent,__FRAGMENT_SIZE);
-        /**printf("\n---------Packet--------\n");
-        write(STDOUT_FILENO,(content + tot_sent),to_send);
-        fflush(stdout);
-        printf("\n-------End Packet------\n\n");**/
 
         tmp_sent = ssend(conn,content + tot_sent, to_send);
-        printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
         tot_sent += tmp_sent;
+        //printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
+        advance_mac(conn,next_macs,__ADV_SELF);
+
         int acked = 0;
         while(!(acked))
         {
@@ -158,9 +158,9 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
             if(!strncmp(response,"ACK",3))
                 acked = 1;
         }
-
-        advance_macs(conn,__CLIENT_SEND);
+        advance_mac(conn,next_macs,__ADV_OTHR);
     }
+    ssend(conn,"ENDMSG",6);
 }
 
 void recv_content(char * ip, int port)
@@ -183,18 +183,24 @@ int recv_loop(connection * conn)
     int len = sizeof(cli_addr);
     do
     {
+        char * next_macs = get_next_macs(__CLIENT_RECV);
+
         printf("Waiting on data...\n");
         bytes_rcvd = recvfrom(conn -> fd,(char *)buf, 1024,
         MSG_WAITALL,(struct sockaddr *)&cli_addr,(socklen_t *)&len);
+        advance_mac(conn,next_macs,__ADV_OTHR);
+
         printf("\n---RCVD---\n");
         write(STDOUT_FILENO,buf,bytes_rcvd);
         printf("\n---ERCV---\n\n");
+        
         char sendbuf[32];
         memset(sendbuf,0,32);
         sprintf(sendbuf,"ACK %i",*((int *)buf));
         bytes_rspd = sendto(conn -> fd, sendbuf,strlen(sendbuf) + 1, 
             MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
-        advance_macs(conn,__CLIENT_RECV);
+        
+        advance_mac(conn,next_macs,__ADV_SELF);
     } while (strncmp(buf,"ENDMSG",6));
     
 }

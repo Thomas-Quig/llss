@@ -12,6 +12,9 @@
 #include "../utils/utils.h"
 
 #define __IFACE "wlan0"
+#define __ADV_SELF 1
+#define __ADV_OTHR 2
+
 
 ssize_t ssend(connection * conn, char * data, size_t size);
 
@@ -23,4 +26,5 @@ int set_mac(char * iface, char * newMac);
 
 void set_arp_cache(char * ip, char * _new_mac);
 
-int advance_macs(connection * conn, int mode);
+char * get_next_macs(int mode);
+int advance_mac(connection * conn, char * macs, int who);
