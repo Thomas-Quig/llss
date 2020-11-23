@@ -9,3 +9,25 @@ You see, the thing I didnt realize *at the time* is that DHCP is costly and very
     I could maybe maybe do it later but thats not for now. Gives me a good idea for a app name. "Chaos Agent" which just shuffles EVERYTHING but maintains communication somehow.
 2. The communication would break between the two hosts
 3. *SSH would break*
+
+
+## Mac Address setting + Random
+TLDR (Fill in tomorrow)
+Tried everything, link forum posts
+SC's to discord post at 3am
+Fuzzing to figure it out at the end
+Infinite loop, fine, forbidden
+What the hell is errno 52
+solutions I tried
+    asymettic mac use/generation.
+    strace
+    reading system kernel
+    shutting down fd's when not in use
+    https://forum.pine64.org/showthread.php?tid=10301
+    removing modules
+    restarting arp
+
+random effing me over
+    fuzzing
+    eric huber shoutout
+
