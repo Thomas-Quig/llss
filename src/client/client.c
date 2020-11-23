@@ -108,14 +108,14 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     {
         ssize_t tmp_sent = 0;
         size_t to_send = min(content_size - tot_sent,1024);
-        printf("\n---------Packet--------\n");
-        write(STDOUT_FILENO,(content + tot_sent),min(content_size - tot_sent,1024));
+        /**printf("\n---------Packet--------\n");
+        write(STDOUT_FILENO,(content + tot_sent),to_send);
         fflush(stdout);
-        printf("\n-------End Packet------\n\n");
-        tmp_sent = sendto(conn -> fd, (const char *)(content + tot_sent), to_send, 
-			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
-				sizeof(conn -> s_addr));
-        printf("Packet sent, code %d\n",tmp_sent);
+        printf("\n-------End Packet------\n\n");**/
+
+        tmp_sent = ssend(conn,content + tot_sent, to_send);
+        printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
+        tot_sent += tmp_sent;
         int acked = 0;
         while(!(acked))
         {
@@ -125,12 +125,56 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
 					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
 					(socklen_t * )&len);
             response[rf_resp] = '\0';
-            printf("Response: \"%s\"\n",response);
-            acked = 1;
+            printf("[RSP] Response receieved...\n\"%s\"\n[End Response]\n\n",response);
+            if(!strncmp(response,"ACK",3))
+                acked = 1;
         }
 
         advance_macs(conn -> ip,__CLIENT_SEND);
     }
+}
+
+void recv_content(char * ip, int port)
+{
+    //The IP here is technically unneccesary, but valuable for debugging.
+    connection * conn = establish_connection(ip,port,__CLIENT_RECV);
+	recv_loop(conn);
+	close(conn -> fd); 
+	free(conn);
+}
+
+int recv_loop(connection * conn)
+{
+    printConnection(conn);
+    char buf[1024];
+    ssize_t bytes_rcvd;
+    ssize_t bytes_rspd;
+    struct sockaddr_in cli_addr;
+    memset(&cli_addr, 0, sizeof(cli_addr));
+    int len = sizeof(cli_addr);
+    do
+    {
+        printf("Waiting on data...\n");
+        bytes_rcvd = recvfrom(conn -> fd,(char *)buf, 1024,
+        MSG_WAITALL,(struct sockaddr *)&cli_addr,(socklen_t *)&len);
+        printf("\n---RCVD---\n");
+        write(STDOUT_FILENO,buf,bytes_rcvd);
+        printf("\n---ERCV---\n\n");
+        char sendbuf[32];
+        sprintf(sendbuf,"ACK %i",*((int *)buf));
+        bytes_rspd = sendto(conn -> fd, sendbuf,strlen(sendbuf) + 1, 
+            MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
+        advance_macs(conn -> ip,__CLIENT_RECV);
+    } while (strncmp(buf,"ENDMSG",6));
+    
+}
+
+void cleanup(uint8_t * orig, char * ip)
+{
+	set_mac(__IFACE,orig);
+	char cmd[64];
+	sprintf(cmd,"arp -d %s",ip);
+	system(cmd);
 }
 
 void chat(char * ip,int port)
@@ -201,49 +245,6 @@ void * chat_recv(void * arg){
 
 }
 
-
-void recv_content(char * ip, int port)
-{
-    //The IP here is technically unneccesary
-    connection * conn = establish_connection(ip,port,__CLIENT_RECV);
-	recv_loop(conn);
-	close(conn -> fd); 
-	free(conn);
-}
-
-int recv_loop(connection * conn)
-{
-    printConnection(conn);
-    char buf[1024];
-    ssize_t bytes_rcvd;
-    ssize_t bytes_rspd;
-    struct sockaddr_in cli_addr;
-    memset(&cli_addr, 0, sizeof(cli_addr));
-    int len = sizeof(cli_addr);
-    do
-    {
-        printf("Waiting on data...\n");
-        bytes_rcvd = recvfrom(conn -> fd,(char *)buf, 1024,
-        MSG_WAITALL,(struct sockaddr *)&cli_addr,(socklen_t *)&len);
-        printf("\n---RCVD---\n");
-        write(STDOUT_FILENO,buf,bytes_rcvd);
-        printf("\n---ERCV---\n\n");
-        char sendbuf[32];
-        sprintf(sendbuf,"ACK %i",*((int *)buf));
-        bytes_rspd = sendto(conn -> fd, sendbuf,strlen(sendbuf) + 1, 
-            MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
-        advance_macs(conn -> ip,__CLIENT_RECV);
-    } while (strncmp(buf,"ENDMSG",6));
-    
-}
-
-void cleanup(uint8_t * orig, char * ip)
-{
-	set_mac(__IFACE,orig);
-	char cmd[64];
-	sprintf(cmd,"arp -d %s",ip);
-	system(cmd);
-}
 
 int client_main(int argc, char ** argv, int mode)
 {	

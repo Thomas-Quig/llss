@@ -12,6 +12,9 @@
 #include "../utils/utils.h"
 
 #define __IFACE "wlan0"
+
+ssize_t ssend(connection * conn, char * data, size_t size);
+
 /**
 *   Changes your current mac address
 *   Returns 0 on success, -1 otherwise
