@@ -16,7 +16,8 @@
 #define __ADV_OTHR 2
 
 
-ssize_t ssend(connection * conn, char * data, size_t size);
+ssize_t s_send(connection * conn, char * data, size_t size);
+ssize_t s_ack(connection * conn, char * data, size_t size, struct sockaddr * cli_addr);
 
 /**
 *   Changes your current mac address

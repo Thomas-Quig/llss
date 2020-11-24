@@ -140,7 +140,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         ssize_t tmp_sent = 0;
         size_t to_send = min(content_size - tot_sent,__FRAGMENT_SIZE);
 
-        tmp_sent = ssend(conn,content + tot_sent, to_send);
+        tmp_sent = s_send(conn,content + tot_sent, to_send);
         tot_sent += tmp_sent;
         //printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
         advance_mac(conn,next_macs,__ADV_SELF);
@@ -160,7 +160,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         }
         advance_mac(conn,next_macs,__ADV_OTHR);
     }
-    ssend(conn,"ENDMSG",6);
+    s_send(conn,"ENDMSG",6);
 }
 
 void recv_content(char * ip, int port)
@@ -180,7 +180,6 @@ int recv_loop(connection * conn)
     ssize_t bytes_rspd;
     struct sockaddr_in cli_addr;
     memset(&cli_addr, 0, sizeof(cli_addr));
-    int len = sizeof(cli_addr);
     do
     {
         char * next_macs = get_next_macs(__CLIENT_RECV);
@@ -196,9 +195,12 @@ int recv_loop(connection * conn)
         
         char sendbuf[32];
         memset(sendbuf,0,32);
-        sprintf(sendbuf,"ACK %i",*((int *)buf));
-        bytes_rspd = sendto(conn -> fd, sendbuf,strlen(sendbuf) + 1, 
-            MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
+        sprintf(sendbuf,"ACK: %i",*((int *)buf));
+        dbprintf("respond()");
+        
+        bytes_rspd = s_ack(conn, );
+        //sendto(conn -> fd, sendbuf,strlen(sendbuf), 
+        //    MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
         
         advance_mac(conn,next_macs,__ADV_SELF);
     } while (strncmp(buf,"ENDMSG",6));
