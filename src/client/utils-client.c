@@ -10,12 +10,14 @@ ssize_t s_send(connection * conn, char * data, size_t size)
 				sizeof(conn -> s_addr));
 }
 
-ssize_t s_ack(connection * conn, char * data, size_t size, struct sockaddr_in * cli_addr)
+ssize_t s_recv(connection * conn, char * data, size_t size)
 {
-    dbprintf("s_ack(%p,\"%.8s...\",%d,%p)\n",conn,data,size,cli_addr);
-    return sendto(conn -> fd, data,size, 
-            MSG_CONFIRM, (const struct sockaddr *)cli_addr, sizeof(*cli_addr));
+    dbprintf("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
+    return recvfrom(conn -> fd, data, size, 
+			MSG_WAITALL, (const struct sockaddr *) &(conn -> s_addr),  
+				sizeof(conn -> s_addr));
 }
+
 
 int ping(connection * conn)
 {
