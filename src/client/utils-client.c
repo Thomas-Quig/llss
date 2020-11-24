@@ -17,6 +17,13 @@ ssize_t s_ack(connection * conn, char * data, size_t size, struct sockaddr_in * 
             MSG_CONFIRM, (const struct sockaddr *)cli_addr, sizeof(*cli_addr));
 }
 
+int ping(connection * conn)
+{
+    if(sendto(conn -> fd,"PING",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),sizeof(conn -> s_addr)) == -1)
+    return errno;
+    char rsp[5];
+}
+
 int set_mac(char * iface, char * newMac)
 {
     char cmd[64];

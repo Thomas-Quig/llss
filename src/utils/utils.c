@@ -20,21 +20,10 @@ connection * establish_connection(char * addr, int port, int mode)
     // Filling server information 
     (ret -> s_addr).sin_family = AF_INET; 
     (ret -> s_addr).sin_port = htons(port);
-    if(mode == __CLIENT_RECV){
-        (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
-        if(bind(ret -> fd, (const struct sockaddr *)&(ret -> s_addr),
-            sizeof(ret -> s_addr)) == -1)
-        {
-            perror("rcv-bind failed");
-            printf("errno: %i",errno);
-            exit(EXIT_FAILURE);
-        }
-    }
-    else{
-        (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
-    }
+    (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
     
     strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
+    srand((unsigned int)(ret -> secret));
 	return ret;
 }
 
@@ -100,7 +89,6 @@ char * estab_shared_secret(connection * conn, int mode)
 {
     char * ret = malloc(32);
     strncpy(ret,"0123456789ABCDEF0123456789ABCDEF",32);
-    printf("Shared Secret: %.*s\n",32,ret);
     return ret;
     DH *mykey;
     int codes;
