@@ -4,7 +4,7 @@
 
 ssize_t s_send(connection * conn, char * data, size_t size)
 {
-    dbprintf("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 9);
+    dbprintf("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
     return sendto(conn -> fd, (const char *)(data), size, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
 				sizeof(conn -> s_addr));

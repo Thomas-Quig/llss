@@ -180,14 +180,14 @@ int recv_loop(connection * conn)
     ssize_t bytes_rspd;
     struct sockaddr_in cli_addr;
     int len = sizeof(cli_addr);
-    memset(&cli_addr, 0, sizeof(cli_addr));
     do
     {
+        memset(&cli_addr, 0, sizeof(cli_addr));
         char * next_macs = get_next_macs(__CLIENT_RECV);
 
         printf("Waiting on data...\n");
         bytes_rcvd = recvfrom(conn -> fd,(char *)buf, 1024,
-        MSG_WAITALL,(struct sockaddr *)&cli_addr,(socklen_t *)&len);
+            MSG_WAITALL,(struct sockaddr *)&cli_addr,(socklen_t *)&len);
         advance_mac(conn,next_macs,__ADV_OTHR);
 
         printf("\n---RCVD---\n");
