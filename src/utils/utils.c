@@ -23,6 +23,7 @@ connection * establish_connection(char * addr, int port, int mode)
     (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
     
     strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
+    ret -> s_len = sizeof(ret -> s_addr);
     srand((unsigned int)(ret -> secret));
 	return ret;
 }

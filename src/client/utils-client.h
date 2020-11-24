@@ -18,8 +18,6 @@
 
 ssize_t s_send(connection * conn, char * data, size_t size);
 ssize_t s_recv(connection * conn, char * data, size_t size);
-ssize_t s_ack(connection * conn, char * data, size_t size, struct sockaddr_in * cli_addr);
-
 /**
 *   Changes your current mac address
 *   Returns 0 on success, -1 otherwise

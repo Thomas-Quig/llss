@@ -148,11 +148,9 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         int acked = 0;
         while(!(acked))
         {
-            int len;
+            
             char response[65];
-            ssize_t rf_resp = recvfrom(conn -> fd, response, 64,  
-					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
-					(socklen_t * )&len);
+            ssize_t rf_resp = s_recv(conn,response,64);
             response[rf_resp] = '\0';
             printf("[RSP] Response receieved...\n\"%s\"\n[End Response]\n\n",response);
             if(!strncmp(response,"ACK",3))
