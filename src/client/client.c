@@ -179,6 +179,7 @@ int recv_loop(connection * conn)
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
     struct sockaddr_in cli_addr;
+    int len = sizeof(cli_addr);
     memset(&cli_addr, 0, sizeof(cli_addr));
     do
     {
@@ -193,12 +194,11 @@ int recv_loop(connection * conn)
         write(STDOUT_FILENO,buf,bytes_rcvd);
         printf("\n---ERCV---\n\n");
         
-        char sendbuf[32];
-        memset(sendbuf,0,32);
-        sprintf(sendbuf,"ACK: %i",*((int *)buf));
-        dbprintf("respond()");
+        char resp_buf[32];
+        memset(resp_buf,0,32);
+        sprintf(resp_buf,"ACK: %i",*((int *)buf));
         
-        bytes_rspd = s_ack(conn, );
+        bytes_rspd = s_ack(conn, resp_buf,strlen(resp_buf),&cli_addr);
         //sendto(conn -> fd, sendbuf,strlen(sendbuf), 
         //    MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
         
