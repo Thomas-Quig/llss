@@ -173,6 +173,7 @@ int recv_loop(connection * conn)
 {
     printConnection(conn);
     char rcv_buf[__FRAG_SIZE];
+    memset(rcv_buf,0,16);
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
     do
