@@ -12,9 +12,9 @@ void sig_handler(int signo)
     {
         printf("\nReceived user interrupt via ^C, safely exiting...\n");
         char cmd[32];
-        memset(cmd,0,32);
-        sprintf(cmd,"arp -d %s",_ohost_ip);
-        system(cmd);
+        //memset(cmd,0,32);
+        //sprintf(cmd,"arp -d %s",_ohost_ip);
+        //system(cmd);
         sprintf(cmd,"ping -c 1 %s",_ohost_ip);
         printf("Ensure arp has recovered with 'arp %s'\n",_ohost_ip);
         exit(0);
