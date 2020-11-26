@@ -43,10 +43,9 @@ int pong(connection * conn)
     char buf[5];
     int len;
     memset(buf,0,5);
-    if(recvfrom(conn -> fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1)
+    while(recvfrom(conn -> fd,buf,4,MSG_DONTWAIT,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1 && errno == EAGAIN)
     {
         perror("Ping Fail:");
-        return errno;
     } 
     printf("Ping Worked!!!");
     if(sendto(conn -> fd,"PONG",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
