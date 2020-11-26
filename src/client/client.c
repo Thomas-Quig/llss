@@ -39,7 +39,7 @@ int client_main(int argc, char ** argv, int mode)
             custom_test_code(argc,argv);
             break;
         case __CLIENT_RECV:
-            ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_RECV));
+            pong(establish_connection(argv[2],atoi(argv[3]),__CLIENT_RECV));
             //recv_content(argv[2],atoi(argv[3]));
             break;
         case __CLIENT_SEND:
