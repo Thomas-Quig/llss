@@ -13,6 +13,11 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
 {
     dbprintf("s_recv(%p,%p,%d)\n",conn,data,size);
     //return recv(conn -> fd, data, size - 1, MSG_WAITALL);
+    (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
+    if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
+    {
+        perror("advance-bind");
+    }
     return recvfrom(conn -> fd, data, size, 
 			0, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
 }
@@ -134,7 +139,7 @@ char * get_next_macs(int mode)
     return new_macs;
 }
 
-int advance_mac(connection * conn, char *macs, int who, int mode)
+int advance_mac(connection * conn, char *macs, int who,)
 {
     char *my_new_mac = macs;
     char *ot_new_mac = macs + 6;
@@ -146,14 +151,6 @@ int advance_mac(connection * conn, char *macs, int who, int mode)
         close(conn -> fd);
         set_mac(__IFACE,my_new_mac);
         conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
-        if(mode == __CLIENT_RECV)
-        {
-            (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
-            if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
-            {
-                perror("advance-bind");
-            }
-        }
     }
     else if(who == __ADV_OTHR)
     {
