@@ -142,13 +142,12 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
 
         tmp_sent = s_send(conn,content + tot_sent, to_send);
         tot_sent += tmp_sent;
-        //printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
+        printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
         //advance_mac(conn,next_macs,__ADV_SELF);
 
         int acked = 0;
         while(!(acked))
         {
-            
             char response[65];
             ssize_t rf_resp = s_recv(conn,response,64);
             response[rf_resp] = '\0';
@@ -182,6 +181,7 @@ int recv_loop(connection * conn)
 
         printf("Waiting on data...\n");
         bytes_rcvd = s_recv(conn,rcv_buf,__FRAG_SIZE);
+        printf("[RCVD] Received %d bytes\n",bytes_rcvd);
         //advance_mac(conn,next_macs,__ADV_OTHR);
 
         printf("\n---RCVD---\n");
