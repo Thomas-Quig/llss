@@ -2,6 +2,8 @@
 
 int server_main(int argc, char ** argv)
 {
+    printf("DEPRECATED, DONT RUN THIS CODE\n");
+    /**
 	int sockfd; 
     char buffer[1024]; 
     char *hello = "Hello from server"; 
@@ -45,5 +47,5 @@ int server_main(int argc, char ** argv)
 				len); 
 		printf("Response sent.\n"); 
 	} 
-    return 0; 
+    return 0;**/
 }
