@@ -93,8 +93,8 @@ int set_mac(char * iface, char * newMac)
         printf("explain-ioctl: %s\n",explain_errno_ioctl(errno,s,SIOCSIFHWADDR, &ifr));
         return EXIT_FAILURE;
 	  }
-
-	  
+    
+    printf("New Mac: %s\n",format_mac(get_mac(__IFACE)));
 }
 
 void set_arp_cache(char * ip, char * _new_mac)
@@ -104,7 +104,7 @@ void set_arp_cache(char * ip, char * _new_mac)
 	sprintf(cmd,"arp -s %s %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	//printf("cmd \"%s\"\n",cmd);
 	system(cmd);
-  
+    system("arp -a");
 }
 char safe_rand(int i)
 {
