@@ -5,18 +5,20 @@
 
 static pthread_t chat_threads[2];
 static char _ohost_ip[16];
-
+static char _orig_mac[6];
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
     {
         printf("\nReceived user interrupt via ^C, safely exiting...\n");
+        set_mac(__IFACE,_orig_mac);
         char cmd[128];
         memset(cmd,0,128);
         sprintf(cmd,"arp -d %s",_ohost_ip);
         system(cmd);
         sprintf(cmd,"ping -c 10 -I wlan0 %s",_ohost_ip);
         printf("Ensure arp has recovered with 'arp %s'\n",_ohost_ip);
+
         exit(0);
     }
 }
@@ -28,7 +30,7 @@ int client_main(int argc, char ** argv, int mode)
         strncpy(_ohost_ip,argv[2],min(strlen(argv[2]),15));
 
 	printf("Original Mac: ");
-	char _orig_mac[6];
+	
     memcpy(_orig_mac,get_mac(__IFACE),12);
 	print_mac(__IFACE);nl();
 
