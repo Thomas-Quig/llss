@@ -11,7 +11,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
 
 ssize_t s_recv(connection * conn, char * data, size_t size)
 {
-    dbprintf("s_recv(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
+    dbprintf("s_recv(%p,%p,%d)\n",conn,data,size);
     return recvfrom(conn -> fd, data, size, 
 			MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
 }
