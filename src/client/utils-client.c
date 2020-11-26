@@ -148,6 +148,7 @@ int advance_mac(connection * conn, char *macs, int who, int mode)
         conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
         if(mode == __CLIENT_RECV)
         {
+            (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
             if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
             {
                 perror("advance-bind");
