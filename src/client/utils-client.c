@@ -134,7 +134,7 @@ char * get_next_macs(int mode)
     return new_macs;
 }
 
-int advance_mac(connection * conn, char *macs, int who)
+int advance_mac(connection * conn, char *macs, int who, int mode)
 {
     char *my_new_mac = macs;
     char *ot_new_mac = macs + 6;
@@ -146,6 +146,13 @@ int advance_mac(connection * conn, char *macs, int who)
         close(conn -> fd);
         set_mac(__IFACE,my_new_mac);
         conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
+        if(mode == __CLIENT_RECV)
+        {
+            if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
+            {
+                perror("advance-bind");
+            }
+        }
     }
     else if(who == __ADV_OTHR)
     {
