@@ -24,8 +24,8 @@ connection * establish_connection(char * addr, int port, int mode)
     
     strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
     ret -> s_len = sizeof(ret -> s_addr);
-    printf("Secret int%d\n",(unsigned int)(ret -> secret));
-    srand((unsigned int)(ret -> secret));
+    printf("Secret int: %d\n",(unsigned int)(ret -> secret));
+    srand(420);
 	return ret;
 }
 
