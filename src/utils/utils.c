@@ -27,6 +27,7 @@ connection * establish_connection(char * addr, int port, int mode)
     ret -> s_len = sizeof(ret -> s_addr);
     if(mode == __CLIENT_RECV)
     {
+        (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
         if(bind(ret -> fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
         {
             perror("bind");
