@@ -22,10 +22,7 @@ connection * establish_connection(char * addr, int port, int mode)
     (ret -> s_addr).sin_family = AF_INET; 
     (ret -> s_addr).sin_port = htons(port);
     (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
-    
-    strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
-    ret -> s_len = sizeof(ret -> s_addr);
-    if(mode == __CLIENT_RECV)
+    /**if(mode == __CLIENT_RECV)
     {
         (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
         if(bind(ret -> fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
@@ -33,7 +30,9 @@ connection * establish_connection(char * addr, int port, int mode)
             perror("bind");
             return NULL;
         }
-    }
+    }**/
+    strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
+    ret -> s_len = sizeof(ret -> s_addr);
     printf("Secret int: %d\n",(unsigned int)(ret -> secret));
     srand(420);
 	return ret;

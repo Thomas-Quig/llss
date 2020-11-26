@@ -166,7 +166,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
 void recv_content(char * ip, int port)
 {
     //The IP here is technically unneccesary, but valuable for debugging.
-    connection * conn = establish_connection(ip,port);
+    connection * conn = establish_connection(ip,port,__CLIENT_RECV);
 	recv_loop(conn);
 	close(conn -> fd); 
 	free(conn);
@@ -224,7 +224,7 @@ void chat(char * ip,int port)
 int chat_loop(connection * conn)
 {
 	
-	char _currmac[6] = {0x00,0x00,0x00,0x00,0x00,0x11};
+	char _currmac[6] = {0x00,0x00,0x00,0x00,0x00,0x116};
 	while(1)
 	{
         break;
