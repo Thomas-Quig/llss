@@ -20,7 +20,7 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
 
 int ping(connection * conn)
 {
-    if(sendto(conn -> fd,"PING",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),sizeof(conn -> s_addr)) == -1)
+    if(sendto(conn -> fd,"PING",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("Ping Fail:");
         return errno;
@@ -29,7 +29,7 @@ int ping(connection * conn)
     char buf[5];
     int len;
     memset(buf,0,5);
-    if(recvfrom(conn -> fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),sizeof(conn -> s_addr)) == -1)
+    if(recvfrom(conn -> fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1)
     {
         perror("Pong Fail:");
         return errno;
@@ -43,12 +43,12 @@ int pong(connection * conn)
     char buf[5];
     int len;
     memset(buf,0,5);
-    if(recvfrom(conn -> fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),sizeof(conn -> s_addr)) == -1)
+    if(recvfrom(conn -> fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1)
     {
         perror("Ping Fail:");
         return errno;
     } 
-    if(sendto(conn -> fd,"PONG",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),sizeof(conn -> s_addr)) == -1)
+    if(sendto(conn -> fd,"PONG",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("Pong Fail:");
         return errno;
