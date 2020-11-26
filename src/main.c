@@ -34,7 +34,7 @@ int main(int argc, char ** argv){
         }
         else if(argc == 2 && (!strncmp(argv[1],"help",5) || !strncmp(argv[1],"-h",3) || !strncmp(argv[1],"--help",7)))
         {
-            printf("usage: llss (client,server) <args>\n");
+            printf("usage: llss (cli,snd,rcv,svr) <ip> <port> [args]\n");
             return 0;
         }
     }
