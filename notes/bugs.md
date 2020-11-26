@@ -9,7 +9,7 @@ You see, the thing I didnt realize *at the time* is that DHCP is costly and very
     I could maybe maybe do it later but thats not for now. Gives me a good idea for a app name. "Chaos Agent" which just shuffles EVERYTHING but maintains communication somehow.
 2. The communication would break between the two hosts
 3. *SSH would break*
-
+Ssh breaking was bad, because my workflow was heavily optimized and I was using SSH to control all three devices at once.
 
 ## Mac Address setting + Random
 TLDR (Fill in tomorrow)
