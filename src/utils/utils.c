@@ -5,8 +5,8 @@ connection * establish_connection(char * addr, int port, int mode)
 {
 	connection * ret = malloc(sizeof(connection));
     memset(ret,0,sizeof(connection));
+    memset(ret -> ip, 0,16);
 	strncpy(ret -> ip,addr,strlen(addr));
-	(ret -> ip)[strlen(addr)] = '\0';
 	ret -> port = port;
     memset(&(ret -> s_addr),0,sizeof(ret -> s_addr));
   

@@ -12,9 +12,9 @@ ssize_t s_send(connection * conn, char * data, size_t size)
 ssize_t s_recv(connection * conn, char * data, size_t size)
 {
     dbprintf("s_recv(%p,%p,%d)\n",conn,data,size);
-    return recv(conn -> fd, data, size - 1, MSG_WAITALL);
+    //return recv(conn -> fd, data, size - 1, MSG_WAITALL);
     return recvfrom(conn -> fd, data, size, 
-			MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
+			NULL, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
 }
 
 
