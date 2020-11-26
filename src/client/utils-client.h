@@ -14,7 +14,7 @@
 #define __IFACE "wlan0"
 #define __ADV_SELF 1
 #define __ADV_OTHR 2
-
+#define __ADVANCE_MACS 0
 
 ssize_t s_send(connection * conn, char * data, size_t size);
 ssize_t s_recv(connection * conn, char * data, size_t size);

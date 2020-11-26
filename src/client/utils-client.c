@@ -141,6 +141,8 @@ char * get_next_macs(int mode)
 
 int advance_mac(connection * conn, char *macs, int who)
 {
+    if(!__ADVANCE_MACS)
+        return 2;
     char *my_new_mac = macs;
     char *ot_new_mac = macs + 6;
     dbprintf("advance_mac(%p,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x %.2x:%.2x:%.2x:%.2x:%.2x:%.2x,%i)\n",conn,my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
