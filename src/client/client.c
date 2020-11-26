@@ -11,11 +11,11 @@ void sig_handler(int signo)
     if (signo == SIGINT)
     {
         printf("\nReceived user interrupt via ^C, safely exiting...\n");
-        char cmd[32];
-        //memset(cmd,0,32);
-        //sprintf(cmd,"arp -d %s",_ohost_ip);
-        //system(cmd);
-        sprintf(cmd,"ping -c 1 %s",_ohost_ip);
+        char cmd[128];
+        memset(cmd,0,128);
+        sprintf(cmd,"arp -d %s",_ohost_ip);
+        system(cmd);
+        sprintf(cmd,"ping -c 10 -I wlan0 %s",_ohost_ip);
         printf("Ensure arp has recovered with 'arp %s'\n",_ohost_ip);
         exit(0);
     }
@@ -39,19 +39,19 @@ int client_main(int argc, char ** argv, int mode)
             custom_test_code(argc,argv);
             break;
         case __CLIENT_RECV:
-            pong(establish_connection(argv[2],atoi(argv[3]),__CLIENT_RECV));
-            //recv_content(argv[2],atoi(argv[3]));
+            //pong(establish_connection(argv[2],atoi(argv[3]),__CLIENT_RECV));
+            recv_content(argv[2],atoi(argv[3]));
             break;
         case __CLIENT_SEND:
             if(access(argv[4],F_OK) != -1)
             {
-                ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_SEND));
-                //send_content(argv[2],atoi(argv[3]),argv[4],__SEND_FILE);
+                //ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_SEND));
+                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_FILE);
             }
             else
             {
-                ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_SEND));
-                //send_content(argv[2],atoi(argv[3]),argv[4],__SEND_MESSAGE);
+                //ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_SEND));
+                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_MESSAGE);
             }
             break;
         case __CLIENT_CHAT:
