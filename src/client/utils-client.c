@@ -139,7 +139,7 @@ char * get_next_macs(int mode)
     return new_macs;
 }
 
-int advance_mac(connection * conn, char *macs, int who,)
+int advance_mac(connection * conn, char *macs, int who)
 {
     char *my_new_mac = macs;
     char *ot_new_mac = macs + 6;
