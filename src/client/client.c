@@ -143,7 +143,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         tmp_sent = s_send(conn,content + tot_sent, to_send);
         tot_sent += tmp_sent;
         //printf("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
-        advance_mac(conn,next_macs,__ADV_SELF);
+        //advance_mac(conn,next_macs,__ADV_SELF);
 
         int acked = 0;
         while(!(acked))
@@ -156,7 +156,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
             if(!strncmp(response,"ACK",3))
                 acked = 1;
         }
-        advance_mac(conn,next_macs,__ADV_OTHR);
+        //advance_mac(conn,next_macs,__ADV_OTHR);
     }
     s_send(conn,"ENDMSG",6);
 }
@@ -182,7 +182,7 @@ int recv_loop(connection * conn)
 
         printf("Waiting on data...\n");
         bytes_rcvd = s_recv(conn,rcv_buf,__FRAG_SIZE);
-        advance_mac(conn,next_macs,__ADV_OTHR);
+        //advance_mac(conn,next_macs,__ADV_OTHR);
 
         printf("\n---RCVD---\n");
         write(STDOUT_FILENO,rcv_buf,bytes_rcvd);
@@ -196,7 +196,7 @@ int recv_loop(connection * conn)
         //sendto(conn -> fd, sendbuf,strlen(sendbuf), 
         //    MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
         
-        advance_mac(conn,next_macs,__ADV_SELF);
+        //advance_mac(conn,next_macs,__ADV_SELF);
     } while (strncmp(rcv_buf,"ENDMSG",6));
     
 }
