@@ -29,5 +29,5 @@ solutions I tried
 
 random effing me over
     fuzzing
-    eric huber shoutout
+    eric shoutout
 

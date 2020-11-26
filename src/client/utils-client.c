@@ -2,12 +2,26 @@
 
 // Found on https://www.linuxquestions.org/questions/programming-9/how-to-change-mac-addres-via-c-code-801613/
 
-ssize_t ssend(connection * conn, char * data, size_t size)
+ssize_t s_send(connection * conn, char * data, size_t size)
 {
-    dbprintf("ssend(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 9);
-    return sendto(conn -> fd, (const char *)(data), size, 
-			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
-				sizeof(conn -> s_addr));
+    dbprintf("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
+    return sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
+            (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
+}
+
+ssize_t s_recv(connection * conn, char * data, size_t size)
+{
+    dbprintf("s_recv(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
+    return recvfrom(conn -> fd, data, size, 
+			MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
+}
+
+
+int ping(connection * conn)
+{
+    if(sendto(conn -> fd,"PING",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),sizeof(conn -> s_addr)) == -1)
+        return errno;
+    char rsp[5];
 }
 
 int set_mac(char * iface, char * newMac)

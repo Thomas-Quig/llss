@@ -16,8 +16,8 @@
 #define __ADV_OTHR 2
 
 
-ssize_t ssend(connection * conn, char * data, size_t size);
-
+ssize_t s_send(connection * conn, char * data, size_t size);
+ssize_t s_recv(connection * conn, char * data, size_t size);
 /**
 *   Changes your current mac address
 *   Returns 0 on success, -1 otherwise
