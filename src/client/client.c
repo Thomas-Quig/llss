@@ -39,16 +39,19 @@ int client_main(int argc, char ** argv, int mode)
             custom_test_code(argc,argv);
             break;
         case __CLIENT_RECV:
-            recv_content(argv[2],atoi(argv[3]));
+            ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_RECV));
+            //recv_content(argv[2],atoi(argv[3]));
             break;
         case __CLIENT_SEND:
             if(access(argv[4],F_OK) != -1)
             {
-                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_FILE);
+                ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_SEND));
+                //send_content(argv[2],atoi(argv[3]),argv[4],__SEND_FILE);
             }
             else
             {
-                send_content(argv[2],atoi(argv[3]),argv[4],__SEND_MESSAGE);
+                ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_SEND));
+                //send_content(argv[2],atoi(argv[3]),argv[4],__SEND_MESSAGE);
             }
             break;
         case __CLIENT_CHAT:
