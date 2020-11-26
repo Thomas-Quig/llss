@@ -25,7 +25,7 @@ int ping(connection * conn)
         perror("Ping Fail:");
         return errno;
     }
-        
+    printf("Ping Worked (Always)\n");
     char buf[5];
     int len;
     memset(buf,0,5);
@@ -48,6 +48,7 @@ int pong(connection * conn)
         perror("Ping Fail:");
         return errno;
     } 
+    printf("Ping Worked!!!");
     if(sendto(conn -> fd,"PONG",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("Pong Fail:");
