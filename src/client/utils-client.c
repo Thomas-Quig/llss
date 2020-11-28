@@ -68,6 +68,7 @@ int set_mac(char * iface, char * newMac)
     //return EXIT_SUCCESS;
     //printf("%d:%d:%d:%d:%d:%d\n",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     struct ifreq ifr;
+    memset(ifr,0,sizeof(ifreq));
     int s;
 
     s = socket(AF_INET, SOCK_DGRAM, 0);
