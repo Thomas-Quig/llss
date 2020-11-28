@@ -148,7 +148,7 @@ int advance_mac(connection * conn, char *macs, int who)
         close(conn -> fd);
         set_mac(__IFACE,my_new_mac);
         conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
-        if(connection -> mode == __CLIENT_RECV)
+        if(conn -> mode == __CLIENT_RECV)
         {
             (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
             if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
