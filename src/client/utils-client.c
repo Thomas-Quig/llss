@@ -60,15 +60,14 @@ int pong(connection * conn)
 
 int set_mac(char * iface, char * newMac)
 {
-    /**char cmd[64];
+    char cmd[64];
     memset(cmd,0,64);
     sprintf(cmd,"ifconfig %s hw ether %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
-    system(cmd);**/
+    system(cmd);
     dbprintf("set_mac(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
-    //return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
     //printf("%d:%d:%d:%d:%d:%d\n",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     struct ifreq ifr;
-    memset(ifr,0,sizeof(ifreq));
     int s;
 
     s = socket(AF_INET, SOCK_DGRAM, 0);
