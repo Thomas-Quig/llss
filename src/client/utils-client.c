@@ -13,8 +13,18 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
 {
     dbprintf("s_recv(%p,%p,%d)\n",conn,data,size);
     //return recv(conn -> fd, data, size - 1, MSG_WAITALL);
-    return recvfrom(conn -> fd, data, size, 
+    (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
+    if(bind(ret -> fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
+    {
+        perror("bind");
+        return NULL;
+    }
+
+    ssize_t retval = recvfrom(conn -> fd, data, size, 
 			0, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
+    close(ret -> fd);
+    socket(ret -> fd, AF_INET, SOCK_DGRAM,0);
+    return retval;
 }
 
 
