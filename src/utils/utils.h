@@ -64,6 +64,7 @@
  * @param secret 256 bit shared secret key created by the diffie hellman process when establishing a "connection" between two hosts.
  **/
 typedef struct _connection{
+    int mode;
     char ip[16];
     int port;
     int fd;
