@@ -24,7 +24,7 @@ connection * establish_connection(char * addr, int port, int mode)
     (ret -> s_addr).sin_port = htons(port);
     (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
     ret -> s_len = sizeof(ret -> s_addr);
-    if(mode == __CLIENT_RECV)
+    if(mode != 0)
     {
         (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
         if(bind(ret -> fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
