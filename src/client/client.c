@@ -11,7 +11,7 @@ void sig_handler(int signo)
     if (signo == SIGINT)
     {
         printf("\nReceived user interrupt via ^C, safely exiting...\n");
-        set_mac(__IFACE,_orig_mac);
+        //set_mac(__IFACE,_orig_mac);
         char cmd[128];
         memset(cmd,0,128);
         sprintf(cmd,"arp -d %s",_ohost_ip);
