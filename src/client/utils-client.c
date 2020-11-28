@@ -5,6 +5,8 @@
 ssize_t s_send(connection * conn, char * data, size_t size)
 {
     dbprintf("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
+    close(conn -> fd);
+    conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     return sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
 }
