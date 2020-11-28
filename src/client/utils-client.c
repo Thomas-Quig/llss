@@ -60,12 +60,12 @@ int pong(connection * conn)
 
 int set_mac(char * iface, char * newMac)
 {
-    char cmd[64];
+    /**char cmd[64];
     memset(cmd,0,64);
     sprintf(cmd,"ifconfig %s hw ether %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
-    system(cmd);
-    dbprintf("set_mac(%s,%x:%x:%x:%x:%x:%x)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
-    return EXIT_SUCCESS;
+    system(cmd);**/
+    dbprintf("set_mac(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
+    //return EXIT_SUCCESS;
     //printf("%d:%d:%d:%d:%d:%d\n",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     struct ifreq ifr;
     int s;
@@ -99,6 +99,7 @@ void set_arp_cache(char * ip, char * _new_mac)
 	system(cmd);
     system("arp -a");
 }
+
 char safe_rand(int i)
 {
     char c = (char)(rand() % 255);
@@ -107,6 +108,7 @@ char safe_rand(int i)
     }
     return c;
 }
+
 char * get_next_macs(int mode)
 {
     char * new_macs = malloc(12);
