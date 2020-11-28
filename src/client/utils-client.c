@@ -5,7 +5,7 @@
 ssize_t s_send(connection * conn, char * data, size_t size)
 {
     dbprintf("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
-    return sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
+    return sendto(conn -> snd_fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
 }
 
@@ -13,14 +13,14 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
 {
     dbprintf("s_recv(%p,%p,%d)\n",conn,data,size);
     //return recv(conn -> fd, data, size - 1, MSG_WAITALL);
-    return recvfrom(conn -> fd, data, size, 
+    return recvfrom(conn -> rcv_fd, data, size, 
 			0, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
 }
 
 
 int ping(connection * conn)
 {
-    if(sendto(conn -> fd,"PING",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
+    if(sendto(conn -> snd_fd,"PING",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("Ping Fail:");
         return errno;
@@ -29,7 +29,7 @@ int ping(connection * conn)
     char buf[5];
     int len;
     memset(buf,0,5);
-    if(recvfrom(conn -> fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1)
+    if(recvfrom(conn -> rcv_fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1)
     {
         perror("Pong Fail:");
         return errno;
@@ -45,12 +45,12 @@ int pong(connection * conn)
     memset(buf,0,5);
     printf("Waiting on ping...");
     int i = 0;
-    while(recvfrom(conn -> fd,buf,4,MSG_DONTWAIT,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1 && errno == EAGAIN)
+    while(recvfrom(conn -> snd_fd,buf,4,MSG_DONTWAIT,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1 && errno == EAGAIN)
     {
         i += 1;
     } 
     printf("Ping Worked after %i!!!\n",i);
-    if(sendto(conn -> fd,"PONG",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
+    if(sendto(conn -> rcv_fd,"PONG",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("Pong Fail:");
         return errno;

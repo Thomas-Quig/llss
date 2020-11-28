@@ -12,26 +12,29 @@ connection * establish_connection(char * addr, int port, int mode)
     memset(&(ret -> s_addr),0,sizeof(ret -> s_addr));
   
     // Creating socket file descriptor 
-    if ((ret -> fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-        perror("socket creation failed"); 
+    if ((ret -> snd_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("snd_fd fail"); 
+		free(ret);
+        return NULL;
+    }
+    if ((ret -> rcv_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("rcv_fd fail"); 
 		free(ret);
         return NULL;
     }
     memset(&(ret ->s_addr), 0, sizeof(ret -> s_addr)); 
-      
+    
     // Filling server information 
     (ret -> s_addr).sin_family = AF_INET; 
     (ret -> s_addr).sin_port = htons(port);
     (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
     ret -> s_len = sizeof(ret -> s_addr);
-    if(mode != 0)
+    
+    (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
+    if(bind(ret -> rcv_fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
     {
-        (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
-        if(bind(ret -> fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
-        {
-            perror("bind");
-            return NULL;
-        }
+        perror("bind");
+        return NULL;
     }
     strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
     printf("Secret int: %d\n",(unsigned int)(ret -> secret));
