@@ -220,7 +220,7 @@ void chat(char * ip,int port)
 	connection * conn = establish_connection(ip,port,__CLIENT_CHAT);
 	chat_loop(conn);
 	close(conn -> snd_fd); 
-    close(conn -> rcv_fd)
+    close(conn -> rcv_fd);
 	free(conn);
 }
 
