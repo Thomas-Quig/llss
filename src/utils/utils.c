@@ -13,12 +13,7 @@ connection * establish_connection(char * addr, int port, int mode)
   
     // Creating socket file descriptor 
     if ((ret -> snd_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-        perror("snd_fd fail"); 
-		free(ret);
-        return NULL;
-    }
-    if ((ret -> rcv_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-        perror("rcv_fd fail"); 
+        perror("snd-fd fail"); 
 		free(ret);
         return NULL;
     }
@@ -29,12 +24,14 @@ connection * establish_connection(char * addr, int port, int mode)
     (ret -> s_addr).sin_port = htons(port);
     (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
     ret -> s_len = sizeof(ret -> s_addr);
-    
-    (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
-    if(bind(ret -> rcv_fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
+    if(mode == __CLIENT_RECV)
     {
-        perror("bind");
-        return NULL;
+        (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
+        if(bind(ret -> fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
+        {
+            perror("bind");
+            return NULL;
+        }
     }
     strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
     printf("Secret int: %d\n",(unsigned int)(ret -> secret));
@@ -137,24 +134,24 @@ char * estab_shared_secret(connection * conn, int mode)
         char pubbuf[keysize];
         if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors();
 
-        ssize_t key_sent = sendto(conn -> snd_fd,pubbuf, keysize, 
+        ssize_t key_sent = sendto(conn -> fd,pubbuf, keysize, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
 			sizeof(conn -> s_addr));
         
-        ssize_t key_recv = recvfrom(conn -> rcv_fd, ohost, keysize,  
+        ssize_t key_recv = recvfrom(conn -> fd, ohost, keysize,  
 					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
 					(socklen_t * )&len); 
     }
     else if(mode == __CLIENT_RECV)
     {
-        ssize_t key_recv = recvfrom(conn -> rcv_fd, ohost, keysize,  
+        ssize_t key_recv = recvfrom(conn -> fd, ohost, keysize,  
 					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
 					(socklen_t * )&len);
 
         char pubbuf[keysize];
         if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors();
 
-        ssize_t key_sent = sendto(conn -> snd_fd,pubbuf, keysize, 
+        ssize_t key_sent = sendto(conn -> fd,pubbuf, keysize, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
 			sizeof(conn -> s_addr)); 
     }
@@ -183,7 +180,7 @@ void printConnection(connection * conn)
     printf("Connection %p\n",conn);
     printf("Addr: %s\n",conn -> ip);
     printf("Port: %i\n",conn ->port);
-    printf("FD: %i,%i\n",conn -> snd_fd,conn -> rcv_fd);
+    printf("FD: %i\n",conn -> fd);
     printf("Secret: %.*s\n",32,conn ->secret);
     printf("Saddr: %p\n",conn -> s_addr);
 }

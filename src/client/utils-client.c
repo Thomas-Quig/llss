@@ -5,22 +5,22 @@
 ssize_t s_send(connection * conn, char * data, size_t size)
 {
     dbprintf("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
-    return sendto(conn -> snd_fd, (const char *)(data), size, MSG_CONFIRM,
+    return sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
 }
 
 ssize_t s_recv(connection * conn, char * data, size_t size)
 {
     dbprintf("s_recv(%p,%p,%d)\n",conn,data,size);
-    //return recv(conn -> rcv_fd, data, size - 1, MSG_WAITALL);
-    return recvfrom(conn -> rcv_fd, data, size, 
+    //return recv(conn -> fd, data, size - 1, MSG_WAITALL);
+    return recvfrom(conn -> fd, data, size, 
 			0, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
 }
 
 
 int ping(connection * conn)
 {
-    if(sendto(conn -> snd_fd,"PING",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
+    if(sendto(conn -> fd,"PING",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("Ping Fail:");
         return errno;
@@ -29,7 +29,7 @@ int ping(connection * conn)
     char buf[5];
     int len;
     memset(buf,0,5);
-    if(recvfrom(conn -> rcv_fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1)
+    if(recvfrom(conn -> fd,buf,4,0,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1)
     {
         perror("Pong Fail:");
         return errno;
@@ -45,12 +45,12 @@ int pong(connection * conn)
     memset(buf,0,5);
     printf("Waiting on ping...");
     int i = 0;
-    while(recvfrom(conn -> snd_fd,buf,4,MSG_DONTWAIT,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1 && errno == EAGAIN)
+    while(recvfrom(conn -> fd,buf,4,MSG_DONTWAIT,(struct sockaddr *)&(conn -> s_addr),&(conn -> s_len)) == -1 && errno == EAGAIN)
     {
         i += 1;
     } 
     printf("Ping Worked after %i!!!\n",i);
-    if(sendto(conn -> rcv_fd,"PONG",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
+    if(sendto(conn -> fd,"PONG",4,MSG_CONFIRM,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("Pong Fail:");
         return errno;
@@ -64,7 +64,7 @@ int set_mac(char * iface, char * newMac)
     memset(cmd,0,64);
     sprintf(cmd,"ifconfig %s hw ether %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     system(cmd);
-    dbprintf("set_mac(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
+    dbprintf("set_mac(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%x)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     return EXIT_SUCCESS;
     //printf("%d:%d:%d:%d:%d:%d\n",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     struct ifreq ifr;
@@ -147,15 +147,16 @@ int advance_mac(connection * conn, char *macs, int who)
     
     if(who == __ADV_SELF)
     {
-        close(conn -> snd_fd);
-        close(conn -> rcv_fd);
+        close(conn -> fd);
         set_mac(__IFACE,my_new_mac);
-        conn -> snd_fd = socket(AF_INET, SOCK_DGRAM, 0);
-        conn -> rcv_fd = socket(AF_INET, SOCK_DGRAM, 0);
-        (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
-        if(bind(conn -> rcv_fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
+        conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
+        if(conn -> mode == __CLIENT_RECV)
         {
-            perror("advance-bind");
+            (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
+            if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
+            {
+                perror("advance-bind");
+            }
         }
     }
     else if(who == __ADV_OTHR)

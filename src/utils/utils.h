@@ -67,8 +67,7 @@ typedef struct _connection{
     int mode;
     char ip[16];
     int port;
-    int snd_fd;
-    int rcv_fd;
+    int fd;
     struct sockaddr_in s_addr;
     socklen_t s_len;
     char secret[32];

@@ -170,8 +170,7 @@ void recv_content(char * ip, int port)
     //The IP here is technically unneccesary, but valuable for debugging.
     connection * conn = establish_connection(ip,port,__CLIENT_RECV);
 	recv_loop(conn);
-	close(conn -> snd_fd); 
-    close(conn -> rcv_fd);
+	close(conn -> fd); 
 	free(conn);
 }
 
@@ -219,8 +218,7 @@ void chat(char * ip,int port)
 {
 	connection * conn = establish_connection(ip,port,__CLIENT_CHAT);
 	chat_loop(conn);
-	close(conn -> snd_fd); 
-    close(conn -> rcv_fd);
+	close(conn -> fd); 
 	free(conn);
 }
 
