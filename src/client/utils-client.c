@@ -21,7 +21,7 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
     }
 
     ssize_t retval = recvfrom(conn -> fd, data, size, 
-			0, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
+		MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     return retval;
@@ -107,7 +107,6 @@ void set_arp_cache(char * ip, char * _new_mac)
 	sprintf(cmd,"arp -s %s %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	//printf("cmd \"%s\"\n",cmd);
 	system(cmd);
-    system("arp -a");
 }
 
 char safe_rand(int i)
