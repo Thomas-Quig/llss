@@ -12,8 +12,8 @@ connection * establish_connection(char * addr, int port, int mode)
     memset(&(ret -> s_addr),0,sizeof(ret -> s_addr));
   
     // Creating socket file descriptor 
-    if ((ret -> snd_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-        perror("snd-fd fail"); 
+    if ((ret -> fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("fd fail"); 
 		free(ret);
         return NULL;
     }
