@@ -12,7 +12,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
 ssize_t s_recv(connection * conn, char * data, size_t size)
 {
     dbprintf("s_recv(%p,%p,%d)\n",conn,data,size);
-    //return recv(conn -> fd, data, size - 1, MSG_WAITALL);
+    //return recv(conn -> rcv_fd, data, size - 1, MSG_WAITALL);
     return recvfrom(conn -> rcv_fd, data, size, 
 			0, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
 }
@@ -147,16 +147,15 @@ int advance_mac(connection * conn, char *macs, int who)
     
     if(who == __ADV_SELF)
     {
-        close(conn -> fd);
+        close(conn -> snd_fd);
+        close(conn -> rcv_fd);
         set_mac(__IFACE,my_new_mac);
-        conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
-        if(conn -> mode == __CLIENT_RECV)
+        conn -> snd_fd = socket(AF_INET, SOCK_DGRAM, 0);
+        conn -> rcv_fd = socket(AF_INET, SOCK_DGRAM, 0);
+        (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
+        if(bind(conn -> rcv_fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
         {
-            (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
-            if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
-            {
-                perror("advance-bind");
-            }
+            perror("advance-bind");
         }
     }
     else if(who == __ADV_OTHR)
