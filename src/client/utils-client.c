@@ -149,12 +149,12 @@ int advance_mac(connection * conn, char *macs, int who)
         set_mac(__IFACE,my_new_mac);
         conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
         (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
-        //(conn -> s_addr).sin_family = AF_INET;
-        //(conn -> s_addr).sin_port = htons(conn -> port);
+        (conn -> s_addr).sin_family = AF_INET;
+        (conn -> s_addr).sin_port = htons(conn -> port);
         if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
-    {
-        perror("advance-bind");
-    }
+        {
+            perror("advance-bind");
+        }
     }
     else if(who == __ADV_OTHR)
     {
