@@ -163,6 +163,8 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         advance_mac(conn,next_macs,__ADV_OTHR);
     }
     s_send(conn,"ENDMSG",6);
+    char endbuf[12];
+    printf("Received final packet %d:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
 }
 
 void recv_content(char * ip, int port)
