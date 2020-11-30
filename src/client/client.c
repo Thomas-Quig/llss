@@ -197,7 +197,6 @@ int recv_loop(connection * conn)
         char resp_buf[32];
         memset(resp_buf,0,32);
         sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));
-        usleep(1000000);
         bytes_rspd = s_send(conn, resp_buf,strlen(resp_buf));
         //sendto(conn -> fd, sendbuf,strlen(sendbuf), 
         //    MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);

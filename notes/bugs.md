@@ -27,7 +27,11 @@ solutions I tried
     removing modules
     restarting arp
 
-random effing me over
+## random effing me over (The big error)
     fuzzing
     eric shoutout
 
+## port error
+1. recvfrom changing the fonky
+2. Sending back causes a port mismatch
+3. ICMP port unreachable.

@@ -10,6 +10,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
     (conn -> s_addr).sin_family = AF_INET; 
     (conn -> s_addr).sin_port = htons(conn -> port);
     //(conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
+    usleep(1000000);
     return sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
 }
@@ -26,7 +27,6 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
         perror("rcv-bind");
         return -1;
     }
-
     ssize_t retval = recvfrom(conn -> fd, data, size, 
 		MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
     close(conn -> fd);
