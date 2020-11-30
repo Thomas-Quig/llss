@@ -180,7 +180,7 @@ int recv_loop(connection * conn)
 {
     printConnection(conn);
     char rcv_buf[__FRAG_SIZE];
-    memset(rcv_buf,0,16);
+    memset(rcv_buf,0,__FRAG_SIZE);
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
     do
@@ -196,8 +196,8 @@ int recv_loop(connection * conn)
         write(STDOUT_FILENO,rcv_buf,bytes_rcvd);
         printf("\n---ERCV---\n\n");
         
-        char resp_buf[32];
-        memset(resp_buf,0,32);
+        char resp_buf[12];
+        memset(resp_buf,0,12);
         sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));
         bytes_rspd = s_send(conn, resp_buf,strlen(resp_buf));
         //sendto(conn -> fd, sendbuf,strlen(sendbuf), 

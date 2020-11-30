@@ -127,6 +127,7 @@ char safe_rand(int i)
 
 char * get_next_macs(int mode)
 {
+    dbprintf("get_next_macs(%i)",mode);
     char * new_macs = malloc(12);
     char * my_new_mac = new_macs;
     char * ot_new_mac = new_macs + 6;
@@ -166,18 +167,18 @@ int advance_mac(connection * conn, char *macs, int who)
         close(conn -> fd);
         set_mac(__IFACE,my_new_mac);
         conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
-        if(conn -> mode == __CLIENT_RECV)
+        /**if(conn -> mode == __CLIENT_RECV)
         {
             (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
             if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
             {
                 perror("advance-bind");
             }
-        }
+        }**/
     }
     else if(who == __ADV_OTHR)
     {
-         char * ip = conn -> ip;
+        char * ip = conn -> ip;
         set_arp_cache(ip,ot_new_mac);
     }
    
