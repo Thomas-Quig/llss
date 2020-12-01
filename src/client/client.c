@@ -1,7 +1,7 @@
 #include "client.h"
 #define nl newline
 #define __MAX_BUFFER_SIZE 16384
-#define __FRAG_SIZE 16
+#define __FRAG_SIZE 4
 
 static pthread_t chat_threads[2];
 static char _ohost_ip[16];
