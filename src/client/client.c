@@ -148,7 +148,6 @@ int custom_test_code(int argc, char ** argv)
 void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
-    if(__DEBUG__)printConnection(conn);    
     if(conn == NULL)
     {
         printf("Error: Connection could not be established\n");
@@ -228,7 +227,6 @@ void recv_content(char * ip, int port)
 {
     //The IP here is technically unneccesary, but valuable for debugging.
     connection * conn = establish_connection(ip,port,__CLIENT_RECV);
-    if(__DEBUG__)printConnection(conn);
 	recv_loop(conn);
 	close(conn -> fd); 
 	free(conn);

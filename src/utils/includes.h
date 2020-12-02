@@ -5,9 +5,9 @@
 #include <signal.h>
 #include <pthread.h>
 #include <assert.h>
-//#include <stdbool.h>
-//#include <argp.h>
-//#include <fcntl.h>
+#include <stdbool.h>
+#include <argp.h>
+#include <fcntl.h>
 
 #include <sys/types.h>
 #include <inttypes.h> 

@@ -16,7 +16,6 @@
         __typeof__ (b) _b = (b); \
         _a < _b ? a : _b;})
 
-#define __DEBUG__ 0
 
 
 /**

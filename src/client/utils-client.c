@@ -55,8 +55,8 @@ int set_mac(char * iface, char * newMac)
 
     ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
     if(ioctl(s, SIOCSIFHWADDR, &ifr) == -1){
-        //perror("sm-IOCTL");
-        printf("explain-ioctl: %s\n",explain_errno_ioctl(errno,s,SIOCSIFHWADDR, &ifr));
+        perror("sm-IOCTL");
+        //printf("explain-ioctl: %s\n",explain_errno_ioctl(errno,s,SIOCSIFHWADDR, &ifr));
         return EXIT_FAILURE;
 	  }
     
@@ -103,8 +103,7 @@ char * get_next_macs(int mode)
             return NULL; //This should be impossible but whatever.
         }
     }
-    _sys_log("\nLOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
-                                                            ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
+    _sys_log("\nLOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
     return new_macs;
 }
 
@@ -114,8 +113,7 @@ int advance_mac(connection * conn, char *macs, int who)
         return 2;
     char *my_new_mac = macs;
     char *ot_new_mac = macs + 6;
-    _sys_log("advance_mac(%p,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x %.2x:%.2x:%.2x:%.2x:%.2x:%.2x,%i)\n",conn,my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
-                                                            ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5],who);
+    _sys_log("advance_mac(%p,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x %.2x:%.2x:%.2x:%.2x:%.2x:%.2x,%i)\n",conn,my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5],who);
     
     if(who == __ADV_SELF)
     {
