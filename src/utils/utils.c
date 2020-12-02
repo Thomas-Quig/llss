@@ -1,7 +1,7 @@
 #include "utils.h"
 //Modified from https://www.binarytides.com/c-program-to-get-mac-address-from-interface-name-on-linux/
 
-config _global_conf = {false,false,true,true,true,false,1,1,-1};
+config _global_conf = {0,0,1,1,1,0,1,1,-1};
 
 //
 
@@ -203,4 +203,16 @@ void handleErrors()
 {
     printf("OPENSSL ERROR, EXITING\n");
     perror("OSSL-ERRNO");
+}
+
+int _sys_log(const char * format,...)
+{ 
+    if(_global_conf._DEBUG)
+    {
+        va_list args;
+        va_start(args, format);
+        int result = vprintf(format,args);
+        va_end(args);
+        return result;
+    }
 }

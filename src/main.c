@@ -1,5 +1,4 @@
 #include "client/client.h"
-#include "server/server.h"
 #include "utils/utils.h"
 int main(int argc, char ** argv){
     if(argc == 1)

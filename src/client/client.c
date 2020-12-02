@@ -65,10 +65,6 @@ int client_main(int argc, char ** argv, int mode)
     };
     if(strcmp(argv[argc - 1],"-c"))
 	    cleanup(_orig_mac,argv[2]);
-    else
-    {
-        dbprintf("[SYS] No Cleanup, do it yourself :(\n");
-    }
     
 	return 0;
 }
@@ -115,7 +111,7 @@ void configure(char * conf_path)
     {
         FILE * f = fopen(conf_path,"r");
         fscanf(f,"%i\n%i\n%i\n%i\n%i\n%i",(_global_conf._DEBUG),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
-        dbprintf("Params: %i,%i,%i,%i,%i,%i",(_global_conf._DEBUG),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
+        printf("Params: %i,%i,%i,%i,%i,%i",(_global_conf._DEBUG),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
     }
     else
     {

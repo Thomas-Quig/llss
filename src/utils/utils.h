@@ -17,8 +17,6 @@
         _a < _b ? a : _b;})
 
 #define __DEBUG__ 0
-#define dbprintf \
-    if(__DEBUG__)printf
 
 
 /**
@@ -116,3 +114,4 @@ void print_mac(char * iface);
 void printConnection(connection * conn);
 
 void handleErrors();
+int _sys_log(const char * format,...);

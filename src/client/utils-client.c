@@ -4,7 +4,7 @@
 
 ssize_t s_send(connection * conn, char * data, size_t size)
 {
-    dbprintf("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
+    _sys_log("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     (conn -> s_addr).sin_family = AF_INET; 
@@ -17,7 +17,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
 
 ssize_t s_recv(connection * conn, char * data, size_t size)
 {
-    dbprintf("s_recv(%p,%p,%d)\n",conn,data,size);
+    _sys_log("s_recv(%p,%p,%d)\n",conn,data,size);
     //return recv(conn -> fd, data, size - 1, MSG_WAITALL);
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
@@ -40,7 +40,7 @@ int set_mac(char * iface, char * newMac)
     //memset(cmd,0,64);
     //sprintf(cmd,"ifconfig %s hw ether %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     //system(cmd);
-    printf("set_mac(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%x)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
+    _sys_log("set_mac(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%x)\n",iface,newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     //return EXIT_SUCCESS;
     //printf("%d:%d:%d:%d:%d:%d\n",newMac[0],newMac[1],newMac[2],newMac[3],newMac[4],newMac[5]);
     struct ifreq ifr;
@@ -48,14 +48,11 @@ int set_mac(char * iface, char * newMac)
 
     s = socket(AF_INET, SOCK_DGRAM, 0);
     assert(s != -1);
+    //memset(&(ifr.ifr_name),0,IF_NAMESIZE);
+    strncpy(ifr.ifr_name, "wlan0",min(strlen(iface),5));
+    for(int i = 0; i < 6; i++)
+        ifr.ifr_hwaddr.sa_data[i] = newMac[i];
 
-    strncpy(ifr.ifr_name, iface,min(strlen(iface),5));
-    ifr.ifr_hwaddr.sa_data[0] = newMac[0];
-    ifr.ifr_hwaddr.sa_data[1] = newMac[1];
-    ifr.ifr_hwaddr.sa_data[2] = newMac[2];
-    ifr.ifr_hwaddr.sa_data[3] = newMac[3];
-    ifr.ifr_hwaddr.sa_data[4] = newMac[4];
-    ifr.ifr_hwaddr.sa_data[5] = newMac[5];
     ifr.ifr_hwaddr.sa_family = ARPHRD_ETHER;
     if(ioctl(s, SIOCSIFHWADDR, &ifr) == -1){
         //perror("sm-IOCTL");
@@ -63,12 +60,11 @@ int set_mac(char * iface, char * newMac)
         return EXIT_FAILURE;
 	  }
     
-    dbprintf("New Mac: %s\n",format_mac(get_mac(__IFACE)));
 }
 
 void set_arp_cache(char * ip, char * _new_mac)
 {
-    dbprintf("set_arp_cache(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
+    _sys_log("set_arp_cache(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	char cmd[64];
 	sprintf(cmd,"arp -s %s %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	//printf("cmd \"%s\"\n",cmd);
@@ -86,7 +82,7 @@ char safe_rand(int i)
 
 char * get_next_macs(int mode)
 {
-    dbprintf("get_next_macs(%i)",mode);
+    _sys_log("get_next_macs(%i)",mode);
     char * new_macs = malloc(12);
     char * my_new_mac = new_macs;
     char * ot_new_mac = new_macs + 6;
@@ -107,7 +103,7 @@ char * get_next_macs(int mode)
             return NULL; //This should be impossible but whatever.
         }
     }
-    dbprintf("\nLOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
+    _sys_log("\nLOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
     return new_macs;
 }
@@ -118,7 +114,7 @@ int advance_mac(connection * conn, char *macs, int who)
         return 2;
     char *my_new_mac = macs;
     char *ot_new_mac = macs + 6;
-    dbprintf("advance_mac(%p,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x %.2x:%.2x:%.2x:%.2x:%.2x:%.2x,%i)\n",conn,my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
+    _sys_log("advance_mac(%p,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x %.2x:%.2x:%.2x:%.2x:%.2x:%.2x,%i)\n",conn,my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5],who);
     
     if(who == __ADV_SELF)
