@@ -137,7 +137,7 @@ void configure(char * conf_path)
             char log_path[64];
             printf("File path for sys logs?:");
             fgets(log_path, 64,stdin);
-            _global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
+            //_global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
         }
     }
     
