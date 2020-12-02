@@ -2,7 +2,7 @@
 
 int server_main(int argc, char ** argv)
 {
-    printf("DEPRECATED, DONT RUN THIS CODE\n");
+    printf("DEPRECATED, THIS CODE SHOULD LITERALLY NEVER RUN\n");
     /**
 	int sockfd; 
     char buffer[1024]; 

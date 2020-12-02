@@ -1,6 +1,10 @@
 #include "utils.h"
 //Modified from https://www.binarytides.com/c-program-to-get-mac-address-from-interface-name-on-linux/
 
+config _global_conf = {false,false,true,true,true,false,1,1,-1};
+
+//
+
 connection * establish_connection(char * addr, int port, int mode)
 {
 	connection * ret = malloc(sizeof(connection));
@@ -84,6 +88,15 @@ void newline()
 {
 	puts("\n");
 	fflush(stdout);
+}
+
+int boolify(char * input)
+{   
+    char c1 = tolower(input[0]);
+    if(c1 != 'n' && c1 != '0' && c1 != 'f' && c1 != 'y' && c1 != 't' && c1 != '1')
+        return -1;
+    else
+        return (c1 == 'y') || (c1 == 't') || (c1 == '1');
 }
 
 void print_mac(char * iface)

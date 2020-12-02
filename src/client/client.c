@@ -14,10 +14,10 @@ void sig_handler(int signo)
         //set_mac(__IFACE,_orig_mac);
         char cmd[128];
         memset(cmd,0,128);
+        
         sprintf(cmd,"arp -d %s",_ohost_ip);
         system(cmd);
-        sprintf(cmd,"ping -c 10 -I wlan0 %s",_ohost_ip);
-        printf("Ensure arp has recovered with 'arp %s'\n",_ohost_ip);
+        printf("Recover original mac address with ping -I %s %s\n",__IFACE,_ohost_ip);
 
         exit(0);
     }
@@ -73,13 +73,74 @@ int client_main(int argc, char ** argv, int mode)
 	return 0;
 }
 
+void wizard()
+{
+    enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
+    
+    
+    
+    while(state != EXECUTE)
+    {
+        
+        if(state == GENERAL)
+        {
+
+        }
+        else if(state == CONFIGURE)
+        {
+            if(access("./llss.conf",F_OK) != -1)
+                configure("./llss.conf");
+            else
+                configure(NULL);
+        }
+    }
+
+}
+
 void print_wizard_options()
 {
 	printf("1. Get Current Mac Address");
-	printf("2. Change Mac Address (User Input)");
-	printf("3. Change Mac Address (Conf File, Random)");
-	printf("4. Change Mac Address (Conf File, Pregen)");
-	printf("T. Run Custom Code");
+	printf("2. Send message");
+	printf("3. Send file");
+    printf("4. Receive message or file");
+    printf("5. Chat");
+    printf("6. Configure settings");
+    //If you happen to be compiling/editing this yourself, hello :)
+    printf("T. Custom Test Code"); 
+}
+
+void configure(char * conf_path)
+{
+    if(conf_path != NULL && access(conf_path, F_OK) != -1)
+    {
+        FILE * f = fopen(conf_path,"r");
+        fscanf(f,"%i\n%i\n%i\n%i\n%i\n%i",(_global_conf._DEBUG),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
+        dbprintf("Params: %i,%i,%i,%i,%i,%i",(_global_conf._DEBUG),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
+    }
+    else
+    {
+        char * param_qs[6] = {"Print debug statements","Print function calls","Shuffle MAC addresses","Encrypt messages","Cleanup arp at end of session", "Log system messages to file"};
+        int * params[6] = {&(_global_conf._DEBUG),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._DEBUG)};
+        char _arg[8];
+        int _bfr = -1;
+        for(int i = 0; i < 6; i++)
+        {
+            _bfr = -1;
+            printf("%s?:",param_qs[i]);
+            fgets(_arg,8,stdin);
+            _bfr = boolify(_arg);
+            if(_bfr != -1)
+                *(params[i]) = _bfr;
+        }
+        if(_global_conf._LOG_SYS)
+        {
+            char log_path[64];
+            printf("File path for sys logs?:");
+            fgets(log_path, 64,stdin);
+            _global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
+        }
+    }
+    
 }
 
 int custom_test_code(int argc, char ** argv)
@@ -91,7 +152,7 @@ int custom_test_code(int argc, char ** argv)
 void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
-    printConnection(conn);    
+    if(__DEBUG__)printConnection(conn);    
     if(conn == NULL)
     {
         printf("Error: Connection could not be established\n");
@@ -171,6 +232,7 @@ void recv_content(char * ip, int port)
 {
     //The IP here is technically unneccesary, but valuable for debugging.
     connection * conn = establish_connection(ip,port,__CLIENT_RECV);
+    if(__DEBUG__)printConnection(conn);
 	recv_loop(conn);
 	close(conn -> fd); 
 	free(conn);
@@ -178,7 +240,7 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
-    printConnection(conn);
+    
     char rcv_buf[__FRAG_SIZE];
     memset(rcv_buf,0,__FRAG_SIZE);
     ssize_t bytes_rcvd;

@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <net/if_arp.h>
-#include <net/if.h>
-#include <assert.h>
-#include <pthread.h>
+
 #include "../utils/utils.h"
 
 #define __IFACE "wlan0"
@@ -18,8 +8,7 @@
 
 ssize_t s_send(connection * conn, char * data, size_t size);
 ssize_t s_recv(connection * conn, char * data, size_t size);
-int ping(connection * conn);
-int pong(connection * conn);
+
 /**
 *   Changes your current mac address
 *   Returns 0 on success, -1 otherwise

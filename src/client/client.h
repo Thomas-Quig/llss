@@ -13,8 +13,11 @@ size_t send_loop(connection * conn, char * content, size_t content_size);
 void recv_content(char * ip, int port);
 int recv_loop(connection * conn);
 
+void sig_handler(int signo);
 void mac_change_loop();
+void configure(char * path);
 void print_wizard_options();
+void wizard();
 int handle_client_options();
 void cleanup(char * orig, char * ip);
 int client_main(int argc, char ** argv, int mode);

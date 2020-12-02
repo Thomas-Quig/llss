@@ -63,7 +63,7 @@ int set_mac(char * iface, char * newMac)
         return EXIT_FAILURE;
 	  }
     
-    printf("New Mac: %s\n",format_mac(get_mac(__IFACE)));
+    dbprintf("New Mac: %s\n",format_mac(get_mac(__IFACE)));
 }
 
 void set_arp_cache(char * ip, char * _new_mac)
@@ -107,7 +107,7 @@ char * get_next_macs(int mode)
             return NULL; //This should be impossible but whatever.
         }
     }
-    printf("\nLOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
+    dbprintf("\nLOC|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\nOTH|%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
                                                             ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[4],ot_new_mac[5]);
     return new_macs;
 }
