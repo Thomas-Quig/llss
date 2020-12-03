@@ -240,8 +240,8 @@ int recv_loop(connection * conn)
     memset(rcv_buf,0,__FRAG_SIZE);
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
-    int finished = 0;
-    while (!finished)
+    int rcv_data = 0;
+    while (rcv_data)
     {
         char * next_macs = get_next_macs(__CLIENT_RECV);
 
@@ -250,8 +250,8 @@ int recv_loop(connection * conn)
         _sys_log("[RCVD] Received %d bytes\n",bytes_rcvd);
         advance_mac(conn,next_macs,__ADV_OTHR);
         
-        finished = strncmp(rcv_buf,"[ENDMSG]",min(__FRAG_SIZE,8));
-        if(!finished)
+        rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(__FRAG_SIZE,8));
+        if(!rcv_data)
             write(STDOUT_FILENO,rcv_buf,bytes_rcvd);
         char resp_buf[12];
         memset(resp_buf,0,12);
