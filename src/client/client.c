@@ -25,6 +25,7 @@ void sig_handler(int signo)
 
 int client_main(int argc, char ** argv, int mode)
 {	
+    configure("./llss.conf");
     memset(_ohost_ip,0,16);
     if(argc > 2)
         strncpy(_ohost_ip,argv[2],min(strlen(argv[2]),15));
