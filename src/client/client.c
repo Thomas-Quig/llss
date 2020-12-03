@@ -251,7 +251,7 @@ int recv_loop(connection * conn)
         advance_mac(conn,next_macs,__ADV_OTHR);
         
         rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(__FRAG_SIZE,8));
-        if(!rcv_data)
+        if(rcv_data)
             write(STDOUT_FILENO,rcv_buf,bytes_rcvd);
         char resp_buf[12];
         memset(resp_buf,0,12);
