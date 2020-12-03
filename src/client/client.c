@@ -238,7 +238,7 @@ int recv_loop(connection * conn)
     memset(rcv_buf,0,__FRAG_SIZE);
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
-    while (strncmp(rcv_buf,"[ENDMSG]",6))
+    while (strncmp(rcv_buf,"[ENDMSG]",min(__FRAG_SIZE,8)))
     {
         char * next_macs = get_next_macs(__CLIENT_RECV);
 
