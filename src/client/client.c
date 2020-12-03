@@ -345,7 +345,7 @@ void mac_change_loop()
 		//If you were on ssh, ssh gets hella bonked
 		set_mac(_global_conf._IFACE,_newmac);
         printf("Confirm New: ");
-		print_mac(_global_conf._IFACE); nl();
+		print_mac(_global_conf._IFACE); printf("\n");
 		//system("ifconfig | grep -A 5 'wlan0'");
 		//printf("Exit? (y/n): ");
 	}
