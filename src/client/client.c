@@ -117,56 +117,56 @@ void parse_args(args * a, int argc, char ** argv)
             char c = arg[1];
             switch (c){
                 case 'I':
-                    if(i < (argc - 2))
+                    if(i < (argc - 1))
                         strncpy((_global_conf._IFACE),argv[i + 1],min(strlen(argv[i + 1]),sizeof(_global_conf._IFACE)));
                     else
                         goto error;
                     i += 1;
                     break;
                 case 'i':
-                    if(i < (argc - 2))
+                    if(i < (argc - 1))
                         strncpy(a->_target_ip,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _target_ip)));
                     else
                         goto error;
                     i += 1;
                     break;
                 case 'o':
-                    if(i < (argc - 2))
+                    if(i < (argc - 1))
                         strncpy(a -> _out_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _out_path)));
                     else
                         goto error;
                     i += 1;
                     break;
                 case 'l':
-                    if(i < (argc - 2))
+                    if(i < (argc - 1))
                         strncpy(a -> _log_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _log_path)));
                     else
                         goto error;
                     i += 1;
                     break;
                 case 'c':
-                    if(i < (argc - 2))
+                    if(i < (argc - 1))
                         strncpy(a -> _conf_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _conf_path)));
                     else
                         goto error;
                     i += 1;
                     break;
                 case 'C':
-                    if(i < (argc - 2))
+                    if(i < (argc - 1))
                         _global_conf._CLEANUP = atoi(argv[i + 1]);
                     else
                         goto error;
                     i += 1;
                     break;
                 case 'p':
-                    if(i < (argc - 2))
+                    if(i < (argc - 1))
                         a -> _port = atoi(argv[i + 1]);
                     else
                         goto error;
                     i += 1;
                     break;
                 case 'F':
-                    if(i < (argc - 2))
+                    if(i < (argc - 1))
                         _global_conf._FRAG_SIZE = atoi(argv[i + 1]);
                     else
                         goto error;
