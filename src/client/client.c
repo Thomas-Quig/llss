@@ -40,7 +40,7 @@ int client_main(int argc, char ** argv)
             break;
         case __CLIENT_RECV:
             //pong(establish_connection(argv[2],atoi(argv[3]),__CLIENT_RECV));
-            recv_content(argv[2],atoi(argv[3]));
+            recv_content(a._target_ip,a._port);
             break;
         case __CLIENT_SEND:
             if(access(a._data,F_OK) != -1)
