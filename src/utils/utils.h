@@ -44,7 +44,7 @@ typedef struct _connection{
  * This config file is passed into every major function, 
  * where it will sit to be used should it be neccesary
  * 
- * @param _DEBUG should debug statements be printed, this can be enabled by using -v or --verbose. False by default
+ * @param _VERBOSE should debug statements be printed, this can be enabled by using -v or --verbose. False by default
  * @param _FUNCLIST print off the function and arguments for each function as it is called. False by default
  * @param _CLEANUP cleans up the arp table upon completion of the session. True by default
  * @param _SHUFFLE should the host shuffle it's MAC addresses? (Mostly debug). Turning _SHUFFLE off will allow it to run in any network configuration (with dhcp).
@@ -56,7 +56,7 @@ typedef struct _connection{
  * @param _IFACE the interface to run this on
  **/
 typedef struct _config{
-    int _DEBUG;            //False by default
+    int _VERBOSE;            //False by default
     int _FUNCLIST;         //False by default
     int _SHUFFLE;          //True by default
     int _ENCRYPT;          //True by default
@@ -66,6 +66,7 @@ typedef struct _config{
     int  _DB_OUTPUT_FD;     //STDOUT_FILENO by default
 
     int  _CSTMSEED;         //-1 By default
+    int  _FRAG_SIZE;        //Sending fragmentation size
     char _IFACE[6];         //"wlan0" by default
 } config;
 

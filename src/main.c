@@ -3,9 +3,11 @@
 int main(int argc, char ** argv){
     if(argc == 1)
     {
-        printf("usage: llss (cli,rcv,snd,svr) <ip> <port> [args]\n");
+        printf("usage: llss (cli,rcv,snd,cht) <ip> <port> [args] [msg]\nPlease use help or -h for options.\n");
         return 0;
     }
+    client_main(argc,argv);
+    /*
     if(argc >= 2)
     {
         if((!strncmp(argv[1],"cli",4)) || (!strncmp(argv[1],"client",7)))
@@ -23,16 +25,16 @@ int main(int argc, char ** argv){
             //Run the server given argc and argv
             return client_main(argc, argv, __CLIENT_RECV);
         }
-        else if((!strncmp(argv[1],"svr",4)) || (!strncmp(argv[1],"server",7)))
+        else if((!strncmp(argv[1],"cht",4)) || (!strncmp(argv[1],"chat",4)))
         {
             //Run the server given argc and argv
-            return client_main(argc, argv, __CLIENT_RECV);
+            return client_main(argc, argv, __CLIENT_CHAT);
         }
         else if(argc == 2 && (!strncmp(argv[1],"help",5) || !strncmp(argv[1],"-h",3) || !strncmp(argv[1],"--help",7)))
         {
-            printf("usage: llss (cli,snd,rcv,svr) <ip> <port> [args]\n");
+            printf("usage: llss (cli,snd,rcv,cht) <ip> <port> [args]\n");
             return 0;
         }
-    }
-
+        
+    }*/
 }

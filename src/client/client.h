@@ -1,7 +1,18 @@
 #include "utils-client.h"
 
+#define __MAX_BUFFER_SIZE 16384
 #define __SEND_MESSAGE 1
 #define __SEND_FILE 2
+
+typedef struct _args {
+    int _mode;
+    char _target_ip[16]; 
+    int _port; 
+    char _out_path[128];
+    char _conf_path[128];
+    char _log_path[128];
+    char * _data;
+} args;
 
 int custom_test_code(int argc, char ** argv);
 void chat(char * ip,int port);
@@ -17,7 +28,9 @@ void sig_handler(int signo);
 void mac_change_loop();
 void configure(char * path);
 void print_wizard_options();
+void print_help();
 void wizard();
 int handle_client_options();
 void cleanup(char * orig, char * ip);
-int client_main(int argc, char ** argv, int mode);
+int client_main(int argc, char ** argv);
+void parse_args(args * a, int argc, char ** argv);
