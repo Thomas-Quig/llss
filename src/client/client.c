@@ -62,7 +62,7 @@ int client_main(int argc, char ** argv)
             break;
     };
     if(_global_conf._CLEANUP)
-	    cleanup(_orig_mac,argv[2]);
+	    cleanup(_orig_mac,a._target_ip);
     
 	return 0;
 }
