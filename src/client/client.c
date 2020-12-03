@@ -1,7 +1,7 @@
 #include "client.h"
 #define nl newline
 #define __MAX_BUFFER_SIZE 16384
-#define __FRAG_SIZE 4
+#define __FRAG_SIZE 8
 
 static pthread_t chat_threads[2];
 static char _ohost_ip[16];
@@ -217,7 +217,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         }
         advance_mac(conn,next_macs,__ADV_OTHR);
     }
-    s_send(conn,"ENDMSG",6);
+    s_send(conn,"[ENDMSG]",min(__FRAG_SIZE,8));
     char endbuf[12];
     printf("Received final packet %d:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
 }
@@ -238,7 +238,7 @@ int recv_loop(connection * conn)
     memset(rcv_buf,0,__FRAG_SIZE);
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
-    do
+    while (strncmp(rcv_buf,"ENDMSG",6))
     {
         char * next_macs = get_next_macs(__CLIENT_RECV);
 
@@ -246,18 +246,16 @@ int recv_loop(connection * conn)
         bytes_rcvd = s_recv(conn,rcv_buf,__FRAG_SIZE);
         _sys_log("[RCVD] Received %d bytes\n",bytes_rcvd);
         advance_mac(conn,next_macs,__ADV_OTHR);
-
-        write(STDOUT_FILENO,rcv_buf,bytes_rcvd);
+        if(strncmp(rcv_buf,"[ENDMSG]",min(__FRAG_SIZE,8)))
+            write(STDOUT_FILENO,rcv_buf,bytes_rcvd);
         
         char resp_buf[12];
         memset(resp_buf,0,12);
         sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));
         bytes_rspd = s_send(conn, resp_buf,strlen(resp_buf));
-        //sendto(conn -> fd, sendbuf,strlen(sendbuf), 
-        //    MSG_CONFIRM, (const struct sockaddr *)&cli_addr, len);
         
         advance_mac(conn,next_macs,__ADV_SELF);
-    } while (strncmp(rcv_buf,"ENDMSG",6));
+    }
     
 }
 
