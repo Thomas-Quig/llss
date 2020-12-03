@@ -110,7 +110,7 @@ void configure(char * conf_path)
     if(conf_path != NULL && access(conf_path, F_OK) != -1)
     {
         FILE * f = fopen(conf_path,"r");
-        fscanf(f,"%i\n%i\n%i\n%i\n%i\n%i",(_global_conf._DEBUG),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
+        fscanf(f,"%i\n%i\n%i\n%i\n%i\n%i",&(_global_conf._DEBUG),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._LOG_SYS));
         printf("Params: %i,%i,%i,%i,%i,%i",(_global_conf._DEBUG),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
     }
     else
