@@ -11,13 +11,13 @@ void sig_handler(int signo)
     if (signo == SIGINT)
     {
         printf("\nReceived user interrupt via ^C, safely exiting...\n");
-        //set_mac(__IFACE,_orig_mac);
+        //set_mac(_global_conf._IFACE,_orig_mac);
         char cmd[128];
         memset(cmd,0,128);
         
         sprintf(cmd,"arp -d %s",_ohost_ip);
         system(cmd);
-        printf("Recover original mac address with ping -I %s %s\n",__IFACE,_ohost_ip);
+        printf("Recover original mac address with ping -I %s %s\n",_global_conf._IFACE,_ohost_ip);
 
         exit(0);
     }
@@ -29,10 +29,10 @@ int client_main(int argc, char ** argv, int mode)
     if(argc > 2)
         strncpy(_ohost_ip,argv[2],min(strlen(argv[2]),15));
 
-	printf("Original Mac: ");
+	//printf("Original Mac: ");
 	
-    memcpy(_orig_mac,get_mac(__IFACE),12);
-	print_mac(__IFACE);nl();
+    memcpy(_orig_mac,get_mac(_global_conf._IFACE),12);
+	//print_mac(_global_conf._IFACE);nl();
 
     signal(SIGINT,sig_handler);
 
@@ -72,9 +72,7 @@ int client_main(int argc, char ** argv, int mode)
 void wizard()
 {
     enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
-    
-    
-    
+    int exec_option = 0;
     while(state != EXECUTE)
     {
         
@@ -95,14 +93,15 @@ void wizard()
 
 void print_wizard_options()
 {
-	printf("1. Get Current Mac Address");
-	printf("2. Send message");
-	printf("3. Send file");
-    printf("4. Receive message or file");
-    printf("5. Chat");
-    printf("6. Configure settings");
+	printf("1. Get Current Mac Address\n");
+	printf("2. Send message\n");
+	printf("3. Send file\n");
+    printf("4. Receive message or file\n");
+    printf("5. Chat\n");
+    printf("6. Configure settings\n");
+
     //If you happen to be compiling/editing this yourself, hello :)
-    printf("T. Custom Test Code"); 
+    printf("7. Custom Test Code"); 
 }
 
 void configure(char * conf_path)
@@ -264,7 +263,7 @@ int recv_loop(connection * conn)
 
 void cleanup(char * orig_mac, char * ip)
 {
-	set_mac(__IFACE,orig_mac);
+	set_mac(_global_conf._IFACE,orig_mac);
 	char cmd[64];
 	sprintf(cmd,"arp -d %s",ip);
 	system(cmd);
@@ -316,9 +315,9 @@ int chat_loop(connection * conn)
 		else
 		{
 			_currmac[5] += 17;
-			set_mac(__IFACE,_currmac);
+			set_mac(_global_conf._IFACE,_currmac);
 			printf("New Mac: ");
-			print_mac(__IFACE);nl();
+			print_mac(_global_conf._IFACE);nl();
 			continue;
 		}**/
 		
@@ -347,9 +346,9 @@ void mac_change_loop()
 		scanf("%x:%x:%x:%x:%x:%x",_newmac,_newmac + 1,_newmac + 2,_newmac + 3,_newmac + 4,_newmac + 5);
 		printf("New Mac:%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",_newmac[0],_newmac[1],_newmac[2],_newmac[3],_newmac[4],_newmac[5]);
 		//If you were on ssh, ssh gets hella bonked
-		set_mac(__IFACE,_newmac);
+		set_mac(_global_conf._IFACE,_newmac);
         printf("Confirm New: ");
-		print_mac(__IFACE); nl();
+		print_mac(_global_conf._IFACE); nl();
 		//system("ifconfig | grep -A 5 'wlan0'");
 		//printf("Exit? (y/n): ");
 	}

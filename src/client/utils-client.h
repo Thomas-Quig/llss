@@ -1,7 +1,7 @@
 
 #include "../utils/utils.h"
 
-#define __IFACE "wlan0"
+
 #define __ADV_SELF 1
 #define __ADV_OTHR 2
 #define __ADVANCE_MACS 1

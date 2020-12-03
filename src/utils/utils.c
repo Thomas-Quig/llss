@@ -1,19 +1,16 @@
 #include "utils.h"
 //Modified from https://www.binarytides.com/c-program-to-get-mac-address-from-interface-name-on-linux/
 
-config _global_conf = {1,0,1,1,1,0,1,1,-1};
+config _global_conf = {0,0,1,1,1,0,1,1,-1,"wlan0"};
 
 //
 
 connection * establish_connection(char * addr, int port, int mode)
 {
-	connection * ret = malloc(sizeof(connection));
+	connection * ret = calloc(sizeof(connection),1);
     ret -> mode = mode;
-    memset(ret,0,sizeof(connection));
-    memset(ret -> ip, 0,16);
 	strncpy(ret -> ip,addr,strlen(addr));
 	ret -> port = port;
-    memset(&(ret -> s_addr),0,sizeof(ret -> s_addr));
   
     // Creating socket file descriptor 
     if ((ret -> fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
@@ -21,25 +18,15 @@ connection * establish_connection(char * addr, int port, int mode)
 		free(ret);
         return NULL;
     }
-    memset(&(ret ->s_addr), 0, sizeof(ret -> s_addr)); 
     
     // Filling server information 
     (ret -> s_addr).sin_family = AF_INET; 
     (ret -> s_addr).sin_port = htons(port);
     (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
     ret -> s_len = sizeof(ret -> s_addr);
-    /**if(mode == __CLIENT_RECV)
-    {
-        (ret -> s_addr).sin_addr.s_addr = INADDR_ANY;
-        if(bind(ret -> fd,(const struct sockaddr *)&(ret -> s_addr),ret -> s_len) == -1)
-        {
-            perror("bind");
-            return NULL;
-        }
-    }**/
+
     strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
-    printf("Secret int: %d\n",(unsigned int)(ret -> secret));
-    srand(420);
+    srand(atoi(ret -> secret));
 	return ret;
 }
 

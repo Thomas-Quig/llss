@@ -53,6 +53,7 @@ typedef struct _connection{
  * @param _LOG_SYS if true, any debug based statements will be sent to a log file instead
  * @param _OUTPUT_FD fd of where the received output goes.
  * @param _DB_OUTPUT_FD fd of where debug output goes.
+ * @param _IFACE the interface to run this on
  **/
 typedef struct _config{
     int _DEBUG;            //False by default
@@ -65,10 +66,10 @@ typedef struct _config{
     int  _DB_OUTPUT_FD;     //STDOUT_FILENO by default
 
     int  _CSTMSEED;         //-1 By default
+    char _IFACE[6];         //"wlan0" by default
 } config;
 
 extern config _global_conf;
-
 /**
  * Establishes a "connection" with the given address and port, passes ip and port into the connection if it is needed.
  * Returns on the heap, so it needs to be freed.
