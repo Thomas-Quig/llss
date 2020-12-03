@@ -1,7 +1,7 @@
 #include "utils.h"
 //Modified from https://www.binarytides.com/c-program-to-get-mac-address-from-interface-name-on-linux/
 
-config _global_conf = {1,0,1,1,1,0,1,1,-1,"wlan0"};
+config _global_conf = {0,0,1,1,1,0,1,1,-1,"wlan0"};
 
 //
 
