@@ -1,7 +1,6 @@
 #include "client.h"
-#define nl newline
 #define __MAX_BUFFER_SIZE 16384
-#define __FRAG_SIZE 16
+#define __FRAG_SIZE 1024
 
 static pthread_t chat_threads[2];
 static char _ohost_ip[16];
@@ -30,10 +29,7 @@ int client_main(int argc, char ** argv, int mode)
     if(argc > 2)
         strncpy(_ohost_ip,argv[2],min(strlen(argv[2]),15));
 
-	//printf("Original Mac: ");
-	
     memcpy(_orig_mac,get_mac(_global_conf._IFACE),12);
-	//print_mac(_global_conf._IFACE);nl();
 
     signal(SIGINT,sig_handler);
 
@@ -235,7 +231,6 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
-    
     char rcv_buf[__FRAG_SIZE];
     memset(rcv_buf,0,__FRAG_SIZE);
     ssize_t bytes_rcvd;
@@ -252,7 +247,7 @@ int recv_loop(connection * conn)
         
         rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(__FRAG_SIZE,8));
         if(rcv_data)
-            write(STDOUT_FILENO,rcv_buf,bytes_rcvd);
+            write(_global_conf._OUTPUT_FD,rcv_buf,bytes_rcvd);
         char resp_buf[12];
         memset(resp_buf,0,12);
         sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));

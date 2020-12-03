@@ -106,8 +106,8 @@ char * get_next_macs(int mode)
 
 int advance_mac(connection * conn, char *macs, int who)
 {
-    if(!__ADVANCE_MACS)
-        return 2;
+    if(!_global_conf._SHUFFLE)
+        return 0;
     char *my_new_mac = macs;
     char *ot_new_mac = macs + 6;
     _sys_log("advance_mac(%p,%p,%i)\n",conn,macs,who);
@@ -130,5 +130,5 @@ int advance_mac(connection * conn, char *macs, int who)
         char * ip = conn -> ip;
         set_arp_cache(ip,ot_new_mac);
     }
-   
+    return 0;
 }

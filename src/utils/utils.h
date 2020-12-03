@@ -96,12 +96,6 @@ char * get_ip(char * iface);
 **/
 char * format_mac(unsigned char * mac);
 
-/**
-* Instant newline function. I guess its useful.
-*
-**/
-void newline();
-
 //Parses first character of a string and quantifies it as a bool, -1 on error (not true, 1, or yes)
 int boolify(char * input);
 

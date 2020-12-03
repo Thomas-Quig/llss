@@ -71,12 +71,6 @@ char * format_mac(unsigned char * mac)
 	return ret;
 }
 
-void newline()
-{
-	puts("\n");
-	fflush(stdout);
-}
-
 int boolify(char * input)
 {   
     char c1 = tolower(input[0]);
