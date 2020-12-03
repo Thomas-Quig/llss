@@ -64,7 +64,7 @@ int client_main(int argc, char ** argv, int mode)
             printf("How\n");
             break;
     };
-    if(strcmp(argv[argc - 1],"-c"))
+    if(_global_conf._CLEANUP)
 	    cleanup(_orig_mac,argv[2]);
     
 	return 0;
@@ -240,7 +240,7 @@ int recv_loop(connection * conn)
     memset(rcv_buf,0,__FRAG_SIZE);
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
-    int rcv_data = 0;
+    int rcv_data = 1;
     while (rcv_data)
     {
         char * next_macs = get_next_macs(__CLIENT_RECV);
