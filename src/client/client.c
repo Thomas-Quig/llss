@@ -343,15 +343,15 @@ void print_help(){
     printf("-C <1/0>\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
     printf("-e\t Enable or disable encryption. Enabled by default\n");
     printf("-f\t Load the file at path [data] and send it. Selcting this enables _CHECK_FILE in config.\n");
-    printf("-F <size>\t Fragmentation size of the sender's data. Default is 1024");
+    printf("-F <size>\t Fragmentation size of the sender's data. Default is 1024\n");
     printf("-i <ip>\t The IP of the target, **preface <ip> with -i**\n");
-    printf("-I <iface>\t The interface to shuffle MAC addresses on. Ensure that the network you are on allows for Static IP's and no DHCP");
+    printf("-I <iface>\t The interface to shuffle MAC addresses on. Ensure that the network you are on allows for Static IP's and no DHCP\n");
     printf("-l <path>\t Log file, all _sys_log calls will be sent to this file\n");
     printf("-o <path>\t Output file, all non _sys_log call output will be sent to the output file at <path>\n");
     printf("-p <port>\t The port you will be sending to / receiving from.\n");
-    printf("-h\t Display this help message.");
-    printf("-V\t Print version information");
-    printf("-v\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.");
+    printf("-h\t Display this help message.\n");
+    printf("-V\t Print version information\n");
+    printf("-v\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.\n");
 }
 
 void print_version(){
