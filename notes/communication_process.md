@@ -9,3 +9,5 @@ There are some considerations I must make in regards to not changing the mac unt
 Initially A send  -> B ack -> C send -> ack D ...
 
 Now, A -> B ack -> A transform -> C send -> D ack
+
+30 Bytes or smaller -> NO RTS
