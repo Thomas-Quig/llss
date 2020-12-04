@@ -352,7 +352,7 @@ void print_help(){
     printf("-p <port>\t The port you will be sending to / receiving from.\n");
     printf("-h\t Display this help message.");
     printf("-V\t Print version information");
-    printf("-v\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.")
+    printf("-v\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.");
 }
 
 void print_version(){
