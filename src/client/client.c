@@ -335,9 +335,9 @@ void print_help(){
     print_version();
     printf("usage: llss <snd,rcv,cht,cli> <ip> <port> [args] [data]\n");
     printf("--Notes on standard usage--\n * All arguments can go in any order so long as their required information follows it.\n");
-    printf("* Argument parsing is not perfect and may sometimes break, but most standard edge cases should be covered.\n");
-    printf("* I am a college student signle-handedly working on this, there are likely security flaws in this program.\n  That doesnt mean that it is not a good security tool, it just means it is in progress.\n");
-    printf("If you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
+    printf(" * Argument parsing is not perfect and may sometimes break, but most standard edge cases should be covered.\n");
+    printf(" * I am a college student signle-handedly working on this, there are likely security flaws in this program.\n  That doesnt mean that it is not a good security tool, it just means it is in progress.\n");
+    printf(" If you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
     printf("\n--------------------------------------llss arguments--------------------------------------\n");
     printf("-c <path>\t Path to the configuration file. (It's just a bunch of Integers)\n");
     printf("-C <1/0>\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
