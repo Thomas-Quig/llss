@@ -361,7 +361,7 @@ void print_version(){
 
 int custom_test_code(int argc, char ** argv)
 {
-	mac_change_loop();
+	
 	return 0;
 }
 
