@@ -358,7 +358,7 @@ void print_help(){
     printf("------------------------------------------------------------------------------------------\n\n");
     printf("Examples\n\nrunllsss send -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" to 192.168.0.2:3333 in 1 packet\n\n");
     printf("runllss send -i 192.168.0.2 -p 3333 -F 6 \"Hello World!\"\n\tSends \"Hello \" followed by \"World!\" (2 packets)\n\n");
-    printf("runllss send -e 0 -c c1.conf -l log.txt -v -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" in 1 packet, verbose, all logs go to log.txt, configure with c1.conf");
+    printf("runllss send -e 0 -c c1.conf -l log.txt -v -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" in 1 packet, verbose, all logs go to log.txt, configure with c1.conf\n");
 }
 
 void print_version(){
