@@ -337,7 +337,7 @@ void print_wizard_options()
 void print_help(){
     print_version();
     printf("usage: llss <snd,rcv,cht,cli> <ip> <port> [args] [data]\n");
-    printf("--Notes on standard usage--\n * All arguments can go in any order so long as their required information follows it.\n");
+    printf("\n--Notes on standard usage--\n * All arguments can go in any order so long as their required information follows it.\n");
     printf(" * Argument parsing is not perfect and may sometimes break, but most standard edge cases should be covered.\n");
     printf(" * I am a college student signle-handedly working on this, there are likely security flaws in this program.\n  That doesnt mean that it is not a good security tool, it just means it is in progress.\n");
     printf("\nIf you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
@@ -359,6 +359,7 @@ void print_help(){
     printf("Examples\n\nrunllsss send -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" to 192.168.0.2:3333 in 1 packet\n\n");
     printf("runllss send -i 192.168.0.2 -p 3333 -F 6 \"Hello World!\"\n\tSends \"Hello \" followed by \"World!\" (2 packets)\n\n");
     printf("runllss send -e 0 -c c1.conf -l log.txt -v -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" in 1 packet, verbose, all logs go to log.txt, configure with c1.conf\n");
+    printf("runllss receive -i 192.168.0.3 -p 3333 -o out.txt\n\tReceives from 192.168.0.3:3333 and saves the file to \"out.txt\"");
 }
 
 void print_version(){
