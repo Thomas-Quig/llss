@@ -1,3 +1,4 @@
+#pragma once
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -6,7 +7,6 @@
 #include <pthread.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <argp.h>
 #include <fcntl.h>
 
 #include <sys/types.h>
@@ -34,6 +34,3 @@
 #include <openssl/crypto.h>
 #include <openssl/cryptoerr.h>
 #include <libexplain/ioctl.h>
-
-
-#pragma once

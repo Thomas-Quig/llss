@@ -35,3 +35,10 @@ solutions I tried
 1. recvfrom changing the fonky
 2. Sending back causes a port mismatch
 3. ICMP port unreachable.
+
+## Debug error
+1. tried commenting everything out
+2. Commented line by line
+3. Found isolated source of error
+4. Was memory corruption
+5. Zeroed out the ifreq struct to fix. I had already done this but idk why it didnt work.

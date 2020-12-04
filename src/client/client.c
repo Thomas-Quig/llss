@@ -23,8 +23,10 @@ void sig_handler(int signo)
 
 int client_main(int argc, char ** argv)
 {	
-
-    //Initial configuration, can be overwritten by parse-args
+    //Signal Handler for SIGINT
+    signal(SIGINT,sig_handler);
+    
+    //Initial configuration, is overwritten by parse-args and any future configs.
     configure("./llss.conf");
 
     args a;
@@ -35,33 +37,28 @@ int client_main(int argc, char ** argv)
 
     memcpy(_orig_mac,get_mac(_global_conf._IFACE),12);
 
-    signal(SIGINT,sig_handler);
 
 	switch(a._mode){
         case __CLIENT_MAIN:
             custom_test_code(argc,argv);
             break;
         case __CLIENT_RECV:
-            //pong(establish_connection(argv[2],atoi(argv[3]),__CLIENT_RECV));
             recv_content(a._target_ip,a._port);
             break;
         case __CLIENT_SEND:
-            if(access(a._data,F_OK) != -1)
+            if(_global_conf._CHECK_FILE && access(a._data,F_OK) != -1)
             {
-                //ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_SEND));
+                _sys_log("File found, loading \"%s\"")
                 send_content(a._target_ip,a._port,a._data,__SEND_FILE);
             }
             else
-            {
-                //ping(establish_connection(argv[2],atoi(argv[3]),__CLIENT_SEND));
                 send_content(a._target_ip,a._port,a._data,__SEND_MESSAGE);
-            }
             break;
         case __CLIENT_CHAT:
             chat(a._target_ip,a._port);
             break;
         default:
-            printf("How\n");
+            fprintf(stderr,"Invalid state (%i), exiting...\n",a._mode);
             break;
     };
     if(_global_conf._CLEANUP)
@@ -343,10 +340,19 @@ void print_help(){
     printf("* I am a college student signle-handedly working on this, there are likely security flaws in this program.\n  That doesnt mean that it is not a good security tool, it just means it is in progress.\n");
     printf("If you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
     printf("\n--------llss arguments--------\n");
-    printf("-c <config_path>\t Path to the configuration file. (It's just a bunch of Integers)\n");
-    printf("-C\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
-    printf("-e\t Enable or disable encryption");
-
+    printf("-c <path>\t Path to the configuration file. (It's just a bunch of Integers)\n");
+    printf("-C <1/0>\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
+    printf("-e\t Enable or disable encryption. Enabled by default\n");
+    printf("-f\t Load the file at path [data] and send it. Selcting this enables _CHECK_FILE in config.\n");
+    printf("-F <size>\t Fragmentation size of the sender's data. Default is 1024")
+    printf("-i <ip>\t The IP of the target, **preface <ip> with -i**\n");
+    printf("-I <iface>\t The interface to shuffle MAC addresses on. Ensure that the network you are on allows for Static IP's and no DHCP");
+    printf("-l <path>\t Log file, all _sys_log calls will be sent to this file\n");
+    printf("-o <path>\t Output file, all non _sys_log call output will be sent to the output file at <path>\n");
+    printf("-p <port>\t The port you will be sending to / receiving from.\n");
+    printf("-h\t Display this help message.");
+    printf("-V\t Print version information");
+    printf("-v\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.")
 }
 
 void print_version(){
@@ -373,7 +379,8 @@ void send_content(char * ip, int port, char * arg, int mode)
         FILE * infile = fopen(arg,"r");
         if(infile == NULL)
         {
-            printf("Coult not open file");
+            fprintf(stderr,"Coult not open file \"%s\"", arg);
+            perror(" ");
             return;
         }
         else
