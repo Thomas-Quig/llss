@@ -271,7 +271,7 @@ void parse_args(args * a, int argc, char ** argv)
                     goto error;
                 mode_selected = 1;
             }
-            else if(!strncmp(argv[i],"help",5))
+            else if(!strncmp(argv[i],"help",4))
             {
                 print_help();
                 exit(EXIT_SUCCESS);
