@@ -344,7 +344,7 @@ void print_help(){
     printf("-C <1/0>\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
     printf("-e\t Enable or disable encryption. Enabled by default\n");
     printf("-f\t Load the file at path [data] and send it. Selcting this enables _CHECK_FILE in config.\n");
-    printf("-F <size>\t Fragmentation size of the sender's data. Default is 1024")
+    printf("-F <size>\t Fragmentation size of the sender's data. Default is 1024");
     printf("-i <ip>\t The IP of the target, **preface <ip> with -i**\n");
     printf("-I <iface>\t The interface to shuffle MAC addresses on. Ensure that the network you are on allows for Static IP's and no DHCP");
     printf("-l <path>\t Log file, all _sys_log calls will be sent to this file\n");
