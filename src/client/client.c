@@ -352,7 +352,7 @@ void print_help(){
     printf("-h\t\t Display this help message.\n");
     printf("-V\t\t Print version information\n");
     printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.\n");
-    printf("\n------------------------------------------------------------------------------------------\n");
+    printf("------------------------------------------------------------------------------------------\n");
 }
 
 void print_version(){
