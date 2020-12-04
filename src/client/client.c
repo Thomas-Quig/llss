@@ -344,7 +344,7 @@ void print_help(){
     printf("-e\t\t Enable or disable encryption. Enabled by default\n");
     printf("-f\t\t Load the file at path [data] and send it. Selcting this enables _CHECK_FILE in config.\n");
     printf("-F <size>\t Fragmentation size of the sender's data. Default is 1024\n");
-    printf("-i <ip>\t The IP of the target, **preface <ip> with -i**\n");
+    printf("-i <ip>\t\t The IP of the target, **preface <ip> with -i**\n");
     printf("-I <iface>\t The interface to shuffle MAC addresses on. Ensure that the network you are on allows for Static IP's and no DHCP\n");
     printf("-l <path>\t Log file, all _sys_log calls will be sent to this file\n");
     printf("-o <path>\t Output file, all non _sys_log call output will be sent to the output file at <path>\n");
