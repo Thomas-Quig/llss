@@ -25,7 +25,6 @@ int client_main(int argc, char ** argv)
 {	
     //Signal Handler for SIGINT
     signal(SIGINT,sig_handler);
-    
     //Initial configuration, is overwritten by parse-args and any future configs.
     configure("./llss.conf");
 
@@ -76,7 +75,7 @@ void configure(char * conf_path)
         fscanf(f,"%i\n%i\n%i\n%i\n%i\n%i",&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._LOG_SYS));
         _sys_log("[Config Loaded]\n---------------\nPrintDebug: %i\nFuncList: %i\nShuffle: %i\nEncryption: %i\nCleanup: %i\nSysLogs: %i\n---------------\n",(_global_conf._VERBOSE),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
     }
-    else
+    else if(conf_path == NULL)
     {
         char * param_qs[6] = {"Print debug statements","Print function calls","Shuffle MAC addresses","Encrypt messages","Cleanup arp at end of session", "Log system messages to file"};
         int * params[6] = {&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._VERBOSE)};
@@ -271,7 +270,7 @@ void parse_args(args * a, int argc, char ** argv)
                     goto error;
                 mode_selected = 1;
             }
-            else if(!strncmp(argv[i],"help",4))
+            else if(!strncmp(argv[i],"help",5))
             {
                 print_help();
                 exit(EXIT_SUCCESS);
