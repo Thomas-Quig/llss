@@ -176,7 +176,7 @@ void printConnection(connection * conn)
     printf("Port: %i\n",conn ->port);
     printf("FD: %i\n",conn -> fd);
     printf("Secret: %.*s\n",32,conn ->secret);
-    printf("Saddr: %p\n",conn -> s_addr);
+    printf("Saddr: %p\n",&(conn -> s_addr));
 }
 
 
