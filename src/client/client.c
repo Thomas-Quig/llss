@@ -30,7 +30,10 @@ int client_main(int argc, char ** argv)
 
     args a;
     parse_args(&a,argc,argv);
-    
+    if(strlen(a._conf_path) > 0){
+        configure(a._conf_path);
+    }
+
     memset(_target_ip,0,16);
     strncpy(_target_ip,a._target_ip,min(strlen(a._target_ip),15));
 
@@ -339,7 +342,7 @@ void print_help(){
     printf(" * I am a college student signle-handedly working on this, there are likely security flaws in this program.\n  That doesnt mean that it is not a good security tool, it just means it is in progress.\n");
     printf("\nIf you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
     printf("\n--------------------------------------llss arguments--------------------------------------\n");
-    printf("-c <path>\t Path to the configuration file. (It's just a bunch of Integers)\n");
+    printf("-c <path>\t Path to the configuration file. This OVERRIDES any other configuration settings set in the arguments\n");
     printf("-C <1/0>\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
     printf("-e\t\t Enable or disable encryption. Enabled by default\n");
     printf("-f\t\t Load the file at path [data] and send it. Selcting this enables _CHECK_FILE in config.\n");
@@ -352,7 +355,10 @@ void print_help(){
     printf("-h\t\t Display this help message.\n");
     printf("-V\t\t Print version information\n");
     printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.\n");
-    printf("------------------------------------------------------------------------------------------\n");
+    printf("------------------------------------------------------------------------------------------\n\n");
+    printf("Examples\n\nrunllsss send -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" to 192.168.0.2:3333 in 1 packet\n\n");
+    printf("runllss send -i 192.168.0.2 -p 3333 -F 6 \"Hello World!\"\n\tSends \"Hello \" followed by \"World!\" (2 packets)\n\n");
+    printf("runllss send -e 0 -c c1.conf -l log.txt -v -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" in 1 packet, verbose, all logs go to log.txt, configure with c1.conf")
 }
 
 void print_version(){
