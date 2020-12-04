@@ -338,7 +338,7 @@ void print_help(){
     printf("* Argument parsing is not perfect and may sometimes break, but most standard edge cases should be covered.\n");
     printf("* I am a college student signle-handedly working on this, there are likely security flaws in this program.\n  That doesnt mean that it is not a good security tool, it just means it is in progress.\n");
     printf("If you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
-    printf("\n--------llss arguments--------\n");
+    printf("\n--------------------------------------llss arguments--------------------------------------\n");
     printf("-c <path>\t Path to the configuration file. (It's just a bunch of Integers)\n");
     printf("-C <1/0>\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
     printf("-e\t\t Enable or disable encryption. Enabled by default\n");
@@ -352,6 +352,7 @@ void print_help(){
     printf("-h\t\t Display this help message.\n");
     printf("-V\t\t Print version information\n");
     printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.\n");
+    printf("\n------------------------------------------------------------------------------------------\n");
 }
 
 void print_version(){
