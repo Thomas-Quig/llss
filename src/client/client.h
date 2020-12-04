@@ -25,7 +25,6 @@ void recv_content(char * ip, int port);
 int recv_loop(connection * conn);
 
 void sig_handler(int signo);
-void mac_change_loop();
 void configure(char * path);
 void print_wizard_options();
 void print_help();

@@ -557,20 +557,3 @@ void * chat_send(void * arg){
 void * chat_recv(void * arg){
 
 }
-
-
-void mac_change_loop()
-{
-	while(1){
-		char _newmac[6];
-        printf("Enter Mac: ");
-		scanf("%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",_newmac,_newmac + 1,_newmac + 2,_newmac + 3,_newmac + 4,_newmac + 5);
-		printf("New Mac:%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",_newmac[0],_newmac[1],_newmac[2],_newmac[3],_newmac[4],_newmac[5]);
-		//If you were on ssh, ssh gets hella bonked
-		set_mac(_global_conf._IFACE,_newmac);
-        printf("Confirm New: ");
-		print_mac(_global_conf._IFACE); printf("\n");
-		//system("ifconfig | grep -A 5 'wlan0'");
-		//printf("Exit? (y/n): ");
-	}
-}
