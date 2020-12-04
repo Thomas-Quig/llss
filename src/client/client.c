@@ -441,7 +441,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     }
     s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
     char endbuf[12];
-    printf("Received final packet %d:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
+    printf("Received final packet %ld:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
 }
 
 void recv_content(char * ip, int port)
@@ -564,7 +564,7 @@ void mac_change_loop()
 	while(1){
 		char _newmac[6];
         printf("Enter Mac: ");
-		scanf("%x:%x:%x:%x:%x:%x",_newmac,_newmac + 1,_newmac + 2,_newmac + 3,_newmac + 4,_newmac + 5);
+		scanf("%.2x:%.2x:%.2x:%.2x:%.2x:%.2x",_newmac,_newmac + 1,_newmac + 2,_newmac + 3,_newmac + 4,_newmac + 5);
 		printf("New Mac:%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",_newmac[0],_newmac[1],_newmac[2],_newmac[3],_newmac[4],_newmac[5]);
 		//If you were on ssh, ssh gets hella bonked
 		set_mac(_global_conf._IFACE,_newmac);
