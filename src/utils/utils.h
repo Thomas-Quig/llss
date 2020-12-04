@@ -46,13 +46,17 @@ typedef struct _connection{
  * 
  * @param _VERBOSE should debug statements be printed, this can be enabled by using -v or --verbose. False by default
  * @param _FUNCLIST print off the function and arguments for each function as it is called. False by default
- * @param _CLEANUP cleans up the arp table upon completion of the session. True by default
  * @param _SHUFFLE should the host shuffle it's MAC addresses? (Mostly debug). Turning _SHUFFLE off will allow it to run in any network configuration (with dhcp).
- * @param _CSTMSEED a custom seed for MAC address shuffling, suggested if using unencrypted. Default is -1 which signifies no custom seed has been set.
  * @param _ENCRYPT determines if the message should be encrypted using AES, true by default, turning off increases program speed.
+ * @param _CLEANUP cleans up the arp table upon completion of the session. True by default
  * @param _LOG_SYS if true, any debug based statements will be sent to a log file instead
+ * @param _CHECK_FILE if true, this will check to see if a file exists by the name of [message]
+ * 
+ * 
  * @param _OUTPUT_FD fd of where the received output goes.
  * @param _DB_OUTPUT_FD fd of where debug output goes.
+ * @param _CSTMSEED a custom seed for MAC address shuffling, suggested if using unencrypted. Default is -1 which signifies no custom seed has been set.
+ * @param _FRAG_SIZE the fragmentation size, default 1024
  * @param _IFACE the interface to run this on
  **/
 typedef struct _config{
@@ -62,9 +66,10 @@ typedef struct _config{
     int _ENCRYPT;          //True by default
     int _CLEANUP;          //True by default
     int _LOG_SYS;          //False by default
+    int  _CHECK_FILE;        //False by default
+
     int  _OUTPUT_FD;        //STDOUT_FILENO By default
     int  _DB_OUTPUT_FD;     //STDOUT_FILENO by default
-
     int  _CSTMSEED;         //-1 By default
     int  _FRAG_SIZE;        //Sending fragmentation size
     char _IFACE[6];         //"wlan0" by default

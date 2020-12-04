@@ -23,7 +23,10 @@ void sig_handler(int signo)
 
 int client_main(int argc, char ** argv)
 {	
+
+    //Initial configuration, can be overwritten by parse-args
     configure("./llss.conf");
+
     args a;
     parse_args(&a,argc,argv);
     
@@ -82,22 +85,51 @@ void configure(char * conf_path)
         int * params[6] = {&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._VERBOSE)};
         char _arg[8];
         int _bfr = -1;
-        for(int i = 0; i < 6; i++)
+        for(int i = 0; i < 6;)
         {
             _bfr = -1;
             printf("%s?:",param_qs[i]);
             fgets(_arg,8,stdin);
             _bfr = boolify(_arg);
-            if(_bfr != -1)
+            if(_bfr != -1){
                 *(params[i]) = _bfr;
+                i += 1;
+            }
+            else{
+                printf("Invalid Response (valid responses are t/f,y/n,1/0)\n");
+            }
         }
         if(_global_conf._LOG_SYS)
         {
-            char log_path[64];
+            char log_path[128];
+            memset(log_path,0,128);
             printf("File path for sys logs?:");
-            fgets(log_path, 64,stdin);
-            //_global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
+            fgets(log_path, 127,stdin);
+            _global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
+            if(_global_conf._DB_OUTPUT_FD == -1)
+            {
+
+            }
         }
+        
+        int diff_out = -1;
+        char out_buf[128];
+        memset(out_buf,0,128);
+        do{
+            
+            fgets(out_buf,8,stdin);
+            printf("Send output to file?: ");
+            diff_out = boolify(out_buf);
+        }while(diff_out == -1);
+        
+        if(diff_out)
+        {
+            memset(out_buf,0,128);
+            printf("Output file path?: ");
+            fgets(out_buf,128,stdin);
+            _global_conf._DB_OUTPUT_FD = open(out_buf, O_CREAT | O_TRUNC);
+        }
+        
     }
     
 }
@@ -132,12 +164,18 @@ void parse_args(args * a, int argc, char ** argv)
                     break;
                 case 'o':
                     if(i < (argc - 1))
+                    {
                         strncpy(a -> _out_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _out_path)));
+                        _global_conf._DB_OUTPUT_FD = open(a -> _out_path, O_CREAT | O_TRUNC);
+                        if(_global_conf._DB_OUTPUT_FD == -1)
+                        perror("OUTPUT-Open");
+                    }
                     else
                         goto error;
                     i += 1;
                     break;
                 case 'l':
+                    _global_conf._LOG_SYS = 1;
                     if(i < (argc - 1))
                         strncpy(a -> _log_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _log_path)));
                     else
@@ -172,18 +210,28 @@ void parse_args(args * a, int argc, char ** argv)
                         goto error;
                     i += 1;
                     break;
+                case 'e':
+                    if(i < (argc - 1))
+                        _global_conf._ENCRYPT = atoi(argv[i + 1]);
+                    else
+                        goto error;
+                    i += 1;
+                    break;
+                case 'f':
+                    _global_conf._CHECK_FILE = 1;
+                    break;
                 case 'h':
                     print_help();
                     exit(EXIT_SUCCESS);
                     break;
                 case 'V':
-                    printf("llss Version %i.%i.%i, by Thomas Quig\n",_lvn,_mvn,_rvn);
+                    print_version();
                     exit(EXIT_SUCCESS);
                     break;
                 case 'v':
                     _global_conf._VERBOSE = 1;
                     break;
-                case 'f':
+                case 'L':
                     _global_conf._FUNCLIST = 1;
                     break;
                 case 'w':
@@ -233,6 +281,15 @@ void parse_args(args * a, int argc, char ** argv)
             }
         }
     }
+    if(_global_conf._LOG_SYS)
+    {
+        _global_conf._DB_OUTPUT_FD = open(a -> _log_path, O_CREAT | O_TRUNC);
+        if(_global_conf._DB_OUTPUT_FD == -1)
+        {
+            perror("SYSLOG-Open");
+            exit(EXIT_FAILURE);
+        }
+    }
     if(a -> _mode == __CLIENT_SEND)
     {
         a -> _data = argv[argc - 1];
@@ -258,10 +315,8 @@ void wizard()
         }
         else if(state == CONFIGURE)
         {
-            if(access("./llss.conf",F_OK) != -1)
-                configure("./llss.conf");
-            else
-                configure(NULL);
+            
+            configure(NULL);
         }
     }
 
@@ -281,7 +336,21 @@ void print_wizard_options()
 }
 
 void print_help(){
-    printf("HELP AAAAAAAAAAAA\n");
+    print_version();
+    printf("usage: llss <snd,rcv,cht,cli> <ip> <port> [args] [data]\n");
+    printf("--Notes on standard usage--\n * All arguments can go in any order so long as their required information follows it.\n");
+    printf("* Argument parsing is not perfect and may sometimes break, but most standard edge cases should be covered.\n");
+    printf("* I am a college student signle-handedly working on this, there are likely security flaws in this program.\n  That doesnt mean that it is not a good security tool, it just means it is in progress.\n");
+    printf("If you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
+    printf("\n--------llss arguments--------\n");
+    printf("-c <config_path>\t Path to the configuration file. (It's just a bunch of Integers)\n");
+    printf("-C\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
+    printf("-e\t Enable or disable encryption");
+
+}
+
+void print_version(){
+    printf("llss Version %i.%i.%i, by Thomas Quig\n",_lvn,_mvn,_rvn);
 }
 
 int custom_test_code(int argc, char ** argv)

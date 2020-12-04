@@ -29,6 +29,7 @@ void mac_change_loop();
 void configure(char * path);
 void print_wizard_options();
 void print_help();
+void print_version();
 void wizard();
 int handle_client_options();
 void cleanup(char * orig, char * ip);

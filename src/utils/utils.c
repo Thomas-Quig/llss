@@ -1,9 +1,9 @@
 #include "utils.h"
 //Modified from https://www.binarytides.com/c-program-to-get-mac-address-from-interface-name-on-linux/
 
-config _global_conf = {1,0,1,1,1,0,1,1,-1,1024,"wlan0"};
+config _global_conf = {/*_VERBOSE*/ 1 , /*_FUNCLIST*/ 0 , /*_SHUFFLE*/ 1 , /*_ENCRYPT*/ 1 ,/*_CLEANUP*/ 1 ,
+                         /*_LOG_SYS*/ 0 , /*_CHECK_FILE*/ 0, /*_OUTPUT_FD*/ 1 ,/*_DB_OUTPUT_FD*/ 1 ,/*_CSTMSEED*/ -1 ,/*_FRAG_SIZE*/ 1024,/*_IFACE*/ "wlan0"};
 
-//
 
 connection * establish_connection(char * addr, int port, int mode)
 {
@@ -192,7 +192,7 @@ int _sys_log(const char * format,...)
     va_start(args, format);
     if(_global_conf._VERBOSE)
     {
-        int result = vprintf(format,args);
+        int result = vdprintf(_global_conf._DB_OUTPUT_FD, format,args);
         va_end(args);
         return result;
     }
