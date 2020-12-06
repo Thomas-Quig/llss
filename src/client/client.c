@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 54;
+int _lvn = 1,_mvn = 1,_rvn = 55;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -236,13 +236,9 @@ void parse_args(args * a, int argc, char ** argv)
                     break;
                 case 'h':
                     print_help();
-                    printf("Press Enter to Continue");
-                    while( getchar() != '\n' );
                     break;
                 case 'V':
                     print_version();
-                    printf("Press Enter to Continue");
-                    while( getchar() != '\n' );
                     break;
                 case 'v':
                     _global_conf._VERBOSE = 1;
@@ -393,6 +389,8 @@ void wizard()
                         break;
                     case 7:
                         print_help();
+                        printf("Press Enter to Continue");
+                        while( getchar() != '\n' );
                         break;
                     case 8:
                         a._mode = __CLIENT_MAIN;
