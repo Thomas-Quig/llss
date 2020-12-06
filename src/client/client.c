@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 41;
+int _lvn = 1,_mvn = 1,_rvn = 42;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -336,7 +336,7 @@ void wizard()
         int option = 0;
         switch(state){
             case GENERAL:
-                usleep(2000000);
+                usleep(1250000);
                 print_wizard_options();
                 scanf("%i",&option);
                 switch(option){
@@ -344,6 +344,7 @@ void wizard()
                         a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 0;
                         printf("You are now set to send a message\n");
+                        break;
                     case 2:
                         a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 1;
@@ -384,6 +385,13 @@ void wizard()
                             exit(EXIT_FAILURE);
                         }
                         state = EXECUTE;
+                        break;
+                    case 0:
+                        char confbuf[8]; memset(confbuf); printf("Are you sure (y/n)? "); gets(confbuf);
+                        if(boolify(confbuf)){
+                            printf("Exiting...\n");
+                            eixt(EXIT_SUCCESS);
+                        }
 
                     /**
                         printf("\e[1;1H\e[2J");
