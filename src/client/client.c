@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 52;
+int _lvn = 1,_mvn = 1,_rvn = 54;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -332,19 +332,35 @@ void wizard()
     char data[1024]; memset(data,0,1024);
     print_logo();
     print_version();
-    printf("Booting... ");
+    printf("Booting wizard");
+    for(int i = 0; i < 24; i++)
+    {
+        usleep(50000);
+        printf(".");
+        fflush(stdout);
+    }
     enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
     int mode_selected = 0,ip_present = 0, port_present = 0;
+    int skip_delay = 0;
+
     args a; memset(&a,0,sizeof(a));
     while(state != EXECUTE)
     {
         char opt_buf[5];
         switch(state){
             case GENERAL:
-                usleep(1250000);
+                if(!skip_delay)
+                    usleep(1500000);
+                else
+                    usleep(250000);
                 print_wizard_options();
                 memset(opt_buf,0,5);
                 scanf("%4s",opt_buf); //TODO USE STRTOL TO GET ERRORS
+                if(toupper(opt_buf[0]) == 'F')
+                {
+                    skip_delay = !skip_delay;
+                    break;
+                }
                 char * endptr = NULL;
                 int option = strtol(opt_buf,&endptr,10);
                 if(endptr == opt_buf)
@@ -384,16 +400,24 @@ void wizard()
                         break;
                     case 9:
                         if(!ip_present){
-                            fprintf(stderr,"Parsing Error: Target IP not found or malformed, please preface it with \"-i\", exiting... \n");
-                            exit(EXIT_FAILURE);
+                            fprintf(stderr,"Error: Target IP not found or malformed, please enter it... \n");
+                            break;
                         }
                         if(!port_present){
                             printf("Port not found, using default port(7755)\n");
                             a._port = 7755;
                         }
                         if(!mode_selected){
-                            fprintf(stderr,"Parsing Error: Mode not selected, exiting...\n");
-                            exit(EXIT_FAILURE);
+                            fprintf(stderr,"Error: Mode not selected, please select it...\n");
+                            break;
+                        }
+                        if(a._mode == __CLIENT_SEND)
+                        {
+                            char sendbuf[1024];memset(sendbuf,0,1024);
+                            printf("You are sending a message, more information required\n---Enter your message below---\n");
+                            scanf("%1023s",sendbuf);
+                            printf("------------------------------");
+                            a._data = sendbuf;
                         }
                         state = EXECUTE;
                         break;
@@ -442,10 +466,12 @@ void wizard()
                 scanf("%16s",a._target_ip);
                 printf("Target Port?: ");
                 scanf("%i",&a._port);
-                if(a._port == __LONG_MAX__)
+                if(a._port == 0)
                 {
                     printf("Port input invalid, using default port (%i).\n If needed, reconfigure.\n",__DEFAULT_PORT);
+                    a._port = __DEFAULT_PORT;
                 }
+                ip_present = 1, port_present = 1;
                 state = GENERAL;
                 break;
             case EXECUTE:
@@ -489,7 +515,7 @@ void print_wizard_options()
     printf("8. Custom Test Code\n"); 
     printf("9. Execute\n"); //If you happen to be compiling/editing this yourself, hello :)
     printf("0. Exit\n\n");
-
+    printf("F. Toggle fast mode (wizard only)\n");
     printf("Choice: ");
 }
 
