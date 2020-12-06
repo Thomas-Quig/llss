@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 47;
+int _lvn = 1,_mvn = 1,_rvn = 48;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -338,7 +338,7 @@ void wizard()
             case GENERAL:
                 usleep(1250000);
                 print_wizard_options();
-                scanf("%i",&option);
+                scanf("%i",&option); //TODO USE STRTOL TO GET ERRORS
                 fflush(stdin);
                 switch(option){
                     case 1:
