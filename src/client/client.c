@@ -64,7 +64,7 @@ void execute(args a)
                 _sys_log("File found, loading \"%s\"");
                 send_content(a._target_ip,a._port,a._data,__SEND_FILE);
             }
-            else
+            else                                                
                 send_content(a._target_ip,a._port,a._data,__SEND_MESSAGE);
             break;
         default:
@@ -478,6 +478,7 @@ void wizard()
                 state = GENERAL;
                 break;
             case EXECUTE:
+                printf("Executing llss...\n");
                 execute(a);
                 break;
             default:
