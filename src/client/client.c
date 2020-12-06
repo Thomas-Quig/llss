@@ -53,6 +53,7 @@ int client_main(int argc, char ** argv)
 
 void execute(args a)
 {
+    _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a._target_ip, a._port, a._mode, a._conf_path, a._out_path, a._log_path);
     switch(a._mode){
         case __CLIENT_RECV:
             recv_content(a._target_ip,a._port);
@@ -314,7 +315,6 @@ void parse_args(args * a, int argc, char ** argv)
         fprintf(stderr,"Parsing Error: Mode not selected, exiting...\n");
         exit(EXIT_FAILURE);
     }
-    _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a -> _target_ip, a -> _port, a ->_mode, a -> _conf_path, a -> _out_path, a -> _log_path);
     if(strlen(a -> _target_ip) < 7)
     {
         fprintf(stderr,"Parsing Error: missing or invalid IP, exiting...\n");
