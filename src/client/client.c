@@ -120,8 +120,8 @@ void configure(char * conf_path)
         char out_buf[128];
         memset(out_buf,0,128);
         do{
-            scanf("%8s",out_buf);
             printf("Send output to file?: ");
+            scanf("%8s",out_buf);
             diff_out = boolify(out_buf);
             if(diff_out == -1)
                 printf("Invalid Response (valid responses are t/f,y/n,1/0)\n");
