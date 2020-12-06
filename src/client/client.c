@@ -3,7 +3,7 @@
 static pthread_t chat_threads[2];
 static char _target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 2;
+int _lvn = 1,_mvn = 1,_rvn = 21;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -503,7 +503,10 @@ void send_content(char * ip, int port, char * arg, int mode)
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
-    ssize_t data_size = ds_exchange(conn);
+    if(ds_exchange(conn,(int)content_size) == -1){
+        fprintf(stderr,"ds-exchange failed, exiting...\n");
+        return -1;
+    }
     size_t tot_sent = 0;
     while(tot_sent < content_size)
     {
@@ -547,10 +550,10 @@ int recv_loop(connection * conn)
 {
     char rcv_buf[_global_conf._FRAG_SIZE];
     memset(rcv_buf,0,_global_conf._FRAG_SIZE);
-    ssize_t data_size = ds_exchange(conn);
+    ssize_t data_size = ds_exchange(conn,-1);
     if(data_size < 0)
     {
-        perror("ds-exchange");
+        fprintf(stderr,"ds-exchange failed, exiting...\n");
         return 0;
     }
     ssize_t bytes_rcvd;
