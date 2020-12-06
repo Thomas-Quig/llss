@@ -108,12 +108,8 @@ void configure(char * conf_path)
             _global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
             if(_global_conf._DB_OUTPUT_FD == -1)
             {
-<<<<<<< HEAD
-                perror("log_path-open");
-=======
                 printf("_DB_OUTPUT_FD failed to open, exiting...\n");
                 perror("SYS-Fopen");
->>>>>>> 739ecca7b94f5ee2c89d7ef0a1d76ec6076818ac
                 exit(EXIT_FAILURE);
             }
         }
@@ -142,12 +138,7 @@ void configure(char * conf_path)
 void parse_args(args * a, int argc, char ** argv)
 {
     memset(a,0,sizeof(args));
-<<<<<<< HEAD
     int mode_selected = 0, ip_present = 0,port_present = 0;
-=======
-    int mode_selected = 0;
-    int ip_present = 0, port_present = 0;
->>>>>>> 739ecca7b94f5ee2c89d7ef0a1d76ec6076818ac
     for(int i = 1; i < argc; i++)
     {
         char * arg = argv[i];
@@ -549,7 +540,6 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
-<<<<<<< HEAD
     char rcv_buf[_global_conf._FRAG_SIZE];
     memset(rcv_buf,0,_global_conf._FRAG_SIZE);
     ssize_t data_size = ds_exchange(conn);
@@ -559,11 +549,6 @@ int recv_loop(connection * conn)
         return 0;
     }
     ssize_t bytes_rcvd;
-=======
-    char rcv_buf[max(conn -> data_size,__MAX_BUFFER_SIZE)];
-    memset(rcv_buf,0,max(conn -> data_size,__MAX_BUFFER_SIZE));
-    ssize_t bytes_rcvd = 0, tot_rcvd = 0;
->>>>>>> 739ecca7b94f5ee2c89d7ef0a1d76ec6076818ac
     ssize_t bytes_rspd;
     int rcv_data = 1;
     while (rcv_data)
