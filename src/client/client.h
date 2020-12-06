@@ -27,8 +27,9 @@ int recv_loop(connection * conn);
 
 void sig_handler(int signo);
 void configure(char * path);
+void execute(args a);
 void print_wizard_options();
-void print_logo()
+void print_logo();
 void print_help();
 void print_version();
 void wizard();

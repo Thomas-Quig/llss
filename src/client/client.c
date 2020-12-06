@@ -1,9 +1,9 @@
 #include "client.h"
 
 static pthread_t chat_threads[2];
-static char _target_ip[16];
+static char s_target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 31;
+int _lvn = 1,_mvn = 1,_rvn = 32;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -13,9 +13,9 @@ void sig_handler(int signo)
         char cmd[128];
         memset(cmd,0,128);
         
-        sprintf(cmd,"arp -d %s",_target_ip);
+        sprintf(cmd,"arp -d %s",s_target_ip);
         system(cmd);
-        printf("Recover original mac address with \"ping -I %s %s\"\n",_global_conf._IFACE,_target_ip);
+        printf("Recover original mac address with \"ping -I %s %s\"\n",_global_conf._IFACE,s_target_ip);
 
         exit(0);
     }
@@ -35,12 +35,21 @@ int client_main(int argc, char ** argv)
         configure(a._conf_path);
     }
 
-    memset(_target_ip,0,16);
+    memset(s_target_ip,0,16);
     strncpy(_target_ip,a._target_ip,min(strlen(a._target_ip),15));
 
     memcpy(_orig_mac,get_mac(_global_conf._IFACE),12);
 
-	switch(a._mode){
+	execute(a);
+    if(_global_conf._CLEANUP)
+	    cleanup(_orig_mac,a._target_ip);
+    
+	return 0;
+}
+
+void execute(args a)
+{
+    switch(a._mode){
         case __CLIENT_MAIN:
             custom_test_code(argc,argv);
             break;
@@ -63,10 +72,6 @@ int client_main(int argc, char ** argv)
             fprintf(stderr,"Invalid state (%i), exiting...\n",a._mode);
             break;
     };
-    if(_global_conf._CLEANUP)
-	    cleanup(_orig_mac,a._target_ip);
-    
-	return 0;
 }
 
 void configure(char * conf_path)
@@ -303,15 +308,17 @@ void parse_args(args * a, int argc, char ** argv)
     {
         a -> _data = argv[argc - 1];
     }
-    if(!ip_present)
-    {
-        printf("Parsing Error: Target IP not found or malformed, please preface it with \"-i\", exiting...\n");
+    if(!ip_present){
+        fprintf(stderr,"Parsing Error: Target IP not found or malformed, please preface it with \"-i\", exiting...\n");
         exit(EXIT_FAILURE);
     }
-    if(!port_present)
-    {
+    if(!port_present){
         printf("Port not found, using default port(7755)\n");
         a -> _port = 7755;
+    }
+    if(!mode_selected){
+        fprintf(stderr,"Parsing Error: Mode not selected, exiting...\n");
+        exit(EXIT_FAILURE);
     }
     _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a -> _target_ip, a -> _port, a ->_mode, a -> _conf_path, a -> _out_path, a -> _log_path);
     if(strlen(a -> _target_ip) < 7)
@@ -330,7 +337,7 @@ void wizard()
     print_logo();
     print_version();
     enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
-    int exec_option = 0;
+    int mode_selected = 0,ip_present = 0, port_present = 0;
     args a; memset(&a,0,sizeof(a));
     while(state != EXECUTE)
     {
@@ -341,42 +348,66 @@ void wizard()
                 print_wizard_options();
                 scanf("%i",&option);
                 switch(option){
-                    
                     case 1:
-                        printf("Current Mac Address: %s\n",format_mac(get_mac(_global_conf._IFACE)));
-                        break;
-                    case 2:
                         a.mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 0;
-                        printf("Configured to send a message\n");
-                    case 3:
+                        printf("You are now set to send a message\n");
+                    case 2:
                         a.mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 1;
-                        printf("Configured to send a file\n");
+                        printf("You are now set to send a file\n");
+                        break;
+                    case 3:
+                        a.mode = __CLIENT_RECV;
+                        printf("You are now configured to receive a file\n");
                         break;
                     case 4:
-                        a.mode = __CLIENT_RECV;
-                        printf("Configured to receive a file\n");
+                        state = CONFIGURE;
                         break;
                     case 5:
+                        save_config(NULL);
+                        printf("Successfully saved current configuration to file\n");
+                        break;
+                    case 6:
+                        state = INFO;
+                        break;
+                    case 7:
+                        print_help();
+                        break;
                     case 8:
                         a._mode = __CLIENT_MAIN;
                         printf("Configured to run custom code\n");
                         break;
+                    case 9:
+                        if(!ip_present){
+                            fprintf(stderr,"Parsing Error: Target IP not found or malformed, please preface it with \"-i\", exiting...\n");
+                            exit(EXIT_FAILURE);
+                        }
+                        if(!port_present){
+                            printf("Port not found, using default port(7755)\n");
+                            a -> _port = 7755;
+                        }
+                        if(!mode_selected){
+                            fprintf(stderr,"Parsing Error: Mode not selected, exiting...\n");
+                            exit(EXIT_FAILURE);
+                        }
+                        state = EXECUTE;
 
                     /**
+                        printf("\e[1;1H\e[2J");
                         printf("1. Send message\n");
                         printf("2. Send file\n");
                         printf("3. Receive message or file\n");
-                        printf("4. Configure llss\n");
-                        printf("5. Load config file\n");
-                        printf("6. Command line help\n");
-                        printf("7. Custom Test Code\n"); 
-                        printf("8. Execute\n"); //If you happen to be compiling/editing this yourself, hello :)
+                        printf("4. Configure llss (settings and IP)\n");
+                        printf("5. Save configration");
+                        printf("6. Set critical information (ip, port)\n")
+                        printf("7. Command line help\n");
+                        printf("8. Custom Test Code\n"); 
+                        printf("9. Execute\n"); //If you happen to be compiling/editing this yourself, hello :)
                         printf("0. Exit\n\n");
-                        
+
                         printf("Choice: ");
-                     * */
+                    **/
                 }
                 break;
             case CONFIGURE:
