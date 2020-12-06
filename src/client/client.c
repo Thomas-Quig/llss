@@ -344,23 +344,23 @@ void wizard()
                     case 1:
                         a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 0;
-                        printf("You are now set to send a message "); fflush(stdout);
+                        printf("You are now set to send a message\n");
                         break;
                     case 2:
                         a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 1;
-                        printf("You are now set to send a file "); fflush(stdout);
+                        printf("You are now set to send a file \n");
                         break;
                     case 3:
                         a._mode = __CLIENT_RECV;
-                        printf("You are now configured to receive a file "); fflush(stdout);
+                        printf("You are now configured to receive a file \n");
                         break;
                     case 4:
                         state = CONFIGURE;
                         break;
                     case 5:
                         save_config(NULL);
-                        printf("Successfully saved current configuration to file "); fflush(stdout);
+                        printf("Successfully saved current configuration to file \n");
                         break;
                     case 6:
                         state = INFO;
@@ -370,7 +370,7 @@ void wizard()
                         break;
                     case 8:
                         a._mode = __CLIENT_MAIN;
-                        printf("Configured to run custom code "); fflush(stdout);
+                        printf("Configured to run custom code \n");
                         break;
                     case 9:
                         if(!ip_present){
