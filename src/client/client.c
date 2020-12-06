@@ -345,8 +345,9 @@ void wizard()
                 print_wizard_options();
                 memset(opt_buf,0,5);
                 scanf("%4s",opt_buf); //TODO USE STRTOL TO GET ERRORS
+                errno = 0;
                 int option = strtol(opt_buf,NULL,10);
-                if(option == __INT_MAX__)
+                if(errno != 0)
                     option == -1;
                 fflush(stdin);
                 switch(option){
