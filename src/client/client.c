@@ -35,7 +35,7 @@ int client_main(int argc, char ** argv)
     }
 
     memset(s_target_ip,0,16);
-    strncpy(_target_ip,a._target_ip,min(strlen(a._target_ip),15));
+    strncpy(s_target_ip,a._target_ip,min(strlen(a._target_ip),15));
 
     memcpy(_orig_mac,get_mac(_global_conf._IFACE),12);
     if(a._mode == __CLIENT_MAIN){
@@ -340,16 +340,16 @@ void wizard()
                 scanf("%i",&option);
                 switch(option){
                     case 1:
-                        a.mode = __CLIENT_SEND;
+                        a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 0;
                         printf("You are now set to send a message\n");
                     case 2:
-                        a.mode = __CLIENT_SEND;
+                        a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 1;
                         printf("You are now set to send a file\n");
                         break;
                     case 3:
-                        a.mode = __CLIENT_RECV;
+                        a._mode = __CLIENT_RECV;
                         printf("You are now configured to receive a file\n");
                         break;
                     case 4:
@@ -376,7 +376,7 @@ void wizard()
                         }
                         if(!port_present){
                             printf("Port not found, using default port(7755)\n");
-                            a -> _port = 7755;
+                            a._port = 7755;
                         }
                         if(!mode_selected){
                             fprintf(stderr,"Parsing Error: Mode not selected, exiting...\n");
@@ -453,13 +453,13 @@ void wizard()
 
 void print_logo()
 {
-    char logo = "\n\n\n"
+    char logo[] = "\n\n\n"
     "██╗     ██╗     ███████╗███████╗\n"
     "██║     ██║     ██╔════╝██╔════╝\n"
     "██║     ██║     ███████╗███████╗\n"
     "██║     ██║     ╚════██║╚════██║\n"
     "███████╗███████╗███████║███████║\n"
-    "╚══════╝╚══════╝╚══════╝╚══════╝\n\n\n"
+    "╚══════╝╚══════╝╚══════╝╚══════╝\n\n\n";
     printf("%s",logo);
 }
 
@@ -471,7 +471,7 @@ void print_wizard_options()
     printf("3. Receive message or file\n");
     printf("4. Configure llss (settings and IP)\n");
     printf("5. Save configration");
-    printf("6. Set critical information (ip, port)\n")
+    printf("6. Set critical information (ip, port)\n");
     printf("7. Command line help\n");
     printf("8. Custom Test Code\n"); 
     printf("9. Execute\n"); //If you happen to be compiling/editing this yourself, hello :)
