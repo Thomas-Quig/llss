@@ -93,7 +93,7 @@ void configure(char * conf_path)
         {
             _bfr = -1;
             printf("%s?: ",param_qs[i]);
-            fgets(_arg,8,stdin);
+            scanf("%8s",_arg);
             _bfr = boolify(_arg);
             if(_bfr != -1){
                 *(params[i]) = _bfr;
@@ -108,6 +108,7 @@ void configure(char * conf_path)
             char log_path[128];
             memset(log_path,0,128);
             printf("File path for sys logs?:");
+            scanf("%127s",log_path);
             fgets(log_path, 127,stdin);
             _global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
             if(_global_conf._DB_OUTPUT_FD == -1)
