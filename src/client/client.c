@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 48;
+int _lvn = 1,_mvn = 1,_rvn = 49;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -432,13 +432,10 @@ void wizard()
                 state = GENERAL;  
                 break;
             case INFO: //THIS IS 100& not working
-                fflush(stdin);
                 printf("Target IP?: ");
-                fgets(a._target_ip,16,stdin);
-                fflush(stdin);
+                scanf("%.16s",a._target_ip);
                 printf("Target Port?: ");
-                char p_buf[4]; fgets(p_buf,4,stdin);
-                a._port = strtol(p_buf,NULL,10);
+                scanf("%i",&a._port);
                 if(a._port == __LONG_MAX__)
                 {
                     printf("Port input invalid, using default port (%i).\n If needed, reconfigure.\n",__DEFAULT_PORT);
