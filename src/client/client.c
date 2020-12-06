@@ -316,7 +316,7 @@ void parse_args(args * a, int argc, char ** argv)
     _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a -> _target_ip, a -> _port, a ->_mode, a -> _conf_path, a -> _out_path, a -> _log_path);
     if(strlen(a -> _target_ip) < 7)
     {
-        fprintf("Parsing Error: missing or invalid IP, exiting...\n")
+        fprintf(stderr,"Parsing Error: missing or invalid IP, exiting...\n")
     }
     return;
     error:
@@ -328,7 +328,7 @@ void wizard()
 {
     enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
     int exec_option = 0;
-    args a; memset(a,0,sizeof(a));
+    args a; memset(&a,0,sizeof(a));
     while(state != EXECUTE)
     {
         int option = 0;
@@ -344,7 +344,7 @@ void wizard()
                 {
                     printf("Would you like to save your configuration?: ");
                     char c_buf[8];memset(c_buf,0,8);fgets(c_buf,8,stdin);
-                    save = boolify(input);
+                    save = boolify(c_buf);
                 }
                 if(save)
                 {
@@ -353,7 +353,7 @@ void wizard()
                     FILE * new_conf = fopen(savc_buf,"r");
                     memset(savc_buf,128,0);
 
-                    sprintf(savc_buf,"%i\n%i\n%i\n%i\n%i\n%i\n%i\n",_global_conf._VERBOSE,_global_conf._FUNCLIST,_global_conf._SHUFFLE,_global_conf._ENCRYPT,_global_conf._CLEANUP,_global_conf._LOG_SYS,_global_conf._CHECK_FILE)
+                    sprintf(savc_buf,"%i\n%i\n%i\n%i\n%i\n%i\n%i\n",_global_conf._VERBOSE,_global_conf._FUNCLIST,_global_conf._SHUFFLE,_global_conf._ENCRYPT,_global_conf._CLEANUP,_global_conf._LOG_SYS,_global_conf._CHECK_FILE);
                     if (fwrite(savc_buf,strlen(savc_buf),1,new_conf) == -1)
                     {
                         perror("sconf-fwrite");
@@ -375,6 +375,11 @@ void wizard()
                 state = GENERAL;
                 break;
             case EXECUTE:
+                break;
+            default:
+                fprintf(stderr,"Invalid state, exiting...");
+                exit(EXIT_FAILURE);
+                break;
         }
     }
 
