@@ -433,7 +433,7 @@ void wizard()
                 break;
             case INFO: //THIS IS 100& not working
                 printf("Target IP?: ");
-                scanf("%.16s",a._target_ip);
+                scanf("%16s",a._target_ip);
                 printf("Target Port?: ");
                 scanf("%i",&a._port);
                 if(a._port == __LONG_MAX__)
