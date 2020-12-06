@@ -30,10 +30,10 @@ int set_mac(char * iface, char * newMac)
 
 ssize_t ds_exchange(connection * conn,int ds)		
 {		
-    ssize_t data_size;		
-    switch(conn -> _mode)		
+    ssize_t data_size;	
+    char buf[8];memset(buf,0,8);		
+    switch(conn -> mode)		
     {		
-        char buf[8];memset(buf,0,8);		
         case __CLIENT_RECV:		
             if(s_recv(conn,buf,sizeof(int)) == -1){		
                 perror("r-dsexch-recv:");		

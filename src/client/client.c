@@ -3,7 +3,7 @@
 static pthread_t chat_threads[2];
 static char _target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 0;
+int _lvn = 1,_mvn = 1,_rvn = 2;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
