@@ -36,6 +36,7 @@ typedef struct _connection{
     struct sockaddr_in s_addr;
     socklen_t s_len;
     char secret[32];
+    int data_size;
 } connection;
 
 
@@ -78,6 +79,9 @@ typedef struct _config{
 } config;
 
 extern config _global_conf;
+
+ssize_t s_send(connection * conn, char * data, size_t size);
+ssize_t s_recv(connection * conn, char * data, size_t size);
 /**
  * Establishes a "connection" with the given address and port, passes ip and port into the connection if it is needed.
  * Returns on the heap, so it needs to be freed.
@@ -88,8 +92,13 @@ extern config _global_conf;
  *
  **/
 connection * establish_connection(char * addr, int port, int mode);
-char * estab_shared_secret(connection * conn,int mode);
 
+
+char * estab_shared_secret(connection * conn,int mode);
+int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+            unsigned char *iv, unsigned char *ciphertext);
+int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+            unsigned char *iv, unsigned char *plaintext);
 /**
 *	Gets the MAC Address 
 *	It does the thing, creates 12B of space on the heap

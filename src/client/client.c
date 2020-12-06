@@ -108,7 +108,12 @@ void configure(char * conf_path)
             _global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
             if(_global_conf._DB_OUTPUT_FD == -1)
             {
+<<<<<<< HEAD
                 perror("log_path-open");
+=======
+                printf("_DB_OUTPUT_FD failed to open, exiting...\n");
+                perror("SYS-Fopen");
+>>>>>>> 739ecca7b94f5ee2c89d7ef0a1d76ec6076818ac
                 exit(EXIT_FAILURE);
             }
         }
@@ -137,7 +142,12 @@ void configure(char * conf_path)
 void parse_args(args * a, int argc, char ** argv)
 {
     memset(a,0,sizeof(args));
+<<<<<<< HEAD
     int mode_selected = 0, ip_present = 0,port_present = 0;
+=======
+    int mode_selected = 0;
+    int ip_present = 0, port_present = 0;
+>>>>>>> 739ecca7b94f5ee2c89d7ef0a1d76ec6076818ac
     for(int i = 1; i < argc; i++)
     {
         char * arg = argv[i];
@@ -156,8 +166,11 @@ void parse_args(args * a, int argc, char ** argv)
                     i += 1;
                     break;
                 case 'i':
-                    if(i < (argc - 1))
+                    if(i < (argc - 1) && !ip_present)
+                    {
                         strncpy(a->_target_ip,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _target_ip)));
+                        ip_present = 1;
+                    }
                     else
                         goto error;
                     i += 1;
@@ -168,7 +181,7 @@ void parse_args(args * a, int argc, char ** argv)
                         strncpy(a -> _out_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _out_path)));
                         _global_conf._DB_OUTPUT_FD = open(a -> _out_path, O_CREAT | O_TRUNC);
                         if(_global_conf._DB_OUTPUT_FD == -1)
-                        perror("OUTPUT-Open");
+                            perror("OUTPUT-Open");
                     }
                     else
                         goto error;
@@ -198,7 +211,12 @@ void parse_args(args * a, int argc, char ** argv)
                     break;
                 case 'p':
                     if(i < (argc - 1))
+                    {
+                        if(port_present)
+                            goto error;
                         a -> _port = atoi(argv[i + 1]);
+                        port_present = 1;
+                    }
                     else
                         goto error;
                     i += 1;
@@ -293,6 +311,16 @@ void parse_args(args * a, int argc, char ** argv)
     if(a -> _mode == __CLIENT_SEND)
     {
         a -> _data = argv[argc - 1];
+    }
+    if(!ip_present)
+    {
+        printf("Parsing Error: Target IP not found or malformed, please preface it with \"-i\", exiting...\n");
+        exit(EXIT_FAILURE);
+    }
+    if(!port_present)
+    {
+        printf("Port not found, using default port(7755)\n");
+        a -> _port = 7755;
     }
     _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a -> _target_ip, a -> _port, a ->_mode, a -> _conf_path, a -> _out_path, a -> _log_path);
     if(strlen(a -> _target_ip) < 7)
@@ -390,7 +418,7 @@ void print_help(){
     printf("-I <iface>\t The interface to shuffle MAC addresses on. Ensure that the network you are on allows for Static IP's and no DHCP\n");
     printf("-l <path>\t Log file, all _sys_log calls will be sent to this file\n");
     printf("-o <path>\t Output file, all non _sys_log call output will be sent to the output file at <path>\n");
-    printf("-p <port>\t The port you will be sending to / receiving from.\n");
+    printf("-p <port>\t The port you will be sending to / receiving from. Be aware that this runs atoi(3), so any noninteger is undefined behaviour.\n");
     printf("-h\t\t Display this help message.\n");
     printf("-V\t\t Print version information\n");
     printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required for -l to have any content.\n");
@@ -442,6 +470,15 @@ void send_content(char * ip, int port, char * arg, int mode)
                 size_t content_size = min(__MAX_BUFFER_SIZE,file_size - tot_bytes_sent);
                 char content[content_size];
                 fread(content,content_size,1,infile);
+                if(_global_conf._ENCRYPT)
+                {
+                    char cipher[content_size + 16 - (content_size % 16)];
+                    int cypher_len = encrypt(content,content_size,conn -> secret, conn -> secret + 16,cipher);
+                    send_loop(conn,cipher,cypher_len);
+                }
+                else{
+                    send_loop(conn,content,content_size);
+                }
                 send_loop(conn,content,content_size);
                 tot_bytes_sent += content_size;
             }
@@ -449,7 +486,17 @@ void send_content(char * ip, int port, char * arg, int mode)
     }
     else if(mode == __SEND_MESSAGE)
     {
-        send_loop(conn,arg,strlen(arg));
+        
+        if(_global_conf._ENCRYPT)
+        {
+            char cipher[strlen(arg) + 16 - (strlen(arg) % 16)];
+            int cypher_len = encrypt(arg,strlen(arg),conn -> secret, conn -> secret + 16,cipher);
+            send_loop(conn,cipher,cypher_len);
+        }
+        else{
+            send_loop(conn,arg,strlen(arg));
+        }
+        
     }
     else
     {
@@ -502,6 +549,7 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
+<<<<<<< HEAD
     char rcv_buf[_global_conf._FRAG_SIZE];
     memset(rcv_buf,0,_global_conf._FRAG_SIZE);
     ssize_t data_size = ds_exchange(conn);
@@ -511,6 +559,11 @@ int recv_loop(connection * conn)
         return 0;
     }
     ssize_t bytes_rcvd;
+=======
+    char rcv_buf[max(conn -> data_size,__MAX_BUFFER_SIZE)];
+    memset(rcv_buf,0,max(conn -> data_size,__MAX_BUFFER_SIZE));
+    ssize_t bytes_rcvd = 0, tot_rcvd = 0;
+>>>>>>> 739ecca7b94f5ee2c89d7ef0a1d76ec6076818ac
     ssize_t bytes_rspd;
     int rcv_data = 1;
     while (rcv_data)
@@ -518,13 +571,16 @@ int recv_loop(connection * conn)
         char * next_macs = get_next_macs(__CLIENT_RECV);
 
         _sys_log("Waiting on data...\n");
-        bytes_rcvd = s_recv(conn,rcv_buf,_global_conf._FRAG_SIZE);
+        bytes_rcvd = s_recv(conn,rcv_buf + tot_rcvd,_global_conf._FRAG_SIZE);
+        if(bytes_rcvd == -1){
+            perror("s_recv");
+        }
+        tot_rcvd += bytes_rcvd;
         _sys_log("[RCVD] Received %d bytes\n",bytes_rcvd);
         advance_mac(conn,next_macs,__ADV_OTHR);
         
-        rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
-        if(rcv_data)
-            write(_global_conf._OUTPUT_FD,rcv_buf,bytes_rcvd);
+        //rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
+        //if(rcv_data)
         char resp_buf[12];
         memset(resp_buf,0,12);
         sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));
@@ -532,7 +588,16 @@ int recv_loop(connection * conn)
         
         advance_mac(conn,next_macs,__ADV_SELF);
     }
-    
+    if(_global_conf._ENCRYPT)
+    {
+        char plaintext[conn -> data_size];
+        int plaintext_size = decrypt(rcv_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
+        write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
+    }
+    else
+    {
+        write(_global_conf._OUTPUT_FD,rcv_buf,tot_rcvd);
+    }
 }
 
 void cleanup(char * orig_mac, char * ip)

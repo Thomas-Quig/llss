@@ -31,6 +31,10 @@
 #include <openssl/dh.h>
 #include <openssl/bn.h>
 #include <openssl/err.h>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
 #include <openssl/crypto.h>
 #include <openssl/cryptoerr.h>
+
 #include <libexplain/ioctl.h>
