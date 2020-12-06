@@ -72,6 +72,8 @@ void execute(args a)
     };
 }
 
+
+//TOOD FIX FLUSHING SO IT WORKS
 void configure(char * conf_path)
 {
     if(conf_path != NULL && access(conf_path, F_OK) != -1)
@@ -238,7 +240,8 @@ void parse_args(args * a, int argc, char ** argv)
                     break;
                 case 'V':
                     print_version();
-                    exit(EXIT_SUCCESS);
+                    printf("Press Enter to Continue");
+                    while( getchar() != '\n' );
                     break;
                 case 'v':
                     _global_conf._VERBOSE = 1;
@@ -428,10 +431,11 @@ void wizard()
                 }
                 state = GENERAL;  
                 break;
-            case INFO:
+            case INFO: //THIS IS 100& not working
+                fflush(stdin);
                 printf("Target IP?: ");
                 fgets(a._target_ip,16,stdin);
-                
+                fflush(stdin);
                 printf("Target Port?: ");
                 char p_buf[4]; fgets(p_buf,4,stdin);
                 a._port = strtol(p_buf,NULL,10);
