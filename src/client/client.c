@@ -346,6 +346,8 @@ void wizard()
                 memset(opt_buf,0,5);
                 scanf("%4s",opt_buf); //TODO USE STRTOL TO GET ERRORS
                 int option = strtol(opt_buf,NULL,10);
+                if(option == __INT_MAX__)
+                    option == -1;
                 fflush(stdin);
                 switch(option){
                     case 1:
