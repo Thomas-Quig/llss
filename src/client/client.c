@@ -338,12 +338,13 @@ void wizard()
     args a; memset(&a,0,sizeof(a));
     while(state != EXECUTE)
     {
-        char opt_buf[5] = 0;
+        char opt_buf[5];
         switch(state){
             case GENERAL:
                 usleep(1250000);
                 print_wizard_options();
-                scanf("%4s",&opt_buf); //TODO USE STRTOL TO GET ERRORS
+                memset(opt_buf,0,5);
+                scanf("%4s",opt_buf); //TODO USE STRTOL TO GET ERRORS
                 int option = strtol(opt_buf,NULL,10);
                 fflush(stdin);
                 switch(option){
