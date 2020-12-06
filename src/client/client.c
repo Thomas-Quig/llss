@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 40;
+int _lvn = 1,_mvn = 1,_rvn = 41;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -327,6 +327,7 @@ void wizard()
     char data[1024]; memset(data,0,1024);
     print_logo();
     print_version();
+    printf("Booting... ");
     enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
     int mode_selected = 0,ip_present = 0, port_present = 0;
     args a; memset(&a,0,sizeof(a));
@@ -466,6 +467,8 @@ void print_logo()
 void print_wizard_options()
 {
     printf("\e[1;1H\e[2J");
+    print_version();
+
 	printf("1. Send message\n");
 	printf("2. Send file\n");
     printf("3. Receive message or file\n");
