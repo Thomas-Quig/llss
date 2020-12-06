@@ -90,7 +90,7 @@ void configure(char * conf_path)
         for(int i = 0; i < 6;)
         {
             _bfr = -1;
-            printf("%s?:",param_qs[i]);
+            printf("%s?: ",param_qs[i]);
             fgets(_arg,8,stdin);
             _bfr = boolify(_arg);
             if(_bfr != -1){
@@ -405,7 +405,7 @@ void wizard()
                 printf("Configuring llss execution\n");
                 configure(NULL);
                 int save = -1;
-                while(save = -1)
+                while(save == -1)
                 {
                     printf("Would you like to save your configuration?: ");
                     char c_buf[8];memset(c_buf,0,8);fgets(c_buf,8,stdin);
