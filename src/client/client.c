@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 55;
+int _lvn = 1,_mvn = 1,_rvn = 56;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -369,15 +369,18 @@ void wizard()
                         a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 0;
                         printf("You are now set to send a message\n");
+                        mode_selected = 1;
                         break;
                     case 2:
                         a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 1;
                         printf("You are now set to send a file \n");
+                        mode_selected = 1;
                         break;
                     case 3:
                         a._mode = __CLIENT_RECV;
                         printf("You are now configured to receive a file \n");
+                        mode_selected = 1;
                         break;
                     case 4:
                         state = CONFIGURE;
