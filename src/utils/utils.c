@@ -112,15 +112,6 @@ int boolify(char * input)
         return (c1 == 'y') || (c1 == 't') || (c1 == '1');
 }
 
-void print_mac(char * iface)
-{
-	unsigned char * mac = get_mac(iface);
-	char * formatted = format_mac(mac);
-	printf("%s",formatted);
-	free(mac);
-	free(formatted);
-}
-
 
 // Based on https://wiki.openssl.org/index.php/Diffie_Hellman
 char * estab_shared_secret(connection * conn, int mode)
@@ -317,8 +308,6 @@ void handleErrors(int line)
     ERR_print_errors_fp(stderr);
 }
 
-
-
 unsigned char * get_mac(char * iface)
 {
 	int fd;
@@ -340,15 +329,8 @@ unsigned char * get_mac(char * iface)
 	return ret;	
 }
 
-char * get_ip(char * iface)
+ssize_t save_config(char * fname)
 {
-    int fd;
-    struct ifreq ifr;
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    ifr.ifr_addr.sa_family = AF_INET;
-    strncpy(ifr.ifr_name, iface, IFNAMSIZ-1);
-    ioctl(fd, SIOCGIFADDR, &ifr);
-    close(fd);
-    return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
+    for(int i = 0; i < 10; i++)
+        printf("TODO MOVE THIS CODE OVER FROM WIZARD\n");
 }

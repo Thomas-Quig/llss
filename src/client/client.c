@@ -3,7 +3,7 @@
 static pthread_t chat_threads[2];
 static char _target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 24;
+int _lvn = 1,_mvn = 1,_rvn = 31;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -15,7 +15,7 @@ void sig_handler(int signo)
         
         sprintf(cmd,"arp -d %s",_target_ip);
         system(cmd);
-        printf("Recover original mac address with ping -I %s %s\n",_global_conf._IFACE,_target_ip);
+        printf("Recover original mac address with \"ping -I %s %s\"\n",_global_conf._IFACE,_target_ip);
 
         exit(0);
     }
@@ -30,7 +30,7 @@ int client_main(int argc, char ** argv)
     configure("./llss.conf");
 
     args a;
-    parse_args(&a,argc,argv);
+    parse_args(&a,argc,argv); //Parse args will exit if -w is called
     if(strlen(a._conf_path) > 0){
         configure(a._conf_path);
     }
@@ -39,7 +39,6 @@ int client_main(int argc, char ** argv)
     strncpy(_target_ip,a._target_ip,min(strlen(a._target_ip),15));
 
     memcpy(_orig_mac,get_mac(_global_conf._IFACE),12);
-
 
 	switch(a._mode){
         case __CLIENT_MAIN:
@@ -327,16 +326,59 @@ void parse_args(args * a, int argc, char ** argv)
 
 void wizard()
 {
+    char data[1024]; memset(data,0,1024);
+    print_logo();
+    print_version();
     enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
     int exec_option = 0;
     args a; memset(&a,0,sizeof(a));
     while(state != EXECUTE)
     {
         int option = 0;
-        print_wizard_options();
-        scanf("%i",&option);
         switch(state){
             case GENERAL:
+                usleep(2000000);
+                print_wizard_options();
+                scanf("%i",&option);
+                switch(option){
+                    
+                    case 1:
+                        printf("Current Mac Address: %s\n",format_mac(get_mac(_global_conf._IFACE)));
+                        break;
+                    case 2:
+                        a.mode = __CLIENT_SEND;
+                        _global_conf._CHECK_FILE = 0;
+                        printf("Configured to send a message\n");
+                    case 3:
+                        a.mode = __CLIENT_SEND;
+                        _global_conf._CHECK_FILE = 1;
+                        printf("Configured to send a file\n");
+                        break;
+                    case 4:
+                        a.mode = __CLIENT_RECV;
+                        printf("Configured to receive a file\n");
+                        break;
+                    case 5:
+                    case 8:
+                        a._mode = __CLIENT_MAIN;
+                        printf("Configured to run custom code\n");
+                        break;
+
+                    /**
+                        printf("1. Send message\n");
+                        printf("2. Send file\n");
+                        printf("3. Receive message or file\n");
+                        printf("4. Configure llss\n");
+                        printf("5. Load config file\n");
+                        printf("6. Command line help\n");
+                        printf("7. Custom Test Code\n"); 
+                        printf("8. Execute\n"); //If you happen to be compiling/editing this yourself, hello :)
+                        printf("0. Exit\n\n");
+                        
+                        printf("Choice: ");
+                     * */
+                }
+                break;
             case CONFIGURE:
                 printf("Configuring llss execution\n");
                 configure(NULL);
@@ -362,6 +404,7 @@ void wizard()
                     }
                 }
                 state = GENERAL;  
+                break;
             case INFO:
                 printf("Target IP?: ");
                 fgets(a._target_ip,16,stdin);
@@ -385,17 +428,34 @@ void wizard()
     }
 
 }
+
+void print_logo()
+{
+    char logo = "\n\n\n"
+    "██╗     ██╗     ███████╗███████╗\n"
+    "██║     ██║     ██╔════╝██╔════╝\n"
+    "██║     ██║     ███████╗███████╗\n"
+    "██║     ██║     ╚════██║╚════██║\n"
+    "███████╗███████╗███████║███████║\n"
+    "╚══════╝╚══════╝╚══════╝╚══════╝\n\n\n"
+    printf("%s",logo);
+}
+
 void print_wizard_options()
 {
-	printf("1. Get Current Mac Address\n");
-	printf("2. Send message\n");
-	printf("3. Send file\n");
-    printf("4. Receive message or file\n");
-    printf("5. Configure llss (temporary)\n");
-    printf("6. Load config file");
+    printf("\e[1;1H\e[2J");
+	printf("1. Send message\n");
+	printf("2. Send file\n");
+    printf("3. Receive message or file\n");
+    printf("4. Configure llss (settings and IP)\n");
+    printf("5. Save configration");
+    printf("6. Set critical information (ip, port)\n")
+    printf("7. Command line help\n");
+    printf("8. Custom Test Code\n"); 
+    printf("9. Execute\n"); //If you happen to be compiling/editing this yourself, hello :)
+    printf("0. Exit\n\n");
 
-    //If you happen to be compiling/editing this yourself, hello :)
-    printf("0. Custom Test Code"); 
+    printf("Choice: ");
 }
 
 void print_help(){
@@ -653,7 +713,6 @@ int chat_loop(connection * conn)
 			_currmac[5] += 17;
 			set_mac(_global_conf._IFACE,_currmac);
 			printf("New Mac: ");
-			print_mac(_global_conf._IFACE);nl();
 			continue;
 		}**/
 		

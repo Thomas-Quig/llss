@@ -105,8 +105,6 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 **/
 unsigned char * get_mac(char * iface);
 
-char * get_ip(char * iface);
-
 /**
 *	Formats the mac address
 *	Creates 18B of space on the heap
@@ -116,11 +114,7 @@ char * format_mac(unsigned char * mac);
 //Parses first character of a string and quantifies it as a bool, -1 on error (not true, 1, or yes)
 int boolify(char * input);
 
-/**
-*	Prints the mac address for the given interface
-*	Frees all memory at the end.
-**/
-void print_mac(char * iface);
+ssize_t save_config(char * fname);
 
 void printConnection(connection * conn);
 
