@@ -77,6 +77,9 @@ typedef struct _config{
 } config;
 
 extern config _global_conf;
+
+ssize_t s_send(connection * conn, char * data, size_t size);
+ssize_t s_recv(connection * conn, char * data, size_t size);
 /**
  * Establishes a "connection" with the given address and port, passes ip and port into the connection if it is needed.
  * Returns on the heap, so it needs to be freed.
