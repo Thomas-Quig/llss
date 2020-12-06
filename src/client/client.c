@@ -233,7 +233,8 @@ void parse_args(args * a, int argc, char ** argv)
                     break;
                 case 'h':
                     print_help();
-                    exit(EXIT_SUCCESS);
+                    printf("Press Enter to Continue");
+                    while( getchar() != '\n' );
                     break;
                 case 'V':
                     print_version();
