@@ -183,7 +183,7 @@ char * estab_shared_secret(connection * conn, int mode)
     /* Receive the public key from the peer. In this example we're just hard coding a value */
     
     BIGNUM *ohostkey = NULL;
-    if(0 == (BN_dec2bn(&ohostkey, ohost))) goto dh_error;
+    if(0 == (BN_bin2bn(ohost,keysize,&ohostkey))) goto dh_error;
 
     /* Compute the shared secret */
     unsigned char *secret;
