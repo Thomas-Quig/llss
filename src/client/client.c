@@ -502,8 +502,8 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
-    char rcv_buf[conn -> data_size];
-    memset(rcv_buf,0,conn -> data_size);
+    char rcv_buf[max(conn -> data_size,__MAX_BUFFER_SIZE)];
+    memset(rcv_buf,0,max(conn -> data_size,__MAX_BUFFER_SIZE));
     ssize_t bytes_rcvd = 0, tot_rcvd = 0;
     ssize_t bytes_rspd;
     int rcv_data = 1;
