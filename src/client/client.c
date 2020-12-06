@@ -387,10 +387,10 @@ void wizard()
                         state = EXECUTE;
                         break;
                     case 0:
-                        char confbuf[8]; memset(confbuf); printf("Are you sure (y/n)? "); gets(confbuf);
+                        char confbuf[8]; memset(confbuf,0,8); printf("Are you sure (y/n)? "); fgets(confbuf,7,stin);
                         if(boolify(confbuf)){
                             printf("Exiting...\n");
-                            eixt(EXIT_SUCCESS);
+                            exit(EXIT_SUCCESS);
                         }
 
                     /**
@@ -459,7 +459,7 @@ void wizard()
         }
     }
     if(_global_conf._CLEANUP)
-        cleanup(_orig_mac,s_target_ip);
+        cleanup(s_orig_mac,s_target_ip);
     printf("Thanks for using the llss Wizard! See you again soon :)\n");
 }
 
