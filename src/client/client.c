@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 44;
+int _lvn = 1,_mvn = 1,_rvn = 45;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -348,18 +348,18 @@ void wizard()
                     case 2:
                         a._mode = __CLIENT_SEND;
                         _global_conf._CHECK_FILE = 1;
-                        printf("You are now set to send a file\n");
+                        printf("You are now set to send a file ");
                         break;
                     case 3:
                         a._mode = __CLIENT_RECV;
-                        printf("You are now configured to receive a file\n");
+                        printf("You are now configured to receive a file ");
                         break;
                     case 4:
                         state = CONFIGURE;
                         break;
                     case 5:
                         save_config(NULL);
-                        printf("Successfully saved current configuration to file\n");
+                        printf("Successfully saved current configuration to file ");
                         break;
                     case 6:
                         state = INFO;
@@ -369,11 +369,11 @@ void wizard()
                         break;
                     case 8:
                         a._mode = __CLIENT_MAIN;
-                        printf("Configured to run custom code\n");
+                        printf("Configured to run custom code ");
                         break;
                     case 9:
                         if(!ip_present){
-                            fprintf(stderr,"Parsing Error: Target IP not found or malformed, please preface it with \"-i\", exiting...\n");
+                            fprintf(stderr,"Parsing Error: Target IP not found or malformed, please preface it with \"-i\", exiting... ");
                             exit(EXIT_FAILURE);
                         }
                         if(!port_present){
