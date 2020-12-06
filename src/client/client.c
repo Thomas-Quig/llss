@@ -337,12 +337,12 @@ void wizard()
         printf(".");
         fflush(stdout);
     }
-    enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
+    enum {GENERAL, CONFIGURE, INFO, EXECUTE, FINISHED} state = GENERAL;
     int mode_selected = 0,ip_present = 0, port_present = 0;
     int skip_delay = 0;
 
     args a; memset(&a,0,sizeof(a));
-    while(state != EXECUTE)
+    while(state != FINISHED)
     {
         char opt_buf[5];
         switch(state){
@@ -480,6 +480,14 @@ void wizard()
             case EXECUTE:
                 printf("Executing llss...\n");
                 execute(a);
+                
+                if(_global_conf._CLEANUP)
+                    cleanup(s_orig_mac,s_target_ip);
+                char confbuf[8]; memset(confbuf,0,8); printf("Continue (y/n)? "); scanf("%8s",confbuf);
+                if(boolify(confbuf) == 0){
+                    printf("Exiting...\n");
+                    state = FINISHED;
+                }
                 break;
             default:
                 fprintf(stderr,"Invalid state, exiting...");
@@ -487,8 +495,6 @@ void wizard()
                 break;
         }
     }
-    if(_global_conf._CLEANUP)
-        cleanup(s_orig_mac,s_target_ip);
     printf("Thanks for using the llss Wizard! See you again soon :)\n");
 }
 
