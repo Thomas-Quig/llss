@@ -3,6 +3,7 @@
 #define __MAX_BUFFER_SIZE 16384
 #define __SEND_MESSAGE 1
 #define __SEND_FILE 2
+#define __DEFAULT_PORT 7755
 
 typedef struct _args {
     int _mode;

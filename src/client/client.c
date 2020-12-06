@@ -25,6 +25,7 @@ int client_main(int argc, char ** argv)
 {	
     //Signal Handler for SIGINT
     signal(SIGINT,sig_handler);
+
     //Initial configuration, is overwritten by parse-args and any future configs.
     configure("./llss.conf");
 
@@ -81,7 +82,7 @@ void configure(char * conf_path)
     else if(conf_path == NULL)
     {
         char * param_qs[6] = {"Print debug statements","Print function calls","Shuffle MAC addresses","Encrypt messages","Cleanup arp at end of session", "Log system messages to file"};
-        int * params[6] = {&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._VERBOSE)};
+        int * params[6] = {&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._LOG_SYS)};
         char _arg[8];
         int _bfr = -1;
         for(int i = 0; i < 6;)
@@ -107,7 +108,8 @@ void configure(char * conf_path)
             _global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
             if(_global_conf._DB_OUTPUT_FD == -1)
             {
-
+                perror("log_path-open");
+                exit(EXIT_FAILURE);
             }
         }
         
@@ -115,7 +117,6 @@ void configure(char * conf_path)
         char out_buf[128];
         memset(out_buf,0,128);
         do{
-            
             fgets(out_buf,8,stdin);
             printf("Send output to file?: ");
             diff_out = boolify(out_buf);
@@ -136,7 +137,7 @@ void configure(char * conf_path)
 void parse_args(args * a, int argc, char ** argv)
 {
     memset(a,0,sizeof(args));
-    int mode_selected = 0;
+    int mode_selected = 0, ip_present = 0,port_present = 0;
     for(int i = 1; i < argc; i++)
     {
         char * arg = argv[i];
@@ -294,7 +295,10 @@ void parse_args(args * a, int argc, char ** argv)
         a -> _data = argv[argc - 1];
     }
     _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a -> _target_ip, a -> _port, a ->_mode, a -> _conf_path, a -> _out_path, a -> _log_path);
-
+    if(strlen(a -> _target_ip) < 7)
+    {
+        fprintf("Parsing Error: missing or invalid IP, exiting...\n")
+    }
     return;
     error:
         fprintf(stderr,"Invalid command line option, exiting...\n");
@@ -305,33 +309,68 @@ void wizard()
 {
     enum {GENERAL, CONFIGURE, INFO, EXECUTE} state = GENERAL;
     int exec_option = 0;
+    args a; memset(a,0,sizeof(a));
     while(state != EXECUTE)
     {
-        
-        if(state == GENERAL)
-        {
+        int option = 0;
+        print_wizard_options();
+        scanf("%i",option);
+        switch(state){
+            case GENERAL:
+            case CONFIGURE:
+                printf("Configuring llss execution\n");
+                configure(NULL);
+                int save = -1;
+                while(save = -1)
+                {
+                    printf("Would you like to save your configuration?: ");
+                    char c_buf[8];memset(c_buf,0,8);fgets(c_buf,8,stdin);
+                    save = boolify(input);
+                }
+                if(save)
+                {
+                    printf("Saved file name?: ");
+                    char savc_buf[128]; memset(savc_buf,0,128); fgets(savc_buf,127,stdin);
+                    FILE * new_conf = fopen(savc_buf,"r");
+                    memset(savc_buf,128,0);
 
-        }
-        else if(state == CONFIGURE)
-        {
-            
-            configure(NULL);
+                    sprintf(savc_buf,"%i\n%i\n%i\n%i\n%i\n%i\n%i\n",_global_conf._VERBOSE,_global_conf._FUNCLIST,_global_conf._SHUFFLE,_global_conf._ENCRYPT,_global_conf._CLEANUP,_global_conf._LOG_SYS,_global_conf._CHECK_FILE)
+                    if (fwrite(savc_buf,strlen(savc_buf),1,new_conf) == -1)
+                    {
+                        perror("sconf-fwrite");
+                        exit(EXIT_FAILURE);
+                    }
+                }
+                state = GENERAL;  
+            case INFO:
+                printf("Target IP?: ");
+                fgets(a._target_ip,16,stdin);
+                
+                printf("Target Port?: ");
+                char p_buf[4]; fgets(p_buf,4,stdin);
+                a._port = strtol(p_buf,p_buf + 4,10);
+                if(a._port == __LONG_MAX__)
+                {
+                    printf("Port input invalid, using default port (%i).\n If needed, reconfigure.\n",__DEFAULT_PORT);
+                }
+                state = GENERAL;
+                break;
+            case EXECUTE:
         }
     }
 
 }
-
 void print_wizard_options()
 {
 	printf("1. Get Current Mac Address\n");
 	printf("2. Send message\n");
 	printf("3. Send file\n");
     printf("4. Receive message or file\n");
-    printf("5. Chat\n");
-    printf("6. Configure settings\n");
+    printf("5. Configure llss (temporary)\n");
+    printf("6. Load config file");
 
     //If you happen to be compiling/editing this yourself, hello :)
-    printf("7. Custom Test Code"); 
+    printf("0. Custom Test Code"); 
 }
 
 void print_help(){
@@ -354,7 +393,7 @@ void print_help(){
     printf("-p <port>\t The port you will be sending to / receiving from.\n");
     printf("-h\t\t Display this help message.\n");
     printf("-V\t\t Print version information\n");
-    printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.\n");
+    printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required for -l to have any content.\n");
     printf("------------------------------------------------------------------------------------------\n\n");
     printf("--Examples--\n\nrunllsss send -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" to 192.168.0.2:3333 in 1 packet\n\n");
     printf("runllss send -i 192.168.0.2 -p 3333 -F 6 \"Hello World!\"\n\tSends \"Hello \" followed by \"World!\" (2 packets)\n\n");
@@ -421,6 +460,7 @@ void send_content(char * ip, int port, char * arg, int mode)
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
+    ssize_t data_size = ds_exchange(conn);
     size_t tot_sent = 0;
     while(tot_sent < content_size)
     {
@@ -464,6 +504,12 @@ int recv_loop(connection * conn)
 {
     char rcv_buf[_global_conf._FRAG_SIZE];
     memset(rcv_buf,0,_global_conf._FRAG_SIZE);
+    ssize_t data_size = ds_exchange(conn);
+    if(data_size < 0)
+    {
+        perror("ds-exchange");
+        return 0;
+    }
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
     int rcv_data = 1;

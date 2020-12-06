@@ -14,7 +14,7 @@ ssize_t s_recv(connection * conn, char * data, size_t size);
 *   Returns 0 on success, -1 otherwise
 **/
 int set_mac(char * iface, char * newMac);
-
+ssize_t ds_exchange(connection * conn);
 void set_arp_cache(char * ip, char * _new_mac);
 
 char * get_next_macs(int mode);

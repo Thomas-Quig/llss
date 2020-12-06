@@ -67,11 +67,13 @@ typedef struct _config{
     int _CLEANUP;          //True by default
     int _LOG_SYS;          //False by default
     int  _CHECK_FILE;        //False by default
+    
+    int  _FRAG_SIZE;        //Sending fragmentation size
+    int  _CSTMSEED;         //-1 By default
 
     int  _OUTPUT_FD;        //STDOUT_FILENO By default
     int  _DB_OUTPUT_FD;     //STDOUT_FILENO by default
-    int  _CSTMSEED;         //-1 By default
-    int  _FRAG_SIZE;        //Sending fragmentation size
+    
     char _IFACE[6];         //"wlan0" by default
 } config;
 
