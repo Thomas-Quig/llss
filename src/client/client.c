@@ -34,7 +34,7 @@ int client_main(int argc, char ** argv)
         configure(a._conf_path);
     }
 
-    memset(s_target_ip,0,16);
+    memset(s_target_ip,0,16);//This way its all null
     strncpy(s_target_ip,a._target_ip,min(strlen(a._target_ip),15));
 
     memcpy(s_orig_mac,get_mac(_global_conf._IFACE),12);
@@ -72,8 +72,6 @@ void execute(args a)
     };
 }
 
-
-//TOOD FIX FLUSHING SO IT WORKS
 void configure(char * conf_path)
 {
     if(conf_path != NULL && access(conf_path, F_OK) != -1)
