@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 33;
+int _lvn = 1,_mvn = 1,_rvn = 34;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -38,8 +38,13 @@ int client_main(int argc, char ** argv)
     strncpy(_target_ip,a._target_ip,min(strlen(a._target_ip),15));
 
     memcpy(_orig_mac,get_mac(_global_conf._IFACE),12);
+    if(a._mode == __CLIENT_MAIN){
+        custom_test_code(argc,argv);
+    }
+    else{
+        execute(a);
+    }
 
-	execute(a);
     if(_global_conf._CLEANUP)
 	    cleanup(_orig_mac,a._target_ip);
     
@@ -49,9 +54,6 @@ int client_main(int argc, char ** argv)
 void execute(args a)
 {
     switch(a._mode){
-        case __CLIENT_MAIN:
-            custom_test_code(argc,argv);
-            break;
         case __CLIENT_RECV:
             recv_content(a._target_ip,a._port);
             break;
