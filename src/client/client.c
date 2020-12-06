@@ -1,9 +1,8 @@
 #include "client.h"
 
-static pthread_t chat_threads[2];
 static char s_target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 32;
+int _lvn = 1,_mvn = 1,_rvn = 33;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -64,9 +63,6 @@ void execute(args a)
             }
             else
                 send_content(a._target_ip,a._port,a._data,__SEND_MESSAGE);
-            break;
-        case __CLIENT_CHAT:
-            chat(a._target_ip,a._port);
             break;
         default:
             fprintf(stderr,"Invalid state (%i), exiting...\n",a._mode);
@@ -270,13 +266,6 @@ void parse_args(args * a, int argc, char ** argv)
             else if(!strncmp(argv[i],"snd",4) || !strncmp(argv[i],"send",5))
             {
                 a -> _mode = __CLIENT_SEND;
-                if(mode_selected)
-                    goto error;
-                mode_selected = 1;
-            }
-            else if(!strncmp(argv[i],"cht",4) || !strncmp(argv[i],"chat",4))
-            {
-                a -> _mode = __CLIENT_CHAT;
                 if(mode_selected)
                     goto error;
                 mode_selected = 1;
@@ -694,71 +683,4 @@ void cleanup(char * orig_mac, char * ip)
 	char cmd[64];
 	sprintf(cmd,"arp -d %s",ip);
 	system(cmd);
-}
-
-void chat(char * ip,int port)
-{
-	connection * conn = establish_connection(ip,port,__CLIENT_CHAT);
-	chat_loop(conn);
-	close(conn -> fd); 
-	free(conn);
-}
-
-int chat_loop(connection * conn)
-{
-	
-	char _currmac[6] = {0x00,0x00,0x00,0x00,0x00,0x11};
-	while(1)
-	{
-        break;
-		/**int n, len; 
-		ssize_t bytes_sent = sendto(conn -> fd, (const char *)buf, size, 
-			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
-				sizeof(conn -> s_addr)); 
-		if(bytes_sent == -1)
-		{
-			perror("What");
-			exit(1);
-		}
-		printf("%zd bytes sent.\n",bytes_sent); 
-			
-		n = recvfrom(conn -> fd, (char *)buf, sizeof(buf),  
-					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
-					(socklen_t * )&len); 
-		buf[n] = '\0'; 
-		printf("Server Response: %s\n", buf); 
-		char cont[2];
-		printf("Continue? (y/n):");
-		fflush(stdin);
-		fgets(cont,2,stdin);
-		cont[0] = toupper(cont[0]);
-		printf("Cont:[%x][%x]",cont[0],cont[1]);
-
-		//TODO Change this you idiot lol Stop being stubborn
-		if(0 == 1)
-		{
-			break;
-		}
-		else
-		{
-			_currmac[5] += 17;
-			set_mac(_global_conf._IFACE,_currmac);
-			printf("New Mac: ");
-			continue;
-		}**/
-		
-	}
-	return 0;
-}
-
-void * chat_send(void * arg){
-    connection * conn = (connection *)arg;
-    char buf[512];
-    memset(buf,0,512);
-    size_t size = read(STDIN_FILENO,buf,511);
-    
-}
-
-void * chat_recv(void * arg){
-
 }

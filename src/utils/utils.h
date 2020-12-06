@@ -4,7 +4,6 @@
 #define __CLIENT_MAIN 0
 #define __CLIENT_SEND 1
 #define __CLIENT_RECV 2
-#define __CLIENT_CHAT 3
 
 #define max(a,b) \
     ({__typeof__ (a) _a = (a); \

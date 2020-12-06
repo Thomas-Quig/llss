@@ -16,8 +16,6 @@ typedef struct _args {
 } args;
 
 int custom_test_code(int argc, char ** argv);
-void chat(char * ip,int port);
-int chat_loop(connection * conn);
 
 void send_content(char * ip, int port, char * path, int mode);
 size_t send_loop(connection * conn, char * content, size_t content_size);
