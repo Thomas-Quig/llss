@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 45;
+int _lvn = 1,_mvn = 1,_rvn = 46;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -474,7 +474,7 @@ void print_wizard_options()
 	printf("2. Send file\n");
     printf("3. Receive message or file\n");
     printf("4. Configure llss (settings and IP)\n");
-    printf("5. Save configration");
+    printf("5. Save configration\n");
     printf("6. Set critical information (ip, port)\n");
     printf("7. Command line help\n");
     printf("8. Custom Test Code\n"); 
