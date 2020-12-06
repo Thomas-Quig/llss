@@ -477,7 +477,7 @@ void print_wizard_options()
 	printf("1. Send message\n");
 	printf("2. Send file\n");
     printf("3. Receive message or file\n");
-    printf("4. Configure llss (settings and IP)\n");
+    printf("4. Configure llss (settings)\n");
     printf("5. Save configration\n");
     printf("6. Set critical information (ip, port)\n");
     printf("7. Command line help\n");
