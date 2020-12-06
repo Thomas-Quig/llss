@@ -85,7 +85,7 @@ void configure(char * conf_path)
     }
     else if(conf_path == NULL)
     {
-        char * param_qs[6] = {"Print debug statements","Print function calls","Shuffle MAC addresses","Encrypt messages","Cleanup arp at end of session", "Log system messages to file"};
+        char * param_qs[6] = {"Verbose mode (print debug statements)","Print function calls","Shuffle MAC addresses","Encrypt messages","Cleanup arp at end of session", "Log system (debug/funccall) messages to file"};
         int * params[6] = {&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._LOG_SYS)};
         char _arg[8];
         int _bfr = -1;
