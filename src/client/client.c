@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 51;
+int _lvn = 1,_mvn = 1,_rvn = 52;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -122,7 +122,7 @@ void configure(char * conf_path)
         char out_buf[128];
         memset(out_buf,0,128);
         do{
-            scanf("%8s",out_buf)
+            scanf("%8s",out_buf);
             printf("Send output to file?: ");
             diff_out = boolify(out_buf);
             if(diff_out == -1)
@@ -397,11 +397,11 @@ void wizard()
                     case 0:
                         if(option == 0)
                         {
-                            char confbuf[8]; memset(confbuf,0,8); printf("Are you sure (y/n)? "); fgets(confbuf,7,stdin);
-                        if(boolify(confbuf)){
-                            printf("Exiting...\n");
-                            exit(EXIT_SUCCESS);
-                        }
+                            char confbuf[8]; memset(confbuf,0,8); printf("Are you sure (y/n)? "); scanf("%8s",confbuf);
+                            if(boolify(confbuf)){
+                                printf("Exiting...\n");
+                                exit(EXIT_SUCCESS);
+                            }
                         }
                     default:
                         printf("Invalid option, select from above.");
@@ -415,13 +415,13 @@ void wizard()
                 while(save == -1)
                 {
                     printf("Would you like to save your configuration?: ");
-                    char c_buf[8];memset(c_buf,0,8);fgets(c_buf,8,stdin);
+                    char c_buf[8];memset(c_buf,0,8);scanf("%7s",c_buf);
                     save = boolify(c_buf);
                 }
                 if(save)
                 {
                     printf("Saved file name?: ");
-                    char savc_buf[128]; memset(savc_buf,0,128); fgets(savc_buf,127,stdin);
+                    char savc_buf[128]; memset(savc_buf,0,128); scanf("%127s",savc_buf);
                     FILE * new_conf = fopen(savc_buf,"r");
                     memset(savc_buf,128,0);
 
