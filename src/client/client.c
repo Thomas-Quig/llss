@@ -236,9 +236,11 @@ void parse_args(args * a, int argc, char ** argv)
                     break;
                 case 'h':
                     print_help();
+                    exit(EXIT_SUCCESS);
                     break;
                 case 'V':
                     print_version();
+                    exit(EXIT_SUCCESS);
                     break;
                 case 'v':
                     _global_conf._VERBOSE = 1;
