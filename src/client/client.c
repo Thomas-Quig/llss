@@ -1,8 +1,8 @@
 #include "client.h"
 
 static char s_target_ip[16];
-static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 42;
+static char s_orig_mac[6];
+int _lvn = 1,_mvn = 1,_rvn = 43;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -37,7 +37,7 @@ int client_main(int argc, char ** argv)
     memset(s_target_ip,0,16);
     strncpy(s_target_ip,a._target_ip,min(strlen(a._target_ip),15));
 
-    memcpy(_orig_mac,get_mac(_global_conf._IFACE),12);
+    memcpy(s_orig_mac,get_mac(_global_conf._IFACE),12);
     if(a._mode == __CLIENT_MAIN){
         custom_test_code(argc,argv);
     }
@@ -46,7 +46,7 @@ int client_main(int argc, char ** argv)
     }
 
     if(_global_conf._CLEANUP)
-	    cleanup(_orig_mac,a._target_ip);
+	    cleanup(s_orig_mac,a._target_ip);
     
 	return 0;
 }
@@ -450,6 +450,7 @@ void wizard()
                 state = GENERAL;
                 break;
             case EXECUTE:
+                execute(a);
                 break;
             default:
                 fprintf(stderr,"Invalid state, exiting...");
@@ -457,7 +458,9 @@ void wizard()
                 break;
         }
     }
-
+    if(_global_conf._CLEANUP)
+        cleanup(_orig_mac,s_target_ip);
+    printf("Thanks for using the llss Wizard! See you again soon :)\n");
 }
 
 void print_logo()
@@ -692,6 +695,7 @@ int recv_loop(connection * conn)
 
 void cleanup(char * orig_mac, char * ip)
 {
+    _sys_log("cleanup(%s,%s)\n",format_mac(orig_mac),ip);
 	set_mac(_global_conf._IFACE,orig_mac);
 	char cmd[64];
 	sprintf(cmd,"arp -d %s",ip);
