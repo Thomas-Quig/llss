@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 43;
+int _lvn = 1,_mvn = 1,_rvn = 44;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -387,27 +387,17 @@ void wizard()
                         state = EXECUTE;
                         break;
                     case 0:
-                        char confbuf[8]; memset(confbuf,0,8); printf("Are you sure (y/n)? "); fgets(confbuf,7,stin);
+                        if(option == 0)
+                        {
+                            char confbuf[8]; memset(confbuf,0,8); printf("Are you sure (y/n)? "); fgets(confbuf,7,stdin);
                         if(boolify(confbuf)){
                             printf("Exiting...\n");
                             exit(EXIT_SUCCESS);
                         }
-
-                    /**
-                        printf("\e[1;1H\e[2J");
-                        printf("1. Send message\n");
-                        printf("2. Send file\n");
-                        printf("3. Receive message or file\n");
-                        printf("4. Configure llss (settings and IP)\n");
-                        printf("5. Save configration");
-                        printf("6. Set critical information (ip, port)\n")
-                        printf("7. Command line help\n");
-                        printf("8. Custom Test Code\n"); 
-                        printf("9. Execute\n"); //If you happen to be compiling/editing this yourself, hello :)
-                        printf("0. Exit\n\n");
-
-                        printf("Choice: ");
-                    **/
+                        }
+                    default:
+                        printf("Invalid option, select from above.");
+                        break;
                 }
                 break;
             case CONFIGURE:
