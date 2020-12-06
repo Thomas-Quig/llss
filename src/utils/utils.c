@@ -137,25 +137,25 @@ char * estab_shared_secret(connection * conn, int mode)
     //if(NULL == (mykey = DH_new())) handleErrors();
     FILE * fp = fopen("dhparams.pem","r");
     DH * mykey = PEM_read_DHparams(fp,NULL,NULL,NULL);
-    if(mykey == NULL) goto dh_error;
+    if(mykey == NULL) handleErrors(__LINE__);
 
-    if(1 != DH_check(mykey, &codes)) goto dh_error;
+    if(1 != DH_check(mykey, &codes)) handleErrors(__LINE__);
     if(codes != 0)
     {
         /* Problems have been found with the generated parameters */
         /* Handle these here - we'll just abort for this example */
         printf("DH_check failed\n");
-        handleErrors();
+        handleErrors(__LINE__);
         return NULL;
     }
 
     /* Generate the public and private key pair */
-    if(1 != DH_generate_key(mykey)) goto dh_error;
+    if(1 != DH_generate_key(mykey)) handleErrors(__LINE__);
 
     /* Send the public key to the peer.
     * How this occurs will be specific to your situation (see main text below) */
     int keysize = BN_num_bytes(DH_get0_pub_key(mykey));
-    if(keysize == -1) goto dh_error;
+    if(keysize == -1) handleErrors(__LINE__);
     char * ohost = malloc(keysize);  
     int len;
 
@@ -163,7 +163,7 @@ char * estab_shared_secret(connection * conn, int mode)
     if(mode == __CLIENT_SEND)
     {
         char pubbuf[keysize];
-        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) goto dh_error;
+        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors(__LINE__);
 
         ssize_t key_sent = s_send(conn,pubbuf,keysize);
         if(key_sent == -1) goto keyexch_error;
@@ -174,7 +174,7 @@ char * estab_shared_secret(connection * conn, int mode)
         ssize_t key_recv = s_recv(conn,ohost,keysize);
 
         char pubbuf[keysize];
-        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) goto dh_error;
+        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors(__LINE__);
 
         ssize_t key_sent = s_send(conn,pubbuf,keysize);
         if(key_sent == -1) goto keyexch_error;
@@ -183,13 +183,13 @@ char * estab_shared_secret(connection * conn, int mode)
     /* Receive the public key from the peer. In this example we're just hard coding a value */
     
     BIGNUM *ohostkey = NULL;
-    if(0 == (BN_bin2bn(ohost,keysize,ohostkey))) goto dh_error;
+    if(0 == (BN_bin2bn(ohost,keysize,ohostkey))) handleErrors(__LINE__);
 
     /* Compute the shared secret */
     unsigned char *secret;
-    if(NULL == (secret = OPENSSL_malloc(sizeof(unsigned char) * (DH_size(mykey))))) goto dh_error;
+    if(NULL == (secret = OPENSSL_malloc(sizeof(unsigned char) * (DH_size(mykey))))) handleErrors(__LINE__);
 
-    if(0 > (secret_size = DH_compute_key(secret, ohostkey, mykey))) goto dh_error;
+    if(0 > (secret_size = DH_compute_key(secret, ohostkey, mykey))) handleErrors(__LINE__);
 
     /* Do something with the shared secret */
     /* Note secret_size may be less than DH_size(mykey) */
@@ -217,7 +217,7 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 
     /* Create and initialise the context */
     if(!(ctx = EVP_CIPHER_CTX_new()))
-        handleErrors();
+        handleErrors(__LINE__);
 
     /*
      * Initialise the encryption operation. IMPORTANT - ensure you use a key
@@ -227,14 +227,14 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
      * is 128 bits
      */
     if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
-        handleErrors();
+        handleErrors(__LINE__);
 
     /*
      * Provide the message to be encrypted, and obtain the encrypted output.
      * EVP_EncryptUpdate can be called multiple times if necessary
      */
     if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
-        handleErrors();
+        handleErrors(__LINE__);
     ciphertext_len = len;
 
     /*
@@ -242,7 +242,7 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
      * this stage.
      */
     if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len))
-        handleErrors();
+        handleErrors(__LINE__);
     ciphertext_len += len;
 
     /* Clean up */
@@ -262,7 +262,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 
     /* Create and initialise the context */
     if(!(ctx = EVP_CIPHER_CTX_new()))
-        handleErrors();
+        handleErrors(__LINE__);
 
     /*
      * Initialise the decryption operation. IMPORTANT - ensure you use a key
@@ -272,14 +272,14 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
      * is 128 bits
      */
     if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
-        handleErrors();
+        handleErrors(__LINE__);
 
     /*
      * Provide the message to be decrypted, and obtain the plaintext output.
      * EVP_DecryptUpdate can be called multiple times if necessary.
      */
     if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
-        handleErrors();
+        handleErrors(__LINE__);
     plaintext_len = len;
 
     /*
@@ -287,7 +287,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
      * this stage.
      */
     if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len))
-        handleErrors();
+        handleErrors(__LINE__);
     plaintext_len += len;
 
     /* Clean up */
@@ -311,9 +311,9 @@ void printConnection(connection * conn)
 }
 
 
-void handleErrors()
+void handleErrors(int line)
 {
-    printf("OPENSSL ERROR, EXITING\n");
+    printf("OPENSSL ERROR LINE %i, EXITING\n",line);
     perror("OSSL-ERRNO");
 }
 
