@@ -316,7 +316,7 @@ void parse_args(args * a, int argc, char ** argv)
     _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a -> _target_ip, a -> _port, a ->_mode, a -> _conf_path, a -> _out_path, a -> _log_path);
     if(strlen(a -> _target_ip) < 7)
     {
-        fprintf(stderr,"Parsing Error: missing or invalid IP, exiting...\n")
+        fprintf(stderr,"Parsing Error: missing or invalid IP, exiting...\n");
     }
     return;
     error:
@@ -333,7 +333,7 @@ void wizard()
     {
         int option = 0;
         print_wizard_options();
-        scanf("%i",option);
+        scanf("%i",&option);
         switch(state){
             case GENERAL:
             case CONFIGURE:
@@ -367,7 +367,7 @@ void wizard()
                 
                 printf("Target Port?: ");
                 char p_buf[4]; fgets(p_buf,4,stdin);
-                a._port = strtol(p_buf,p_buf + 4,10);
+                a._port = strtol(p_buf,NULL,10);
                 if(a._port == __LONG_MAX__)
                 {
                     printf("Port input invalid, using default port (%i).\n If needed, reconfigure.\n",__DEFAULT_PORT);
@@ -555,6 +555,7 @@ int recv_loop(connection * conn)
     }
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
+    ssize_t tot_rcvd;
     int rcv_data = 1;
     while (rcv_data)
     {
