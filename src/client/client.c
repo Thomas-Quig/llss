@@ -338,7 +338,7 @@ void wizard()
             case GENERAL:
                 usleep(1250000);
                 print_wizard_options();
-                scanf("%i",&option);
+                scanf("%i\n",&option);
                 switch(option){
                     case 1:
                         a._mode = __CLIENT_SEND;
