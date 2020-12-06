@@ -186,7 +186,7 @@ char * estab_shared_secret(connection * conn, int mode)
     /* Note secret_size may be less than DH_size(mykey) */
     printf("The shared secret(%i) is:",secret_size);
     for(int i = 0; i < secret_size; i++)
-    printf("%.2x"secret[i]);
+    printf("%.2x",secret[i]);
     BIO_dump_fp(stdout, secret, secret_size);
 
     return secret;

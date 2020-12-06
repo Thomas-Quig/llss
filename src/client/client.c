@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 35;
+int _lvn = 1,_mvn = 1,_rvn = 40;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
