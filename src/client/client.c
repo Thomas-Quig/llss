@@ -420,7 +420,7 @@ void wizard()
                 {
                     printf("Saved file name?: ");
                     char savc_buf[128]; memset(savc_buf,0,128); scanf("%127s",savc_buf);
-                    FILE * new_conf = fopen(savc_buf,"r");
+                    FILE * new_conf = fopen(savc_buf,"w");
                     memset(savc_buf,128,0);
 
                     sprintf(savc_buf,"%i\n%i\n%i\n%i\n%i\n%i\n%i\n",_global_conf._VERBOSE,_global_conf._FUNCLIST,_global_conf._SHUFFLE,_global_conf._ENCRYPT,_global_conf._CLEANUP,_global_conf._LOG_SYS,_global_conf._CHECK_FILE);
