@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 49;
+int _lvn = 1,_mvn = 1,_rvn = 51;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -100,16 +100,15 @@ void configure(char * conf_path)
                 i += 1;
             }
             else{
-                printf("Invalid Response (valid responses are t/f,y/n,1/0)\n");
+                printf("Invalid Response, no change (valid responses are t/f,y/n,1/0)\n");
             }
         }
         if(_global_conf._LOG_SYS)
         {
             char log_path[128];
             memset(log_path,0,128);
-            printf("File path for sys logs?:");
+            printf("File path for sys logs?: ");
             scanf("%127s",log_path);
-            fgets(log_path, 127,stdin);
             _global_conf._DB_OUTPUT_FD = open(log_path, O_CREAT | O_TRUNC);
             if(_global_conf._DB_OUTPUT_FD == -1)
             {
@@ -123,16 +122,19 @@ void configure(char * conf_path)
         char out_buf[128];
         memset(out_buf,0,128);
         do{
-            fgets(out_buf,8,stdin);
+            scanf("%8s",out_buf)
             printf("Send output to file?: ");
             diff_out = boolify(out_buf);
+            if(diff_out == -1)
+                printf("Invalid Response (valid responses are t/f,y/n,1/0)\n");
+
         }while(diff_out == -1);
         
         if(diff_out)
         {
             memset(out_buf,0,128);
             printf("Output file path?: ");
-            fgets(out_buf,128,stdin);
+            scanf("%127s",out_buf);
             _global_conf._DB_OUTPUT_FD = open(out_buf, O_CREAT | O_TRUNC);
         }
         
