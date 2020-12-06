@@ -3,7 +3,7 @@
 static pthread_t chat_threads[2];
 static char _target_ip[16];
 static char _orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 22;
+int _lvn = 1,_mvn = 1,_rvn = 24;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -244,7 +244,8 @@ void parse_args(args * a, int argc, char ** argv)
                     _global_conf._FUNCLIST = 1;
                     break;
                 case 'w':
-                    //GOTO WIZARD
+                    wizard();
+                    exit(EXIT_SUCCESS);
                     break;
                 default:
                     goto error;
@@ -403,6 +404,7 @@ void print_help(){
     printf("\n--Notes on standard usage--\n * All arguments can go in any order so long as their required information follows it.\n");
     printf(" * Argument parsing is not perfect and may sometimes break, but most standard edge cases should be covered.\n");
     printf(" * I am a college student single-handedly working on this, there are likely security flaws in this program.\n  That doesnt mean that it is not a good security tool, it just means it is in progress.\n");
+    printf(" * Help, Version, and Wizard will display depending on which is first in argv[], so if -w is first you get wizard, if -v version etc.\n");
     printf("\nIf you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
     printf("\n--------------------------------------llss arguments--------------------------------------\n");
     printf("-c <path>\t Path to the configuration file. This OVERRIDES any other configuration settings set in the arguments\n");
@@ -418,6 +420,7 @@ void print_help(){
     printf("-h\t\t Display this help message.\n");
     printf("-V\t\t Print version information\n");
     printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required for -l to have any content.\n");
+    printf("-w\t\t Enter the wizard, OVERRIDES ANY INFORMATION / CONFIGURATION SETTINGS\n");
     printf("------------------------------------------------------------------------------------------\n\n");
     printf("--Examples--\n\nrunllsss send -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" to 192.168.0.2:3333 in 1 packet\n\n");
     printf("runllss send -i 192.168.0.2 -p 3333 -F 6 \"Hello World!\"\n\tSends \"Hello \" followed by \"World!\" (2 packets)\n\n");
