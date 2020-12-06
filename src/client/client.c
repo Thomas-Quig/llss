@@ -139,6 +139,7 @@ void parse_args(args * a, int argc, char ** argv)
 {
     memset(a,0,sizeof(args));
     int mode_selected = 0;
+    int ip_present = 0, port_present = 0;
     for(int i = 1; i < argc; i++)
     {
         char * arg = argv[i];
@@ -157,8 +158,11 @@ void parse_args(args * a, int argc, char ** argv)
                     i += 1;
                     break;
                 case 'i':
-                    if(i < (argc - 1))
+                    if(i < (argc - 1) && !ip_present)
+                    {
                         strncpy(a->_target_ip,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _target_ip)));
+                        ip_present = 1;
+                    }
                     else
                         goto error;
                     i += 1;
@@ -169,7 +173,7 @@ void parse_args(args * a, int argc, char ** argv)
                         strncpy(a -> _out_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _out_path)));
                         _global_conf._DB_OUTPUT_FD = open(a -> _out_path, O_CREAT | O_TRUNC);
                         if(_global_conf._DB_OUTPUT_FD == -1)
-                        perror("OUTPUT-Open");
+                            perror("OUTPUT-Open");
                     }
                     else
                         goto error;
@@ -199,7 +203,12 @@ void parse_args(args * a, int argc, char ** argv)
                     break;
                 case 'p':
                     if(i < (argc - 1))
+                    {
+                        if(port_present)
+                            goto error;
                         a -> _port = atoi(argv[i + 1]);
+                        port_present = 1;
+                    }
                     else
                         goto error;
                     i += 1;
@@ -295,6 +304,16 @@ void parse_args(args * a, int argc, char ** argv)
     {
         a -> _data = argv[argc - 1];
     }
+    if(!ip_present)
+    {
+        printf("Parsing Error: Target IP not found or malformed, please preface it with \"-i\", exiting...\n");
+        exit(EXIT_FAILURE);
+    }
+    if(!port_present)
+    {
+        printf("Port not found, using default port(7755)\n");
+        a -> _port = 7755;
+    }
     _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a -> _target_ip, a -> _port, a ->_mode, a -> _conf_path, a -> _out_path, a -> _log_path);
 
     return;
@@ -353,7 +372,7 @@ void print_help(){
     printf("-I <iface>\t The interface to shuffle MAC addresses on. Ensure that the network you are on allows for Static IP's and no DHCP\n");
     printf("-l <path>\t Log file, all _sys_log calls will be sent to this file\n");
     printf("-o <path>\t Output file, all non _sys_log call output will be sent to the output file at <path>\n");
-    printf("-p <port>\t The port you will be sending to / receiving from.\n");
+    printf("-p <port>\t The port you will be sending to / receiving from. Be aware that this runs atoi(3), so any noninteger is undefined behaviour.\n");
     printf("-h\t\t Display this help message.\n");
     printf("-V\t\t Print version information\n");
     printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required.\n");

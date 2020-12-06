@@ -4,6 +4,15 @@
 config _global_conf = {/*_VERBOSE*/ 1 , /*_FUNCLIST*/ 0 , /*_SHUFFLE*/ 1 , /*_ENCRYPT*/ 1 ,/*_CLEANUP*/ 1 ,
                          /*_LOG_SYS*/ 0 , /*_CHECK_FILE*/ 0, /*_OUTPUT_FD*/ 1 ,/*_DB_OUTPUT_FD*/ 1 ,/*_CSTMSEED*/ -1 ,/*_FRAG_SIZE*/ 1024,/*_IFACE*/ "wlan0"};
 
+static const char g_dh2048_pm[] = 
+    "-----BEGIN DH PARAMETERS-----\n"
+    "MIIBCAKCAQEA+j881N4TQijS87QR0pOO0f1wkJ7X6myrOU06n4hRr1pR30epHzjB\n"
+    "Ytku4sW6i3SVjvNsFBcHdo42/zTH6BzkwxoRjogrDGyQ5zX0bUep5cAPC2Ktx5I3\n"
+    "XFptTUctY4iLB/AfzcwzXXbfroLvzIB0tMS06psMgtbcHgPdbS0SyoSIK0Khh1rk\n"
+    "W/bpLi65lStCNS2xNaljcuH6W5VHHHcjIBrdCjZtnjf9woAo5KzcVK5c9b+pMqQn\n"
+    "FJUh3/PT4A+m6Q2z8HvxpirmovYl7wZEbxR7OF9ZHi3X3YeglOh3foQDIRjKAG2W\n"
+    "fKPo99jRhG4Tao/XJldhoFai9ACCQIUhiwIBAg==\n"
+    "-----END DH PARAMETERS-----";
 
 connection * establish_connection(char * addr, int port, int mode)
 {
@@ -11,7 +20,10 @@ connection * establish_connection(char * addr, int port, int mode)
     ret -> mode = mode;
 	strncpy(ret -> ip,addr,strlen(addr));
 	ret -> port = port;
-  
+    if(ret -> port == -1)
+    {
+        port = 7755;
+    }
     // Creating socket file descriptor 
     if ((ret -> fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
         perror("fd fail"); 
@@ -25,43 +37,31 @@ connection * establish_connection(char * addr, int port, int mode)
     (ret -> s_addr).sin_addr.s_addr = inet_addr(ret -> ip);
     ret -> s_len = sizeof(ret -> s_addr);
 
-    strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
-    srand(atoi(ret -> secret));
+    //If you arent encrypting, then you aren't being super duper secure, so just srand with the port.
+    if(_global_conf._ENCRYPT)
+    {
+        strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
+        srand(atoi(ret -> secret));
+    }
+    else
+    {
+        srand(port);
+    }
 	return ret;
 }
 
-unsigned char * get_mac(char * iface)
+int _sys_log(const char * format,...)
 {
-	int fd;
-	struct ifreq ifr;
-	unsigned char *mac;
-	
-	fd = socket(AF_INET, SOCK_DGRAM, 0);
-
-	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name , iface , IFNAMSIZ-1);
-
-	ioctl(fd, SIOCGIFHWADDR, &ifr);
-
-	close(fd);
-	
-	mac = (unsigned char *)ifr.ifr_hwaddr.sa_data;
-	unsigned char * ret = malloc(6);
-	memcpy((void *)ret,(void *)mac,6);
-	return ret;	
-}
-
-char * get_ip(char * iface)
-{
-    int fd;
-    struct ifreq ifr;
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    ifr.ifr_addr.sa_family = AF_INET;
-    strncpy(ifr.ifr_name, iface, IFNAMSIZ-1);
-    ioctl(fd, SIOCGIFADDR, &ifr);
-    close(fd);
-    return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
+    va_list args;
+    va_start(args, format);
+    if(_global_conf._VERBOSE)
+    {
+        int result = vdprintf(_global_conf._DB_OUTPUT_FD, format,args);
+        va_end(args);
+        return result;
+    }
+    va_end(args);
+    return 0;
 }
 
 char * format_mac(unsigned char * mac)
@@ -93,32 +93,37 @@ void print_mac(char * iface)
 // Based on https://wiki.openssl.org/index.php/Diffie_Hellman
 char * estab_shared_secret(connection * conn, int mode)
 {
-    char * ret = malloc(32);
-    strncpy(ret,"0123456789ABCDEF0123456789ABCDEF",32);
-    return ret;
-    DH *mykey;
+    _sys_log("estab_shared_secret(%p,%i)\n",conn,mode);
+    //char * ret = malloc(32);
+    //strncpy(ret,"0123456789ABCDEF0123456789ABCDEF",32);
+    //return ret;
+    
     int codes;
     int secret_size;
 
     /* Generate the parameters to be used */
-    if(NULL == (mykey = DH_new())) handleErrors();
-    if(1 != DH_generate_parameters_ex(mykey, 1024, DH_GENERATOR_2, NULL)) handleErrors();
+    //if(NULL == (mykey = DH_new())) handleErrors();
+    FILE * fp = fopen("dhparams.pem","r");
+    DH * mykey = PEM_read_DHparams(fp,NULL,NULL,NULL);
+    if(mykey == NULL) goto dh_error;
 
-    if(1 != DH_check(mykey, &codes)) handleErrors();
+    if(1 != DH_check(mykey, &codes)) goto dh_error;
     if(codes != 0)
     {
         /* Problems have been found with the generated parameters */
         /* Handle these here - we'll just abort for this example */
         printf("DH_check failed\n");
-        abort();
+        handleErrors();
+        return NULL;
     }
 
     /* Generate the public and private key pair */
-    if(1 != DH_generate_key(mykey)) handleErrors();
+    if(1 != DH_generate_key(mykey)) goto dh_error;
 
     /* Send the public key to the peer.
     * How this occurs will be specific to your situation (see main text below) */
     int keysize = BN_num_bytes(DH_get0_pub_key(mykey));
+    if(keysize == -1) goto dh_error;
     char * ohost = malloc(keysize);  
     int len;
 
@@ -126,12 +131,12 @@ char * estab_shared_secret(connection * conn, int mode)
     if(mode == __CLIENT_SEND)
     {
         char pubbuf[keysize];
-        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors();
+        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) goto dh_error;
 
         ssize_t key_sent = sendto(conn -> fd,pubbuf, keysize, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
 			sizeof(conn -> s_addr));
-        
+        if(key_sent == -1) goto keyexch_error;
         ssize_t key_recv = recvfrom(conn -> fd, ohost, keysize,  
 					MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr), 
 					(socklen_t * )&len); 
@@ -143,23 +148,24 @@ char * estab_shared_secret(connection * conn, int mode)
 					(socklen_t * )&len);
 
         char pubbuf[keysize];
-        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors();
+        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) goto dh_error;
 
         ssize_t key_sent = sendto(conn -> fd,pubbuf, keysize, 
 			MSG_CONFIRM, (const struct sockaddr *) &(conn -> s_addr),  
-			sizeof(conn -> s_addr)); 
+			sizeof(conn -> s_addr));
+        if(key_sent == -1) goto keyexch_error;
     }
     
     /* Receive the public key from the peer. In this example we're just hard coding a value */
     
     BIGNUM *ohostkey = NULL;
-    if(0 == (BN_dec2bn(&ohostkey, ohost))) handleErrors();
+    if(0 == (BN_dec2bn(&ohostkey, ohost))) goto dh_error;
 
     /* Compute the shared secret */
     unsigned char *secret;
-    if(NULL == (secret = OPENSSL_malloc(sizeof(unsigned char) * (DH_size(mykey))))) handleErrors();
+    if(NULL == (secret = OPENSSL_malloc(sizeof(unsigned char) * (DH_size(mykey))))) goto dh_error;
 
-    if(0 > (secret_size = DH_compute_key(secret, ohostkey, mykey))) handleErrors();
+    if(0 > (secret_size = DH_compute_key(secret, ohostkey, mykey))) goto dh_error;
 
     /* Do something with the shared secret */
     /* Note secret_size may be less than DH_size(mykey) */
@@ -167,6 +173,13 @@ char * estab_shared_secret(connection * conn, int mode)
     BIO_dump_fp(stdout, secret, secret_size);
 
     return secret;
+
+    dh_error:
+        printf("openssl-dh error, exiting...\n");                                             
+        return NULL;
+    keyexch_error:
+        printf("keyexchange error, exiting...\n");
+        return NULL;
 }
 
 int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
@@ -280,16 +293,38 @@ void handleErrors()
     perror("OSSL-ERRNO");
 }
 
-int _sys_log(const char * format,...)
+
+
+unsigned char * get_mac(char * iface)
 {
-    va_list args;
-    va_start(args, format);
-    if(_global_conf._VERBOSE)
-    {
-        int result = vdprintf(_global_conf._DB_OUTPUT_FD, format,args);
-        va_end(args);
-        return result;
-    }
-    va_end(args);
-    return 0;
+	int fd;
+	struct ifreq ifr;
+	unsigned char *mac;
+	
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	ifr.ifr_addr.sa_family = AF_INET;
+	strncpy(ifr.ifr_name , iface , IFNAMSIZ-1);
+
+	ioctl(fd, SIOCGIFHWADDR, &ifr);
+
+	close(fd);
+	
+	mac = (unsigned char *)ifr.ifr_hwaddr.sa_data;
+	unsigned char * ret = malloc(6);
+	memcpy((void *)ret,(void *)mac,6);
+	return ret;	
+}
+
+char * get_ip(char * iface)
+{
+    int fd;
+    struct ifreq ifr;
+    fd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    ifr.ifr_addr.sa_family = AF_INET;
+    strncpy(ifr.ifr_name, iface, IFNAMSIZ-1);
+    ioctl(fd, SIOCGIFADDR, &ifr);
+    close(fd);
+    return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 }
