@@ -346,7 +346,7 @@ void wizard()
                 memset(opt_buf,0,5);
                 scanf("%4s",opt_buf); //TODO USE STRTOL TO GET ERRORS
                 char * endptr = NULL;
-                int option = strtol(opt_buf,endptr,10);
+                int option = strtol(opt_buf,&endptr,10);
                 if(endptr == opt_buf)
                     option == -1;
                 fflush(stdin);
