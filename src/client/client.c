@@ -37,8 +37,8 @@ int client_main(int argc, char ** argv)
 
     memset(s_target_ip,0,16);//This way its all null
     strncpy(s_target_ip,a._target_ip,min(strlen(a._target_ip),15));
-
     memcpy(s_orig_mac,get_mac(_global_conf._IFACE),12);
+    
     if(a._mode == __CLIENT_MAIN){
         custom_test_code(argc,argv);
     }
@@ -136,7 +136,7 @@ void configure(char * conf_path)
             memset(out_buf,0,128);
             printf("Output file path?: ");
             scanf("%127s",out_buf);
-            _global_conf._DB_OUTPUT_FD = open(out_buf, O_CREAT | O_TRUNC);
+            _global_conf._OUTPUT_FD = open(out_buf, O_CREAT | O_TRUNC);
         }
         
     }
@@ -178,8 +178,8 @@ void parse_args(args * a, int argc, char ** argv)
                     if(i < (argc - 1))
                     {
                         strncpy(a -> _out_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _out_path)));
-                        _global_conf._DB_OUTPUT_FD = open(a -> _out_path, O_CREAT | O_TRUNC);
-                        if(_global_conf._DB_OUTPUT_FD == -1)
+                        _global_conf._OUTPUT_FD = open(a -> _out_path, O_CREAT | O_TRUNC);
+                        if(_global_conf._OUTPUT_FD == -1)
                             perror("OUTPUT-Open");
                     }
                     else
@@ -190,6 +190,9 @@ void parse_args(args * a, int argc, char ** argv)
                     _global_conf._LOG_SYS = 1;
                     if(i < (argc - 1))
                         strncpy(a -> _log_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _log_path)));
+                        _global_conf._DB_OUTPUT_FD = open(a -> _log_path, O_CREAT | O_TRUNC);
+                        if(_global_conf._DB_OUTPUT_FD == -1)
+                            perror("OUTPUT-Open");
                     else
                         goto error;
                     i += 1;
@@ -568,7 +571,7 @@ void print_version(){
 
 int custom_test_code(int argc, char ** argv)
 {
-	
+	//Put your custom test code here
 	return 0;
 }
 
@@ -647,10 +650,11 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     }*/
     size_t tot_sent = 0;
     int iter = 0;
+    char next_macs[12]; memset(next_macs,0,12);
     while(tot_sent < content_size)
     {
         _sys_log("\n\n[Iter %i]\n",iter);
-        char * next_macs = get_next_macs(__CLIENT_SEND);
+        get_next_macs(__CLIENT_SEND,next_macs);
 
         ssize_t tmp_sent = 0;
         size_t to_send = min(content_size - tot_sent,_global_conf._FRAG_SIZE);
@@ -692,7 +696,8 @@ int recv_loop(connection * conn)
     _sys_log("recv_loop(%p)\n",conn);
     char rcv_buf[_global_conf._FRAG_SIZE];memset(rcv_buf,0,_global_conf._FRAG_SIZE);
     char tot_buf[__MAX_BUFFER_SIZE];memset(tot_buf,0,__MAX_BUFFER_SIZE);
-    
+    char next_macs[12]; memset(next_macs,0,12);
+    char resp_buf[12]; memset(resp_buf,0,12);
     /*ssize_t data_size = ds_exchange(conn,-1);
     if(data_size < 0){
         fprintf(stderr,"ds-exchange failed, exiting...\n");
@@ -705,7 +710,8 @@ int recv_loop(connection * conn)
     {
         memset(rcv_buf,0,_global_conf._FRAG_SIZE);
         _sys_log("\n\n[Iter %i]\n",iter);
-        char * next_macs = get_next_macs(__CLIENT_RECV);
+        
+        get_next_macs(__CLIENT_RECV,next_macs);
         bytes_rcvd = s_recv(conn,rcv_buf,_global_conf._FRAG_SIZE);
         if(bytes_rcvd == -1){
             perror("s_recv");
@@ -718,7 +724,6 @@ int recv_loop(connection * conn)
         if(rcv_data)
             memcpy(tot_buf + tot_rcvd,rcv_buf,bytes_rcvd);
         tot_rcvd += bytes_rcvd;
-        char resp_buf[12];
         memset(resp_buf,0,12);
         sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));
         bytes_rspd = s_send(conn, resp_buf,strlen(resp_buf));

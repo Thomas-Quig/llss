@@ -83,12 +83,11 @@ char safe_rand(int i)
     return c;
 }
 
-char * get_next_macs(int mode)
+char * get_next_macs(int mode, char * mac_buf)
 {
     _sys_log("get_next_macs(%i)\n",mode);
-    char * new_macs = malloc(12);
-    char * my_new_mac = new_macs;
-    char * ot_new_mac = new_macs + 6;
+    char * my_new_mac = mac_buf;
+    char * ot_new_mac = mac_buf + 6;
     for(int i = 0; i < 6; i++)
     {
         if(mode == __CLIENT_SEND)
@@ -109,7 +108,7 @@ char * get_next_macs(int mode)
     _sys_log("get_next_macs(Self: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x, Othr: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",
     my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
     ot_new_mac[0],ot_new_mac[1],ot_new_mac[2],ot_new_mac[3],ot_new_mac[5],ot_new_mac[5]);
-    return new_macs;
+    return mac_buf;
 }
 
 int advance_mac(connection * conn, char *macs, int who)
