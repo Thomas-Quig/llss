@@ -38,7 +38,7 @@ int client_main(int argc, char ** argv)
     memset(s_target_ip,0,16);//This way its all null
     strncpy(s_target_ip,a._target_ip,min(strlen(a._target_ip),15));
     memcpy(s_orig_mac,get_mac(_global_conf._IFACE),12);
-    
+
     if(a._mode == __CLIENT_MAIN){
         custom_test_code(argc,argv);
     }
@@ -255,6 +255,12 @@ void parse_args(args * a, int argc, char ** argv)
                 case 'L':
                     _global_conf._FUNCLIST = 1;
                     break;
+                case 's':
+                    if(i < (argc - 1))
+                        _global_conf._SHUFFLE = atoi(argv[i + 1]);
+                    else
+                        goto error;
+                    i += 1;
                 case 'w':
                     wizard();
                     exit(EXIT_SUCCESS);
