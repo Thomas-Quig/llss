@@ -244,8 +244,8 @@ void parse_args(args * a, int argc, char ** argv)
                     exit(EXIT_SUCCESS);
                     break;
                 case 'v':
-                    _sys_log("Verbose has been enabled");
                     _global_conf._VERBOSE = 1;
+                    _sys_log("Verbose has been enabled\n");
                     break;
                 case 'L':
                     _global_conf._FUNCLIST = 1;
