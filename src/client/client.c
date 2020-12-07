@@ -687,11 +687,11 @@ int recv_loop(connection * conn)
     char rcv_buf[_global_conf._FRAG_SIZE];
     memset(rcv_buf,0,_global_conf._FRAG_SIZE);
     ssize_t data_size = ds_exchange(conn,-1);
-    if(data_size < 0)
-    {
+    if(data_size < 0){
         fprintf(stderr,"ds-exchange failed, exiting...\n");
         return 0;
     }
+    _sys_log("recv_loop(): data size is %d\n",data_size);
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
     ssize_t tot_rcvd;
