@@ -37,6 +37,7 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
+    (conn -> s_addr).sin_port = conn -> port;
     if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("rcv-bind");
