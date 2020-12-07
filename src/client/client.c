@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 1,_rvn = 56;
+int _lvn = 1,_mvn = 2,_rvn = 0;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -639,6 +639,7 @@ void send_content(char * ip, int port, char * arg, int mode)
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
+    _sys_log("send_loop(%p,%.8s,%du)\n",conn,content,content_size);
     /*if(ds_exchange(conn,(int)content_size) == -1){
         fprintf(stderr,"ds-exchange failed, exiting...\n");
         return -1;
@@ -647,7 +648,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     int iter = 0;
     while(tot_sent < content_size)
     {
-        _sys_log("\n\n[Iter %i]\nsend_loop(%p,%.8s,%du)\n",iter,conn,content,content_size);
+        _sys_log("\n\n[Iter %i]\n",iter);
         char * next_macs = get_next_macs(__CLIENT_SEND);
 
         ssize_t tmp_sent = 0;
@@ -687,8 +688,10 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
-    char rcv_buf[_global_conf._FRAG_SIZE];
-    memset(rcv_buf,0,_global_conf._FRAG_SIZE);
+    _sys_log("recv_loop(%p)\n",conn);
+    char rcv_buf[_global_conf._FRAG_SIZE];memset(rcv_buf,0,_global_conf._FRAG_SIZE);
+    char tot_buf[__MAX_BUFFER_SIZE];memset(tot_buf,0,__MAX_BUFFER_SIZE);
+    
     /*ssize_t data_size = ds_exchange(conn,-1);
     if(data_size < 0){
         fprintf(stderr,"ds-exchange failed, exiting...\n");
@@ -701,17 +704,19 @@ int recv_loop(connection * conn)
     int rcv_data = 1,iter = 0;
     while (rcv_data)
     {
-        _sys_log("\n\n[Iter %i]\nsend_loop(%p)\n",iter,conn);
+        memset(rcv_buf,0,_global_conf._FRAG_SIZE);
+        _sys_log("\n\n[Iter %i]\n",iter);
         char * next_macs = get_next_macs(__CLIENT_RECV);
-        bytes_rcvd = s_recv(conn,rcv_buf + tot_rcvd,_global_conf._FRAG_SIZE);
+        bytes_rcvd = s_recv(conn,rcv_buf,_global_conf._FRAG_SIZE);
         if(bytes_rcvd == -1){
             perror("s_recv");
         }
+        memcpy(tot_buf + tot_rcvd,rcv_buf,bytes_rcvd);
         tot_rcvd += bytes_rcvd;
-        _sys_log("[RCVD] Received %d bytes\n",bytes_rcvd);
+        _sys_log("recv_loop(): Received %d bytes\n",bytes_rcvd);
         advance_mac(conn,next_macs,__ADV_OTHR);
         
-        //rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
+        rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
         //if(rcv_data)
         char resp_buf[12];
         memset(resp_buf,0,12);
@@ -723,13 +728,13 @@ int recv_loop(connection * conn)
     }
     if(_global_conf._ENCRYPT)
     {
-        char plaintext[conn -> data_size];
-        int plaintext_size = decrypt(rcv_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
+        char plaintext[tot_rcvd];
+        int plaintext_size = decrypt(tot_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
         write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
     }
     else
     {
-        write(_global_conf._OUTPUT_FD,rcv_buf,tot_rcvd);
+        write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
     }
 }
 
