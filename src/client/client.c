@@ -80,11 +80,12 @@ void configure(char * conf_path)
     {
         FILE * f = fopen(conf_path,"r");
         
-        fscanf(f,"%i\n%i\n%i\n%i\n%i\n%i",&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._LOG_SYS));
-        _sys_log("[Config Loaded]\n---------------\nPrintDebug: %i\nFuncList: %i\nShuffle: %i\nEncryption: %i\nCleanup: %i\nSysLogs: %i\n---------------\n",(_global_conf._VERBOSE),(_global_conf._FUNCLIST),(_global_conf._SHUFFLE),(_global_conf._ENCRYPT),(_global_conf._CLEANUP),(_global_conf._LOG_SYS));
+        fscanf(f,"%i\n%i\n%i\n%i\n%i\n%i\n%i\n%i\n%i",&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._LOG_SYS),&(_global_conf._CHECK_FILE),&(_global_conf._FRAG_SIZE),&(_global_conf._CSTMSEED));
+        _sys_log("[Config Loaded]\n---------------\nPrintDebug: %i\nFuncList: %i\nShuffle: %i\nEncryption: %i\nCleanup: %i\nSysLogs: %i\nCheckFile: %i\nFragSize: %i\nCustomSeed: %i\n---------------\n",_global_conf._VERBOSE,_global_conf._FUNCLIST,_global_conf._SHUFFLE,_global_conf._ENCRYPT,_global_conf._CLEANUP,_global_conf._LOG_SYS,_global_conf._CHECK_FILE,_global_conf._FRAG_SIZE,_global_conf._CSTMSEED);
     }
     else if(conf_path == NULL)
     {
+        //Advanced settings (Frag size and custom seed) are left for loading from a file (you cant do it manually).
         char * param_qs[7] = {"Verbose mode (print debug statements)","Print function calls","Shuffle MAC addresses","Encrypt messages","Cleanup arp at end of session", "Log system (debug/funccall) messages to file", "Check for file when sending message"};
         int * params[7] = {&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._LOG_SYS),&(_global_conf._CHECK_FILE)};
         char _arg[8];
@@ -711,12 +712,12 @@ int recv_loop(connection * conn)
             break;
         }
         _sys_log("recv_loop(): Received %d bytes\n",bytes_rcvd);
-        memcpy(tot_buf + tot_rcvd,rcv_buf,bytes_rcvd);
-        tot_rcvd += bytes_rcvd;
         advance_mac(conn,next_macs,__ADV_OTHR);
         
         rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
-        //if(rcv_data)
+        if(rcv_data)
+            memcpy(tot_buf + tot_rcvd,rcv_buf,bytes_rcvd);
+        tot_rcvd += bytes_rcvd;
         char resp_buf[12];
         memset(resp_buf,0,12);
         sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));
