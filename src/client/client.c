@@ -644,8 +644,10 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         return -1;
     }*/
     size_t tot_sent = 0;
+    int iter = 0;
     while(tot_sent < content_size)
     {
+        _sys_log("\n\n[Iter %i]\nsend_loop(%p,%.8s,%du)\n",iter,conn,content,content_size);
         char * next_macs = get_next_macs(__CLIENT_SEND);
 
         ssize_t tmp_sent = 0;
@@ -667,6 +669,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
                 acked = 1;
         }
         advance_mac(conn,next_macs,__ADV_OTHR);
+        iter++;
     }
     s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
     char endbuf[12];
@@ -695,12 +698,11 @@ int recv_loop(connection * conn)
     ssize_t bytes_rcvd;
     ssize_t bytes_rspd;
     ssize_t tot_rcvd;
-    int rcv_data = 1;
+    int rcv_data = 1,iter = 0;
     while (rcv_data)
     {
+        _sys_log("\n\n[Iter %i]\nsend_loop(%p,%.8s,%du)\n",iter,conn);
         char * next_macs = get_next_macs(__CLIENT_RECV);
-
-        _sys_log("Waiting on data...\n");
         bytes_rcvd = s_recv(conn,rcv_buf + tot_rcvd,_global_conf._FRAG_SIZE);
         if(bytes_rcvd == -1){
             perror("s_recv");
@@ -717,6 +719,7 @@ int recv_loop(connection * conn)
         bytes_rspd = s_send(conn, resp_buf,strlen(resp_buf));
         
         advance_mac(conn,next_macs,__ADV_SELF);
+        iter++;
     }
     if(_global_conf._ENCRYPT)
     {
