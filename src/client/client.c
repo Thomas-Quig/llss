@@ -701,7 +701,7 @@ int recv_loop(connection * conn)
     int rcv_data = 1,iter = 0;
     while (rcv_data)
     {
-        _sys_log("\n\n[Iter %i]\nsend_loop(%p,%.8s,%du)\n",iter,conn);
+        _sys_log("\n\n[Iter %i]\nsend_loop(%p)\n",iter,conn);
         char * next_macs = get_next_macs(__CLIENT_RECV);
         bytes_rcvd = s_recv(conn,rcv_buf + tot_rcvd,_global_conf._FRAG_SIZE);
         if(bytes_rcvd == -1){
