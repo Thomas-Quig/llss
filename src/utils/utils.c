@@ -18,7 +18,7 @@ static const char g_dh2048_pm[] =
 
 ssize_t s_send(connection * conn, char * data, size_t size)
 {
-    _sys_log("s_send(%p,\"%.8s...%.8s\",%d)\n",conn,data,data + size - 8,size);
+    _sys_log("s_send(%p,\"%.8s...\",%d)\n",conn,data,data + size - 8,size);
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     (conn -> s_addr).sin_family = AF_INET; 
