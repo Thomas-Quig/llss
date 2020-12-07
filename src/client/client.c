@@ -28,9 +28,10 @@ int client_main(int argc, char ** argv)
     //Initial configuration, is overwritten by parse-args and any future configs.
     configure("./llss.conf");
 
-    args a;
+    args a;memset(&a,0,sizeof(a));
     parse_args(&a,argc,argv); //Parse args will exit if -w is called
     if(strlen(a._conf_path) > 0){
+        printf("Configuring using %s",a._conf_path);
         configure(a._conf_path);
     }
 
