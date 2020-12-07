@@ -23,6 +23,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     (conn -> s_addr).sin_family = AF_INET; 
     (conn -> s_addr).sin_port = htons(conn -> port);
+    (conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
     //(conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
     usleep(20000);
     return sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
