@@ -54,7 +54,8 @@ ssize_t ds_exchange(connection * conn,int ds)
                 perror("r-dsexch-recv:");		
                 return -1;		
             }		
-            data_size = atoi(buf);		
+            data_size = atoi(buf);
+            usleep(10000);	
             break;
         default:
             fprintf(stderr,"dsexch mode invalid (%i), returning -1...",conn -> mode);	
