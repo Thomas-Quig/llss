@@ -88,7 +88,10 @@ int _sys_log(const char * format,...)
 {
     va_list args;
     va_start(args, format);
-    dprintf(_global_conf._DB_OUTPUT_FD,"[%s] ",__TIME__);
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    long ms = spec.tv_nsec / 1000 + spec.tv_sec;
+    dprintf(_global_conf._DB_OUTPUT_FD,"[%u] ",ms);
     if(_global_conf._VERBOSE)
     {
         int result = vdprintf(_global_conf._DB_OUTPUT_FD, format,args);
