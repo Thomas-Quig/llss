@@ -106,7 +106,7 @@ char * get_next_macs(int mode)
             return NULL; //This should be impossible but whatever.
         }
     }
-    _sys_log("get_next_macs(Self: %.2x:%.2x:%.2x:%.2x:%.2x, Othr: %.2x:%.2x:%.2x:%.2x:%.2x",
+    _sys_log("get_next_macs(Self: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x, Othr: %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",
     my_new_mac[0],my_new_mac[1],my_new_mac[2],my_new_mac[3],my_new_mac[4],my_new_mac[5],
     ot_new_mac[0],ot_new_mac[0],ot_new_mac[0],ot_new_mac[0],ot_new_mac[0],ot_new_mac[0]);
     return new_macs;
