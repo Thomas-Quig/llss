@@ -88,7 +88,7 @@ int _sys_log(const char * format,...)
 {
     va_list args;
     va_start(args, format);
-    fdprintf(_global_conf._DB_OUTPUT_FD,"[%s] ",__TIME__);
+    dprintf(_global_conf._DB_OUTPUT_FD,"[%s] ",__TIME__);
     if(_global_conf._VERBOSE)
     {
         int result = vdprintf(_global_conf._DB_OUTPUT_FD, format,args);
