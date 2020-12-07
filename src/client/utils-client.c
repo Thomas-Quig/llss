@@ -49,13 +49,13 @@ ssize_t ds_exchange(connection * conn,int ds)
             if(s_send(conn,buf,strlen(buf)) == -1){		
                 perror("r-dsexch-send:");		
                 return -1;		
-            }		
+            }
             if(s_recv(conn,buf,sizeof(int)) == -1){		
                 perror("r-dsexch-recv:");		
                 return -1;		
-            }		
+            }
+            usleep(1000000);			
             data_size = atoi(buf);
-            usleep(500000);	
             break;
         default:
             fprintf(stderr,"dsexch mode invalid (%i), returning -1...",conn -> mode);	
