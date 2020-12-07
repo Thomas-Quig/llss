@@ -25,7 +25,8 @@ ssize_t s_send(connection * conn, char * data, size_t size)
     (conn -> s_addr).sin_port = htons(conn -> port);
     (conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
     //(conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
-    usleep(20000);
+    if(conn -> mode == __CLIENT_SEND)
+        usleep(20000);
     ssize_t retval = sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
     return retval;
