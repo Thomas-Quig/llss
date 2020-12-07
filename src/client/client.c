@@ -261,6 +261,7 @@ void parse_args(args * a, int argc, char ** argv)
                     else
                         goto error;
                     i += 1;
+                    break;
                 case 'w':
                     wizard();
                     exit(EXIT_SUCCESS);
