@@ -698,9 +698,7 @@ int recv_loop(connection * conn)
         return 0;
     }
     _sys_log("recv_loop(): data size is %d\n",data_size);*/
-    ssize_t bytes_rcvd;
-    ssize_t bytes_rspd;
-    ssize_t tot_rcvd;
+    ssize_t bytes_rcvd = 0, bytes_rspd = 0, tot_rcvd = 0;
     int rcv_data = 1,iter = 0;
     while (rcv_data)
     {
