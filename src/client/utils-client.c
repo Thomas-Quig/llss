@@ -27,7 +27,8 @@ int set_mac(char * iface, char * newMac)
 }
 
 ssize_t ds_exchange(connection * conn,int ds)		
-{		
+{	
+    _sys_log("ds_exchange(%p,%i)\n",conn,ds);
     ssize_t data_size;	
     char buf[8];memset(buf,0,8);		
     switch(conn -> mode)		
@@ -53,7 +54,8 @@ ssize_t ds_exchange(connection * conn,int ds)
                 return -1;		
             }		
             data_size = atoi(buf);		
-        default:		
+        default:
+            fprintf(stderr,"dsexch mode invalid (%i), returning -1...",conn -> mode);	
             return -1;		
     } 		
     return data_size;		

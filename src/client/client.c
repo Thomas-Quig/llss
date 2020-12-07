@@ -419,7 +419,7 @@ void wizard()
                             char sendbuf[1024];memset(sendbuf,0,1024);
                             printf("You are sending a message, more information required\n---Enter your message below---\n");
                             scanf("%1023s",sendbuf);
-                            printf("------------------------------");
+                            printf("------------------------------\n");
                             a._data = sendbuf;
                         }
                         state = EXECUTE;
@@ -480,7 +480,7 @@ void wizard()
             case EXECUTE:
                 printf("Executing llss...\n");
                 execute(a);
-                
+
                 if(_global_conf._CLEANUP)
                     cleanup(s_orig_mac,s_target_ip);
                 char confbuf[8]; memset(confbuf,0,8); printf("Continue (y/n)? "); scanf("%8s",confbuf);
