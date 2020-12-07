@@ -710,10 +710,11 @@ int recv_loop(connection * conn)
         bytes_rcvd = s_recv(conn,rcv_buf,_global_conf._FRAG_SIZE);
         if(bytes_rcvd == -1){
             perror("s_recv");
+            break;
         }
+        _sys_log("recv_loop(): Received %d bytes\n",bytes_rcvd);
         memcpy(tot_buf + tot_rcvd,rcv_buf,bytes_rcvd);
         tot_rcvd += bytes_rcvd;
-        _sys_log("recv_loop(): Received %d bytes\n",bytes_rcvd);
         advance_mac(conn,next_macs,__ADV_OTHR);
         
         rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
