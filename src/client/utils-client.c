@@ -66,7 +66,7 @@ ssize_t ds_exchange(connection * conn,int ds)
 void set_arp_cache(char * ip, char * _new_mac)
 {
     _sys_log("set_arp_cache(%s,%.2x:%.2x:%.2x:%.2x:%.2x:%.2x)\n",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
-	char cmd[64];
+	char cmd[64];memset(cmd,0,64);
 	sprintf(cmd,"arp -s %s %.2x:%.2x:%.2x:%.2x:%.2x:%.2x",ip,_new_mac[0],_new_mac[1],_new_mac[2],_new_mac[3],_new_mac[4],_new_mac[5]);
 	//printf("cmd \"%s\"\n",cmd);
 	system(cmd);
