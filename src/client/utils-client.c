@@ -42,7 +42,8 @@ ssize_t ds_exchange(connection * conn,int ds)
             if(s_send(conn,buf,strlen(buf)) == -1){		
                 perror("r-dsexch-send:");		
                 return -1;		
-            }		
+            }
+            break;
         case __CLIENT_SEND:		
             sprintf(buf,"%i",ds);		
             if(s_send(conn,buf,strlen(buf)) == -1){		
@@ -54,6 +55,7 @@ ssize_t ds_exchange(connection * conn,int ds)
                 return -1;		
             }		
             data_size = atoi(buf);		
+            break;
         default:
             fprintf(stderr,"dsexch mode invalid (%i), returning -1...",conn -> mode);	
             return -1;		
