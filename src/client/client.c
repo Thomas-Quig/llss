@@ -647,7 +647,7 @@ void send_content(char * ip, int port, char * arg, int mode)
     }
         s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
         char endbuf[12];
-        printf("Received final packet %ld:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
+        printf("Received final packet %ld:\"%.12s\", process complete.\n",s_recv(conn,endbuf,12),endbuf);
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
@@ -744,11 +744,19 @@ int recv_loop(connection * conn)
     {
         char plaintext[tot_rcvd];
         int plaintext_size = decrypt(tot_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
-        write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
+        ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
+        if(w_ret == -1)
+        {
+            perror("wret_write:");
+        }
     }
     else
     {
-        write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
+        ssize_t w_ret = write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
+        if(w_ret == -1)
+        {
+            perror("wret_write:");
+        }
     }
 }
 
