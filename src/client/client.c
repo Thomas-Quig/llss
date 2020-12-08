@@ -661,7 +661,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     char next_macs[12]; memset(next_macs,0,12);
     while(tot_sent < content_size)
     {
-        _sys_log("\n\n[Iter %i, %u]\n",iter,tot_sent);
+        _sys_log("\n\n[Iter %i, %u/%u]\n",iter,tot_sent,content_size);
         get_next_macs(__CLIENT_SEND,next_macs);
 
         ssize_t tmp_sent = 0;
