@@ -622,7 +622,6 @@ void send_content(char * ip, int port, char * arg, int mode)
                 else{
                     send_loop(conn,content,content_size);
                 }
-                send_loop(conn,content,content_size);
                 tot_bytes_sent += content_size;
             }
         }
