@@ -178,7 +178,7 @@ void parse_args(args * a, int argc, char ** argv)
                     if(i < (argc - 1))
                     {
                         strncpy(a -> _out_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _out_path)));
-                        _global_conf._OUTPUT_FD = open(a -> _out_path, O_CREAT | O_TRUNC);
+                        _global_conf._OUTPUT_FD = open(a -> _out_path, O_CREAT | O_TRUNC | O_RDWR);
                         _sys_log("Output File on FD %i\n",_global_conf._OUTPUT_FD);
                         if(_global_conf._OUTPUT_FD == -1)
                             perror("OUTPUT-Open");
