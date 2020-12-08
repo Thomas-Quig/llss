@@ -747,6 +747,7 @@ int recv_loop(connection * conn)
         ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
         if(w_ret == -1)
         {
+            print("write(%i)\n",_global_conf._OUTPUT_FD);
             perror("wret_write:");
         }
     }
@@ -755,6 +756,7 @@ int recv_loop(connection * conn)
         ssize_t w_ret = write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
         if(w_ret == -1)
         {
+            print("write(%i)\n";,_global_conf._OUTPUT_FD);
             perror("wret_write:");
         }
     }
