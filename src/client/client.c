@@ -639,6 +639,9 @@ void send_content(char * ip, int port, char * arg, int mode)
         else{
             send_loop(conn,arg,strlen(arg));
         }
+        s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
+        char endbuf[12];
+        printf("Received final packet %ld:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
         
     }
     else
@@ -684,9 +687,6 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         advance_mac(conn,next_macs,__ADV_OTHR);
         iter++;
     }
-    s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
-    char endbuf[12];
-    printf("Received final packet %ld:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
 }
 
 void recv_content(char * ip, int port)
