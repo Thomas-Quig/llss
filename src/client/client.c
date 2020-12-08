@@ -62,7 +62,7 @@ void execute(args a)
         case __CLIENT_SEND:
             if(_global_conf._CHECK_FILE && access(a._data,F_OK) != -1)
             {
-                _sys_log("File found, loading \"%s\"");
+                _sys_log("File found, loading \"%32s...\"\n",a._data);
                 send_content(a._target_ip,a._port,a._data,__SEND_FILE);
             }
             else                                                
@@ -639,17 +639,15 @@ void send_content(char * ip, int port, char * arg, int mode)
         else{
             send_loop(conn,arg,strlen(arg));
         }
-        s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
-        char endbuf[12];
-        printf("Received final packet %ld:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
-        
     }
     else
     {
-        printf("How\n");
+        fprintf(stderr,"Illegal state, exiting...\n");
         return;
     }
-    
+        s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
+        char endbuf[12];
+        printf("Received final packet %ld:\"%.12s\", process complete, cleaning up.\n",s_recv(conn,endbuf,12),endbuf);
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
@@ -663,13 +661,17 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
     char next_macs[12]; memset(next_macs,0,12);
     while(tot_sent < content_size)
     {
-        _sys_log("\n\n[Iter %i]\n",iter);
+        _sys_log("\n\n[Iter %i, %u]\n",iter,tot_sent);
         get_next_macs(__CLIENT_SEND,next_macs);
 
         ssize_t tmp_sent = 0;
         size_t to_send = min(content_size - tot_sent,_global_conf._FRAG_SIZE);
-
+        _sys_log("Offset %d\n",tot_sent);
         tmp_sent = s_send(conn,content + tot_sent, to_send);
+        if(tmp_sent == -1){
+            perror("s_send");
+            break;
+        }
         tot_sent += tmp_sent;
         _sys_log("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
         advance_mac(conn,next_macs,__ADV_SELF);
