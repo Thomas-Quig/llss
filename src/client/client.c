@@ -191,7 +191,7 @@ void parse_args(args * a, int argc, char ** argv)
                     _global_conf._LOG_SYS = 1;
                     if(i < (argc - 1))
                         strncpy(a -> _log_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _log_path)));
-                        _global_conf._DB_OUTPUT_FD = open(a -> _log_path, O_CREAT | O_TRUNC);
+                        _global_conf._DB_OUTPUT_FD = open(a -> _log_path, O_CREAT | O_TRUNC | O_RDWR);
                         if(_global_conf._DB_OUTPUT_FD == -1)
                             perror("OUTPUT-Open");
                     else
@@ -306,7 +306,7 @@ void parse_args(args * a, int argc, char ** argv)
     }
     if(_global_conf._LOG_SYS)
     {
-        _global_conf._DB_OUTPUT_FD = open(a -> _log_path, O_CREAT | O_TRUNC);
+        _global_conf._DB_OUTPUT_FD = open(a -> _log_path, O_CREAT | O_TRUNC | O_RDWR);
         if(_global_conf._DB_OUTPUT_FD == -1)
         {
             perror("SYSLOG-Open");
@@ -745,18 +745,19 @@ int recv_loop(connection * conn)
         char plaintext[tot_rcvd];
         int plaintext_size = decrypt(tot_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
         ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
+        _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,plaintext,plaintext_size,w_ret);
         if(w_ret == -1)
         {
-            _sys_log("write(%i)\n",_global_conf._OUTPUT_FD);
             perror("wret_write:");
         }
     }
     else
     {
+        
         ssize_t w_ret = write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
+        _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,tot_buf,tot_rcvd,w_ret);
         if(w_ret == -1)
         {
-            _sys_log("write(%i)\n",_global_conf._OUTPUT_FD);
             perror("wret_write:");
         }
     }
