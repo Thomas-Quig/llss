@@ -147,7 +147,7 @@ char * estab_shared_secret(connection * conn, int mode)
     {
         /* Problems have been found with the generated parameters */
         /* Handle these here - we'll just abort for this example */
-        printf("DH_check failed\n");
+        fprintf(stderr,"DH_check failed\n");
         handleErrors(__LINE__);
         return NULL;
     }
@@ -163,11 +163,12 @@ char * estab_shared_secret(connection * conn, int mode)
     int len;
 
     //Yes this is repetitive code I dont give a shit how else do i do it.
+    
     if(mode == __CLIENT_SEND)
     {
         char pubbuf[keysize];
         if(-1 == BN_bn2bin(DH_get0_pub_key(privkey),pubbuf)) handleErrors(__LINE__);
-
+        _sys_log("PubKey: %32x",pubbuf);
         ssize_t key_sent = s_send(conn,pubbuf,keysize);
         if(key_sent == -1) goto keyexch_error;
         ssize_t key_recv = s_recv(conn,ohost,keysize);
@@ -178,21 +179,21 @@ char * estab_shared_secret(connection * conn, int mode)
 
         char pubbuf[keysize];
         if(-1 == BN_bn2bin(DH_get0_pub_key(privkey),pubbuf)) handleErrors(__LINE__);
-
+        _sys_log("PubKey: %32x",pubbuf);
         ssize_t key_sent = s_send(conn,pubbuf,keysize);
         if(key_sent == -1) goto keyexch_error;
     }
     
     /* Receive the public key from the peer. In this example we're just hard coding a value */
-    
-    BIGNUM *ohostkey = NULL;
-    if(0 == (BN_dec2bn(&ohostkey,ohost))) handleErrors(__LINE__);
+    _sys_log("Ohost: %32x",ohost);
+    BIGNUM *pubkey = NULL;
+    if(0 == (BN_bin2bn(ohost,keysize,pubkey))) handleErrors(__LINE__);
 
     /* Compute the shared secret */
     unsigned char *secret;
     if(NULL == (secret = OPENSSL_malloc(sizeof(unsigned char) * (DH_size(privkey))))) handleErrors(__LINE__);
 
-    if(0 > (secret_size = DH_compute_key(secret, ohostkey, privkey))) handleErrors(__LINE__);
+    if(0 > (secret_size = DH_compute_key(secret, pubkey, privkey))) handleErrors(__LINE__);
 
     /* Do something with the shared secret */
     /* Note secret_size may be less than DH_size(privkey) */
