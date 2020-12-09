@@ -705,7 +705,7 @@ int recv_loop(connection * conn)
 {
     _sys_log("recv_loop(%p)\n",conn);
     ssize_t tot_rcvd = 0;
-    int rcv_data = 0;
+    int rcv_data = 1;
     while (rcv_data)
     {
         char cur_large_buf[__MAX_BUFFER_SIZE];memset(cur_large_buf,0,__MAX_BUFFER_SIZE);
