@@ -137,12 +137,12 @@ char * estab_shared_secret(connection * conn, int mode)
     int secret_size;
 
     /* Generate the parameters to be used */
-    //if(NULL == (mykey = DH_new())) handleErrors();
+    //if(NULL == (privkey = DH_new())) handleErrors();
     FILE * fp = fopen("dhparams.pem","r");
-    DH * mykey = PEM_read_DHparams(fp,NULL,NULL,NULL);
-    if(mykey == NULL) handleErrors(__LINE__);
+    DH * privkey = PEM_read_DHparams(fp,NULL,NULL,NULL);
+    if(privkey == NULL) handleErrors(__LINE__);
 
-    if(1 != DH_check(mykey, &codes)) handleErrors(__LINE__);
+    if(1 != DH_check(privkey, &codes)) handleErrors(__LINE__);
     if(codes != 0)
     {
         /* Problems have been found with the generated parameters */
@@ -153,11 +153,11 @@ char * estab_shared_secret(connection * conn, int mode)
     }
 
     /* Generate the public and private key pair */
-    if(1 != DH_generate_key(mykey)) handleErrors(__LINE__);
+    if(1 != DH_generate_key(privkey)) handleErrors(__LINE__);
 
     /* Send the public key to the peer.
     * How this occurs will be specific to your situation (see main text below) */
-    int keysize = BN_num_bytes(DH_get0_pub_key(mykey));
+    int keysize = BN_num_bytes(DH_get0_pub_key(privkey));
     if(keysize == -1) handleErrors(__LINE__);
     char * ohost = malloc(keysize);  
     int len;
@@ -166,7 +166,7 @@ char * estab_shared_secret(connection * conn, int mode)
     if(mode == __CLIENT_SEND)
     {
         char pubbuf[keysize];
-        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors(__LINE__);
+        if(-1 == BN_bn2bin(DH_get0_pub_key(privkey),pubbuf)) handleErrors(__LINE__);
 
         ssize_t key_sent = s_send(conn,pubbuf,keysize);
         if(key_sent == -1) goto keyexch_error;
@@ -177,7 +177,7 @@ char * estab_shared_secret(connection * conn, int mode)
         ssize_t key_recv = s_recv(conn,ohost,keysize);
 
         char pubbuf[keysize];
-        if(-1 == BN_bn2bin(DH_get0_pub_key(mykey),pubbuf)) handleErrors(__LINE__);
+        if(-1 == BN_bn2bin(DH_get0_pub_key(privkey),pubbuf)) handleErrors(__LINE__);
 
         ssize_t key_sent = s_send(conn,pubbuf,keysize);
         if(key_sent == -1) goto keyexch_error;
@@ -186,20 +186,20 @@ char * estab_shared_secret(connection * conn, int mode)
     /* Receive the public key from the peer. In this example we're just hard coding a value */
     
     BIGNUM *ohostkey = NULL;
-    if(0 == (BN_bin2bn(ohost,keysize,ohostkey))) handleErrors(__LINE__);
+    if(0 == (BN_dec2bn(&ohostkey,ohost))) handleErrors(__LINE__);
 
     /* Compute the shared secret */
     unsigned char *secret;
-    if(NULL == (secret = OPENSSL_malloc(sizeof(unsigned char) * (DH_size(mykey))))) handleErrors(__LINE__);
+    if(NULL == (secret = OPENSSL_malloc(sizeof(unsigned char) * (DH_size(privkey))))) handleErrors(__LINE__);
 
-    if(0 > (secret_size = DH_compute_key(secret, ohostkey, mykey))) handleErrors(__LINE__);
+    if(0 > (secret_size = DH_compute_key(secret, ohostkey, privkey))) handleErrors(__LINE__);
 
     /* Do something with the shared secret */
-    /* Note secret_size may be less than DH_size(mykey) */
-    printf("The shared secret(%i) is:",secret_size);
+    /* Note secret_size may be less than DH_size(privkey) */
+    _sys_log("The shared secret(%i) is:",secret_size);
     for(int i = 0; i < secret_size; i++)
-    printf("%.2x",secret[i]);
-    BIO_dump_fp(stdout, secret, secret_size);
+        _sys_log("%.2x",secret[i]);
+    //BIO_dump_fp(stdout, secret, secret_size);
 
     return secret;
 
@@ -318,7 +318,7 @@ void printConnection(connection * conn)
 
 void handleErrors(int line)
 {
-    printf("OPENSSL ERROR LINE %i, EXITING\n",line);
+    fprintf(stderr,"OPENSSL ERROR LINE %i, EXITING\n",line);
     ERR_print_errors_fp(stderr);
 }
 
