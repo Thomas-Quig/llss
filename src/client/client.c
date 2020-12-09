@@ -774,7 +774,7 @@ int recv_loop(connection * conn)
             //Plaintext should be no larger than the tot_rcvd, as tot_rcvd is ciphertext size.
             char plaintext[tot_rcvd];
             
-            int plaintext_size = decrypt(cur_large_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
+            int plaintext_size = decrypt(cur_large_buf,clb_rcvd,conn -> secret, conn -> secret + 16, plaintext);
             ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
             _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,plaintext,plaintext_size,w_ret);
             if(w_ret == -1){
@@ -785,7 +785,7 @@ int recv_loop(connection * conn)
         {
             //Writing to _OUTPUT_FD instead of STDOUT allows for file writes using the exact same methods.
             //That is why I went through the painstakingly long process of allowing it. It's clean.
-            ssize_t w_ret = write(_global_conf._OUTPUT_FD,cur_large_buf,tot_rcvd);
+            ssize_t w_ret = write(_global_conf._OUTPUT_FD,cur_large_buf,clb_rcvd);
             _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,cur_large_buf,tot_rcvd,w_ret);
             if(w_ret == -1){
                 perror("wret_write:"); return -tot_rcvd;
