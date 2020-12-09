@@ -676,8 +676,8 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         int acked = 0;
         while(!(acked))
         {
-            char response[65];
-            ssize_t rf_resp = s_recv(conn,response,64);
+            char response[12];
+            ssize_t rf_resp = s_recv(conn,response,12);
             response[rf_resp] = '\0';
             _sys_log("[RSP] Response receieved...\n\"%s\"\n[End Response]\n\n",response);
             if(!strncmp(response,"ACK",3))
@@ -690,77 +690,108 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
 
 void recv_content(char * ip, int port)
 {
-    //The IP here is technically unneccesary, but valuable for debugging.
+    //The IP here is neccesary for ACK sending. It originlly was not (fun fact).
     connection * conn = establish_connection(ip,port,__CLIENT_RECV);
-	recv_loop(conn);
-	close(conn -> fd); 
+    int rl_ret = recv_loop(conn);
+	if(rl_ret == -1)
+        fprintf(stderr, "Receive failed at %d bytes, exiting\n",-rl_ret);
+	
+    //Chances are conn -> fd is already closed, but this makes sure of it.
+    close(conn -> fd); 
 	free(conn);
 }
 
 int recv_loop(connection * conn)
 {
     _sys_log("recv_loop(%p)\n",conn);
-    ssize_t bytes_rcvd = 0, bytes_rspd = 0, tot_rcvd = 0;
-    int rcv_data = 1,iter = 0;
+    ssize_t tot_rcvd = 0;
+    int rcv_data = 0;
     while (rcv_data)
     {
-        char rcv_buf[_global_conf._FRAG_SIZE];memset(rcv_buf,0,_global_conf._FRAG_SIZE);
-        char next_macs[12]; memset(next_macs,0,12);
-        char resp_buf[12]; memset(resp_buf,0,12);
-        char tot_buf[__MAX_BUFFER_SIZE];memset(tot_buf,0,__MAX_BUFFER_SIZE);
+        char cur_large_buf[__MAX_BUFFER_SIZE];memset(cur_large_buf,0,__MAX_BUFFER_SIZE);
+        ssize_t clb_rcvd = 0;
+        int iter = 0;
         do{
-            memset(rcv_buf,0,_global_conf._FRAG_SIZE);
             _sys_log("\n\n[Iter %i]\n",iter);
             
+            //Initialize vars within loop
+            ssize_t bytes_rcvd = 0, bytes_rspd = 0;
+            char rcv_buf[_global_conf._FRAG_SIZE];memset(rcv_buf,0,_global_conf._FRAG_SIZE);
+            char resp_buf[12]; memset(resp_buf,0,12);
+
+            //Get next mac addresses for shuffling. Should shuffling be disabled, this is unneccesary.
+            char next_macs[12]; memset(next_macs,0,12);
             get_next_macs(__CLIENT_RECV,next_macs);
-            bytes_rcvd = s_recv(conn,rcv_buf,_global_conf._FRAG_SIZE);
-            if(bytes_rcvd == -1){
-                perror("s_recv");
-                break;
-            }
-            _sys_log("recv_loop(): Received %d bytes\n",bytes_rcvd);
-            advance_mac(conn,next_macs,__ADV_OTHR);
             
-            rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
+            //Receieve the current fragment of data.
+            bytes_rcvd = s_recv(conn,rcv_buf,_global_conf._FRAG_SIZE);
+            _sys_log("recv_loop(): Received %d bytes\n",bytes_rcvd);
+            if(bytes_rcvd == -1){ 
+                perror("s_recv"); return -tot_rcvd;
+            }
+            
+            //If Reliability is set to asynchronous, advance the sender's MAC address
+            if(_global_conf._RELIABLE_MODE == __RELIABLE_ASYNC)
+                advance_mac(conn,next_macs,__ADV_OTHR);
                 
             memset(resp_buf,0,12);
             sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));
             if(bytes_rspd = s_send(conn, resp_buf,strlen(resp_buf)) == -1){
-                perror("recv-rspd");
-                return -tot_rcvd;
+                perror("recv-rspd"); return -tot_rcvd;
             }
+
+            //If the reliability mode is set to synchronous, advance the other host's MAC
+            //Otherwise, just advance receiver (your) MAC.
+            if(_global_conf._RELIABLE_MODE == __RELIABLE_SYNC)
+                advance_mac(conn,next_macs,__ADV_OTHR);
             advance_mac(conn,next_macs,__ADV_SELF);
+            
+            //Advance iteration counter
             iter++;
+
+            //Check to make sure the message was not the endmsg.
+            //YES THIS DOES MEAN THAT IF YOUR MESSAGE IS "[ENDMSG]" your code stops processing.
+            rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
             if(rcv_data != 0){
-                memcpy(tot_buf + (tot_rcvd % __MAX_BUFFER_SIZE),rcv_buf,bytes_rcvd);
-                tot_rcvd += bytes_rcvd;
+                memcpy(cur_large_buf + clb_rcvd,rcv_buf,bytes_rcvd);
+                clb_rcvd += bytes_rcvd;
             }
             else{
+                //Leave the inner loop if you receive ENDMSG
                 break;
             }
-        } while(tot_rcvd % __MAX_BUFFER_SIZE != 0);
+        } while(clb_rcvd < __MAX_BUFFER_SIZE);
+        //This implies that if _FRAG_SIZE > __MAX_BUFFER_SIZE this immediately breaks. 
+        //So don't do it, and don't tell me I didnt warn you.
+
+
+        //Add your current large buffer rcvd (min(__MAX_BUFFER_SIZE))
+        tot_rcvd += clb_rcvd;
+
+        //Check if decryption is needed
         if(_global_conf._ENCRYPT)
         {
+            //Plaintext should be no larger than the tot_rcvd, as tot_rcvd is ciphertext size.
             char plaintext[tot_rcvd];
-            int plaintext_size = decrypt(tot_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
+            
+            int plaintext_size = decrypt(cur_large_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
             ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
             _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,plaintext,plaintext_size,w_ret);
             if(w_ret == -1){
-                perror("wret_write:");
-                return -tot_rcvd;
+                perror("wret_write:"); return -tot_rcvd;
             }
         }
         else
         {
-            ssize_t w_ret = write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
-            _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,tot_buf,tot_rcvd,w_ret);
+            //Writing to _OUTPUT_FD instead of STDOUT allows for file writes using the exact same methods.
+            //That is why I went through the painstakingly long process of allowing it. It's clean.
+            ssize_t w_ret = write(_global_conf._OUTPUT_FD,cur_large_buf,tot_rcvd);
+            _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,cur_large_buf,tot_rcvd,w_ret);
             if(w_ret == -1){
-                perror("wret_write:");
-                return -tot_rcvd;
+                perror("wret_write:"); return -tot_rcvd;
             }
         }
     }
-    
     return tot_rcvd;
 }
 

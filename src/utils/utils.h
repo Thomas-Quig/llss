@@ -5,6 +5,12 @@
 #define __CLIENT_SEND 1
 #define __CLIENT_RECV 2
 
+#define __DEFAULT_FRAG_SIZE 1024
+#define __RELIABLE_SYNC 1
+#define __RELIABLE_ASYNC 2
+
+
+
 #define max(a,b) \
     ({__typeof__ (a) _a = (a); \
         __typeof__ (b) _b = (b); \
@@ -70,6 +76,7 @@ typedef struct _config{
     
     int  _FRAG_SIZE;        //Sending fragmentation size
     int  _CSTMSEED;         //-1 By default
+    int  _RELIABLE_MODE;    //1 By default
 
     int  _OUTPUT_FD;        //STDOUT_FILENO By default
     int  _DB_OUTPUT_FD;     //STDOUT_FILENO by default

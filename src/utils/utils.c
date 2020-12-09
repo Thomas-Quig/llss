@@ -3,8 +3,10 @@
 
 config _global_conf = 
 {/*_VERBOSE*/ 0 , /*_FUNCLIST*/ 0 , /*_SHUFFLE*/ 1 , /*_ENCRYPT*/ 1 ,
-/*_CLEANUP*/ 0 , /*_LOG_SYS*/ 0 , /*_CHECK_FILE*/ 0, /*_FRAG_SIZE*/ 1024, 
-/*_CSTMSEED*/ -1 , /*_OUTPUT_FD*/ 1 , /*_DB_OUTPUT_FD*/ 1, /*_IFACE*/ "wlan0"};
+/*_CLEANUP*/ 0 , /*_LOG_SYS*/ 0 , /*_CHECK_FILE*/ 0, 
+/*_FRAG_SIZE*/ __DEFAULT_FRAG_SIZE, /*_CSTMSEED*/ -1 ,
+/*_RELIABLE_MODE*/ __RELIABLE_ASYNC , /*_OUTPUT_FD*/ STDOUT_FILENO ,
+/*_DB_OUTPUT_FD*/ STDERR_FILENO, /*_IFACE*/ "wlan0"};
 
 static const char g_dh2048_pm[] = 
     "-----BEGIN DH PARAMETERS-----\n"
@@ -26,7 +28,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
     (conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
     //(conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
     //if(conn -> mode == __CLIENT_SEND)
-    usleep(100000);
+    usleep(10000);
     ssize_t retval = sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
     return retval;
