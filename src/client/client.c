@@ -732,36 +732,35 @@ int recv_loop(connection * conn)
             advance_mac(conn,next_macs,__ADV_SELF);
             iter++;
             if(rcv_data != 0){
-                memcpy(tot_buf + (tot_rcvd,rcv_buf,bytes_rcvd);
+                memcpy(tot_buf + (tot_rcvd % __MAX_BUFFER_SIZE),rcv_buf,bytes_rcvd);
                 tot_rcvd += bytes_rcvd;
             }
             else{
                 break;
             }
         } while(tot_rcvd % __MAX_BUFFER_SIZE != 0);
-        
-    }
-    if(_global_conf._ENCRYPT)
-    {
-        char plaintext[tot_rcvd];
-        int plaintext_size = decrypt(tot_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
-        ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
-        _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,plaintext,plaintext_size,w_ret);
-        if(w_ret == -1){
-            perror("wret_write:");
-            return -tot_rcvd;
+        if(_global_conf._ENCRYPT)
+        {
+            char plaintext[tot_rcvd];
+            int plaintext_size = decrypt(tot_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
+            ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
+            _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,plaintext,plaintext_size,w_ret);
+            if(w_ret == -1){
+                perror("wret_write:");
+                return -tot_rcvd;
+            }
+        }
+        else
+        {
+            ssize_t w_ret = write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
+            _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,tot_buf,tot_rcvd,w_ret);
+            if(w_ret == -1){
+                perror("wret_write:");
+                return -tot_rcvd;
+            }
         }
     }
-    else
-    {
-        
-        ssize_t w_ret = write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
-        _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,tot_buf,tot_rcvd,w_ret);
-        if(w_ret == -1){
-            perror("wret_write:");
-            return -tot_rcvd;
-        }
-    }
+    
     return tot_rcvd;
 }
 
