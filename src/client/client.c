@@ -603,7 +603,7 @@ void send_content(char * ip, int port, char * arg, int mode)
         }
         else
         {
-            printf("Sending file \"%s\" to %s\n",arg,conn -> ip);
+            _sys_log("Sending file \"%s\" to %s\n",arg,conn -> ip);
             //http://www.fundza.com/c4serious/fileIO_reading_all/index.html
             fseek(infile, 0L, SEEK_END);
             long file_size = ftell(infile);
@@ -647,7 +647,7 @@ void send_content(char * ip, int port, char * arg, int mode)
     }
         s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
         char endbuf[12];
-        printf("Received final packet %ld:\"%.12s\", process complete.\n",s_recv(conn,endbuf,12),endbuf);
+        _sys_log("Received final packet\"%.12s\", process complete.\n",s_recv(conn,endbuf,12),endbuf);
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
