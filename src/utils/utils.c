@@ -161,7 +161,7 @@ char * estab_shared_secret(connection * conn, int mode)
     if(keysize == -1) handleErrors(__LINE__);
     char * ohost = malloc(keysize);  
     int len;
-
+    _sys_log("key_size: %i\n",keysize);
     //Yes this is repetitive code I dont give a shit how else do i do it.
     
     if(mode == __CLIENT_SEND)
