@@ -730,12 +730,17 @@ int recv_loop(connection * conn)
         advance_mac(conn,next_macs,__ADV_OTHR);
         
         rcv_data = strncmp(rcv_buf,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
-        if(rcv_data)
+        if(rcv_data){
             memcpy(tot_buf + tot_rcvd,rcv_buf,bytes_rcvd);
-        tot_rcvd += bytes_rcvd;
+            tot_rcvd += bytes_rcvd;
+        }
+            
         memset(resp_buf,0,12);
         sprintf(resp_buf,"ACK:%.4x",*((int *)rcv_buf));
-        bytes_rspd = s_send(conn, resp_buf,strlen(resp_buf));
+        if(bytes_rspd = s_send(conn, resp_buf,strlen(resp_buf)) == -1){
+            perror("recv-rspd");
+            return -tot_rcvd;
+        }
         
         advance_mac(conn,next_macs,__ADV_SELF);
         iter++;
@@ -746,9 +751,9 @@ int recv_loop(connection * conn)
         int plaintext_size = decrypt(tot_buf,tot_rcvd,conn -> secret, conn -> secret + 16, plaintext);
         ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
         _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,plaintext,plaintext_size,w_ret);
-        if(w_ret == -1)
-        {
+        if(w_ret == -1){
             perror("wret_write:");
+            return -tot_rcvd;
         }
     }
     else
@@ -756,11 +761,12 @@ int recv_loop(connection * conn)
         
         ssize_t w_ret = write(_global_conf._OUTPUT_FD,tot_buf,tot_rcvd);
         _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,tot_buf,tot_rcvd,w_ret);
-        if(w_ret == -1)
-        {
+        if(w_ret == -1){
             perror("wret_write:");
+            return -tot_rcvd;
         }
     }
+    return tot_rcvd;
 }
 
 void cleanup(char * orig_mac, char * ip)
