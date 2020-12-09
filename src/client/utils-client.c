@@ -26,44 +26,6 @@ int set_mac(char * iface, char * newMac)
     
 }
 
-ssize_t ds_exchange(connection * conn,int ds)		
-{	
-    _sys_log("ds_exchange(%p,%i)\n",conn,ds);
-    ssize_t data_size;	
-    char buf[8];memset(buf,0,8);		
-    switch(conn -> mode)		
-    {		
-        case __CLIENT_RECV:		
-            if(s_recv(conn,buf,sizeof(int)) == -1){		
-                perror("r-dsexch-recv:");		
-                return -1;		
-            }		
-            data_size = atoi(buf);		
-            if(s_send(conn,buf,strlen(buf)) == -1){		
-                perror("r-dsexch-send:");		
-                return -1;		
-            }
-            break;
-        case __CLIENT_SEND:		
-            sprintf(buf,"%i",ds);		
-            if(s_send(conn,buf,strlen(buf)) == -1){		
-                perror("r-dsexch-send:");		
-                return -1;		
-            }
-            if(s_recv(conn,buf,sizeof(int)) == -1){		
-                perror("r-dsexch-recv:");		
-                return -1;		
-            }
-            usleep(1000000);			
-            data_size = atoi(buf);
-            break;
-        default:
-            fprintf(stderr,"dsexch mode invalid (%i), returning -1...",conn -> mode);	
-            return -1;		
-    } 		
-    return data_size;		
-}
-
 
 void set_arp_cache(char * ip, char * _new_mac)
 {
