@@ -648,9 +648,13 @@ void send_content(char * ip, int port, char * arg, int mode)
         fprintf(stderr,"Illegal state, exiting...\n");
         return;
     }
-        s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
-        char endbuf[12];
-        _sys_log("Received final packet\"%.12s\", process complete.\n",s_recv(conn,endbuf,12),endbuf);
+    s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
+    char endbuf[13];memset(endbuf,0,13);
+    if(s_recv(conn,endbuf,12) == -1){
+        perror("s_recv-end");
+        return;       
+    }
+    _sys_log("Received final packet\"%s\", process complete.\n",endbuf,endbuf);
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
