@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 2,_rvn = 6;
+int _lvn = 1,_mvn = 2,_rvn = 7;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -714,6 +714,7 @@ int recv_loop(connection * conn)
         char cur_large_buf[__MAX_BUFFER_SIZE];memset(cur_large_buf,0,__MAX_BUFFER_SIZE);
         ssize_t clb_rcvd = 0;
         int iter = 0;
+        int fin_on_bborder = 0;
         do{
             _sys_log("\n\n[Iter %i]\n",iter);
             
@@ -761,6 +762,8 @@ int recv_loop(connection * conn)
             }
             else{
                 //Leave the inner loop if you receive ENDMSG
+                if(clb_rcvd == 0)
+                fin_on_bborder = 1;
                 break;
             }
         } while(clb_rcvd < __MAX_BUFFER_SIZE);
@@ -772,7 +775,7 @@ int recv_loop(connection * conn)
         tot_rcvd += clb_rcvd;
 
         //Check if decryption is needed additionally ensure that the final message sent wasnt on the border of a __MAX_BUF_SIZE
-        if(_global_conf._ENCRYPT && !strncmp(cur_large_buf,"[ENDMSG]",min(8,_global_conf._FRAG_SIZE)))
+        if(_global_conf._ENCRYPT && !fin_on_bborder)
         {
             //Plaintext should be no larger than the tot_rcvd, as tot_rcvd is ciphertext size.
             char plaintext[tot_rcvd];
@@ -784,7 +787,7 @@ int recv_loop(connection * conn)
                 perror("wret_write:"); return -tot_rcvd;
             }
         }
-        else
+        else if(!fin_on_bborder)
         {
             //Writing to _OUTPUT_FD instead of STDOUT allows for file writes using the exact same methods.
             //That is why I went through the painstakingly long process of allowing it. It's clean.
@@ -793,7 +796,7 @@ int recv_loop(connection * conn)
             if(w_ret == -1){
                 perror("wret_write:"); return -tot_rcvd;
             }
-        }
+        } 
     }
     return tot_rcvd;
 }
