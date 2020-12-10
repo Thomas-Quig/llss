@@ -762,7 +762,7 @@ int recv_loop(connection * conn)
             }
             else{
                 //Leave the inner loop if you receive ENDMSG
-                _sys_log("recv_loop(): received end message\n");
+                _sys_log("recv_loop(): received end message (%i)\n",clb_rcvd);
                 if(clb_rcvd == 0){
                     fin_on_bborder = 1;
                     _sys_log("recv_loop(): Finished on mod 0 of _MAX_BUF_SIZE\n");
