@@ -614,11 +614,12 @@ void send_content(char * ip, int port, char * arg, int mode)
             long tot_bytes_sent = 0;
             while(tot_bytes_sent < file_size)
             {
-                size_t content_size = min(__MAX_BUFFER_SIZE - 16,file_size - tot_bytes_sent);
+                size_t content_size = min(__MAX_BUFFER_SIZE,file_size - tot_bytes_sent);
                 char content[content_size];
-                fread(content,content_size,1,infile);
+                
                 if(_global_conf._ENCRYPT)
                 {
+                    fread(content,content_size - 16,1,infile);
                     size_t padded_size = content_size + ((content_size % 16 == 0) ? 0 : (16 - (content_size % 16)));
                     _sys_log("psize:%u\n",padded_size);
                     char cipher[padded_size];
@@ -626,6 +627,7 @@ void send_content(char * ip, int port, char * arg, int mode)
                     send_loop(conn,cipher,cypher_len);
                 }
                 else{
+                    fread(content,content_size,1,infile);
                     send_loop(conn,content,content_size);
                 }
                 tot_bytes_sent += content_size;
@@ -634,7 +636,7 @@ void send_content(char * ip, int port, char * arg, int mode)
     }
     else if(mode == __SEND_MESSAGE)
     {
-        
+        //TODO Assure Message < __MAX_BUFFER_SIZE
         if(_global_conf._ENCRYPT)
         {
             size_t content_size = strlen(arg);
