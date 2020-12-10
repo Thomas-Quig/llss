@@ -786,7 +786,7 @@ int recv_loop(connection * conn)
 
         //Add your current large buffer rcvd (min(__MAX_BUFFER_SIZE))
         tot_rcvd += clb_rcvd;
-
+        _sys_log("clb_rcvd: %i\n",clb_rcvd);
         //Check if decryption is needed additionally ensure that the final message sent wasnt on the border of a __MAX_BUF_SIZE
         if(_global_conf._ENCRYPT && !fin_on_bborder)
         {
