@@ -587,7 +587,7 @@ void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
     //Initial setup has a 1/100th second delay so receiver can establish an open port.
-    usleep(10000);
+    usleep(100000);
 
     if(conn == NULL)
     {
