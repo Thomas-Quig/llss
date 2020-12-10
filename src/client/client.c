@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 3,_rvn = 0;
+int _lvn = 1,_mvn = 3,_rvn = 1;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -638,7 +638,7 @@ void send_content(char * ip, int port, char * arg, int mode)
                 if(sl_ret == -1){
                     fprintf(stderr,"send_loop() failed, exiting...\n");
                 }
-                tot_bytes_sent += sl_ret;
+                tot_bytes_sent += content_size; //Raw content size, ignore encryption padding.
             }
         }
     }
@@ -684,7 +684,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
 
         ssize_t tmp_sent = 0;
         size_t to_send = min(content_size - tot_sent,_global_conf._FRAG_SIZE);
-        _sys_log("Offset %d\n",tot_sent);
+
         tmp_sent = s_send(conn,content + tot_sent, to_send);
         if(tmp_sent == -1){
             perror("s_send");
