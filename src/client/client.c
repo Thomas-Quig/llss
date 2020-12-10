@@ -771,8 +771,8 @@ int recv_loop(connection * conn)
         //Add your current large buffer rcvd (min(__MAX_BUFFER_SIZE))
         tot_rcvd += clb_rcvd;
 
-        //Check if decryption is needed
-        if(_global_conf._ENCRYPT)
+        //Check if decryption is needed additionally ensure that the final message sent wasnt on the border of a __MAX_BUF_SIZE
+        if(_global_conf._ENCRYPT && !strncmp(cur_large_buf,"[ENDMSG]",min(8,_global_conf._FRAG_SIZE)))
         {
             //Plaintext should be no larger than the tot_rcvd, as tot_rcvd is ciphertext size.
             char plaintext[tot_rcvd];
