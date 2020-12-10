@@ -78,13 +78,11 @@ connection * establish_connection(char * addr, int port, int mode)
     ret -> s_len = sizeof(ret -> s_addr);
 
     //If you arent encrypting, then you aren't being super duper secure, so just srand with the port.
-    if(_global_conf._ENCRYPT)
-    {
+    if(_global_conf._ENCRYPT){
         strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
         srand(atoi(ret -> secret));
     }
-    else
-    {
+    else{
         srand(port);
     }
 	return ret;

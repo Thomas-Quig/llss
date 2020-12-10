@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 2,_rvn = 5;
+int _lvn = 1,_mvn = 2,_rvn = 6;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -586,6 +586,9 @@ int custom_test_code(int argc, char ** argv)
 void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
+    //Initial setup has a 1/100th second delay so receiver can establish an open port.
+    usleep(10000);
+
     if(conn == NULL)
     {
         printf("Error: Connection could not be established\n");
