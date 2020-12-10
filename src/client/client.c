@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 2,_rvn = 71;
+int _lvn = 1,_mvn = 3,_rvn = 0;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -614,23 +614,31 @@ void send_content(char * ip, int port, char * arg, int mode)
             long tot_bytes_sent = 0;
             while(tot_bytes_sent < file_size)
             {
+                _sys_log("send_content(%li/%li)\n",tot_bytes_sent,file_size);
                 size_t content_size = min(__MAX_BUFFER_SIZE,file_size - tot_bytes_sent);
+
+                if(content_size > __MAX_BUFFER_SIZE - 16 && _global_conf._ENCRYPT){
+                    content_size -= 16;
+                }
                 char content[content_size];
-                
+                fread(content,content_size,1,infile);
+
+                ssize_t sl_ret = 0;
                 if(_global_conf._ENCRYPT)
                 {
-                    fread(content,content_size - 16,1,infile);
                     size_t padded_size = content_size + ((content_size % 16 == 0) ? 0 : (16 - (content_size % 16)));
-                    _sys_log("psize:%u\n",padded_size);
                     char cipher[padded_size];
-                    int cypher_len = encrypt(content,padded_size,conn -> secret, conn -> secret + 16,cipher);
-                    send_loop(conn,cipher,cypher_len);
+                    int cypher_len = encrypt(content,content_size,conn -> secret, conn -> secret + 16,cipher);
+                    sl_ret = send_loop(conn,cipher,cypher_len);
                 }
                 else{
-                    fread(content,content_size,1,infile);
-                    send_loop(conn,content,content_size);
+                    sl_ret = send_loop(conn,content,content_size);
                 }
-                tot_bytes_sent += content_size;
+
+                if(sl_ret == -1){
+                    fprintf(stderr,"send_loop() failed, exiting...\n");
+                }
+                tot_bytes_sent += sl_ret;
             }
         }
     }
@@ -664,7 +672,7 @@ void send_content(char * ip, int port, char * arg, int mode)
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
-    _sys_log("send_loop(%p,%.8s,%du)\n",conn,content,content_size);
+    _sys_log("send_loop(%p,%p,%du)\n",conn,content,content_size);
 
     size_t tot_sent = 0;
     int iter = 0;
@@ -739,7 +747,7 @@ int recv_loop(connection * conn)
             
             //Receieve the current fragment of data.
             bytes_rcvd = s_recv(conn,rcv_buf,_global_conf._FRAG_SIZE);
-            _sys_log("recv_loop(): Received %d bytes\n",bytes_rcvd);
+            _sys_log("recv_loop(%i): Received %d bytes\n",iter,bytes_rcvd);
             if(bytes_rcvd == -1){ 
                 perror("s_recv"); return -tot_rcvd;
             }
