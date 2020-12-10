@@ -166,12 +166,12 @@ char * estab_shared_secret(connection * conn, int mode)
     
     if(mode == __CLIENT_SEND)
     {
-        char pubbuf[keysize];
+        char pubbuf[keysize]; memset(pubbuf,0,keysize);
         if(-1 == BN_bn2bin(DH_get0_pub_key(privkey),pubbuf)) handleErrors(__LINE__);
-        _sys_log("Pubkey: ");
+        /*_sys_log("Pubkey: ");
         for(int i = 0; i < keysize; i++)
             _sys_log("%.2x",pubbuf[i]);
-        _sys_log("\n");
+        _sys_log("\n");*/
         ssize_t key_sent = s_send(conn,pubbuf,keysize);
         if(key_sent == -1) goto keyexch_error;
         ssize_t key_recv = s_recv(conn,ohost,keysize);
@@ -180,23 +180,22 @@ char * estab_shared_secret(connection * conn, int mode)
     {
         ssize_t key_recv = s_recv(conn,ohost,keysize);
 
-        char pubbuf[keysize];
+        char pubbuf[keysize]; memset(pubbuf,0,keysize);
         if(-1 == BN_bn2bin(DH_get0_pub_key(privkey),pubbuf)) handleErrors(__LINE__);
         _sys_log("Pubkey: ");
-        for(int i = 0; i < keysize; i++)
-            _sys_log("%.2x",pubbuf[i]);
         _sys_log("\n");
         ssize_t key_sent = s_send(conn,pubbuf,keysize);
         if(key_sent == -1) goto keyexch_error;
     }
     
     /* Receive the public key from the peer. In this example we're just hard coding a value */
-    _sys_log("Ohost: ");
+    /*_sys_log("Ohost: ");
     for(int i = 0; i < keysize; i++)
         _sys_log("%.2x",ohost[i]);
-    _sys_log("\n");
-    BIGNUM *pubkey = NULL;
-    if(0 == (BN_bin2bn(ohost,keysize,pubkey))) handleErrors(__LINE__);
+    _sys_log("\n");*/
+    BIGNUM *pubkey = BN_bin2bn(ohost,keysize,NULL);
+    if(pubkey == NULL) handleErrors(__LINE__);
+    BN_print_fp(stderr,pubkey);
 
     /* Compute the shared secret */
     unsigned char *secret;
