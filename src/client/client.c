@@ -654,7 +654,7 @@ void send_content(char * ip, int port, char * arg, int mode)
         perror("s_recv-end");
         return;       
     }
-    _sys_log("Received final packet\"%s\", process complete.\n",endbuf,endbuf);
+    _sys_log("Received final packet\"%s\", process complete.\n" ,endbuf);
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
@@ -785,7 +785,7 @@ int recv_loop(connection * conn)
         if(_global_conf._ENCRYPT && !fin_on_bborder)
         {
             //Plaintext should be no larger than the tot_rcvd, as tot_rcvd is ciphertext size.
-            char plaintext[tot_rcvd];
+            char plaintext[tot_rcvd]; memset(plaintext,0,tot_rcvd);
             
             int plaintext_size = decrypt(cur_large_buf,clb_rcvd,conn -> secret, conn -> secret + 16, plaintext);
             ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
