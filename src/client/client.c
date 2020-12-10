@@ -614,7 +614,7 @@ void send_content(char * ip, int port, char * arg, int mode)
             long tot_bytes_sent = 0;
             while(tot_bytes_sent < file_size)
             {
-                size_t content_size = min(__MAX_BUFFER_SIZE,file_size - tot_bytes_sent);
+                size_t content_size = min(__MAX_BUFFER_SIZE - 16,file_size - tot_bytes_sent);
                 char content[content_size];
                 fread(content,content_size,1,infile);
                 if(_global_conf._ENCRYPT)
