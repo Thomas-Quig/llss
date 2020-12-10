@@ -7,14 +7,14 @@ void sig_handler(int signo)
 {
     if (signo == SIGINT)
     {
-        printf("\nReceived user interrupt via ^C, safely exiting...\n");
+        fprintf(stderr,"\nReceived user interrupt via ^C, safely exiting...\n");
         //set_mac(_global_conf._IFACE,_orig_mac);
         char cmd[128];
         memset(cmd,0,128);
         
         sprintf(cmd,"arp -d %s",s_target_ip);
         system(cmd);
-        printf("Recover original mac address with \"ping -I %s %s\"\n",_global_conf._IFACE,s_target_ip);
+        fprintf(stderr,"Recover original mac address with \"ping -I %s %s\"\n",_global_conf._IFACE,s_target_ip);
 
         exit(0);
     }
