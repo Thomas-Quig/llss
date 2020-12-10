@@ -635,7 +635,8 @@ void send_content(char * ip, int port, char * arg, int mode)
         
         if(_global_conf._ENCRYPT)
         {
-            char cipher[strlen(arg) + (16 - (strlen(arg) % 16))];
+            size_t content_size = strlen(arg);
+            char cipher[content_size + (16 - (content_size % 16))];
             int cypher_len = encrypt(arg,strlen(arg),conn -> secret, conn -> secret + 16,cipher);
             send_loop(conn,cipher,cypher_len);
         }
