@@ -619,7 +619,8 @@ void send_content(char * ip, int port, char * arg, int mode)
                 fread(content,content_size,1,infile);
                 if(_global_conf._ENCRYPT)
                 {
-                    size_t padded_size = content_size + (content_size % 16 == 0) ? 0 : (16 - (content_size % 16));
+                    size_t padded_size = content_size + ((content_size % 16 == 0) ? 0 : (16 - (content_size % 16)));
+                    _sys_log("psize:%u\n",padded_size);
                     char cipher[padded_size];
                     int cypher_len = encrypt(content,padded_size,conn -> secret, conn -> secret + 16,cipher);
                     send_loop(conn,cipher,cypher_len);
@@ -637,7 +638,7 @@ void send_content(char * ip, int port, char * arg, int mode)
         if(_global_conf._ENCRYPT)
         {
             size_t content_size = strlen(arg);
-            content_size = content_size + (content_size % 16 == 0) ? 0 : (16 - (content_size % 16));
+            content_size = content_size + ((content_size % 16 == 0) ? 0 : (16 - (content_size % 16)));
             char cipher[content_size];
             int cypher_len = encrypt(arg,strlen(arg),conn -> secret, conn -> secret + 16,cipher);
             send_loop(conn,cipher,cypher_len);
