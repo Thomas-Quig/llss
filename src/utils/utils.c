@@ -205,9 +205,9 @@ char * estab_shared_secret(connection * conn, int mode)
 
     /* Do something with the shared secret */
     /* Note secret_size may be less than DH_size(privkey) */
-    _sys_log("The shared secret(%i) is:",secret_size);
+    /*_sys_log("The shared secret(%i) is:",secret_size);
     for(int i = 0; i < secret_size; i++)
-        _sys_log("%.2x",secret[i]);
+        _sys_log("%.2x",secret[i]);*/
     //BIO_dump_fp(stdout, secret, secret_size);
 
     return secret;
