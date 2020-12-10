@@ -211,6 +211,7 @@ char * estab_shared_secret(connection * conn, int mode)
 int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
             unsigned char *iv, unsigned char *ciphertext)
 {
+    _sys_log("encrypt(%p, %i, %p, %p, %p)\n",plaintext,plaintext_len, key, iv, ciphertext);
     EVP_CIPHER_CTX *ctx;
 
     int len;
@@ -256,6 +257,7 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
             unsigned char *iv, unsigned char *plaintext)
 {
+    _sys_log("decrypt(%p, %i, %p, %p, %p)\n",ciphertext,ciphertext_len, key, iv, plaintext);
     EVP_CIPHER_CTX *ctx;
 
     int len;
