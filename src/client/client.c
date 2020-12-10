@@ -1,8 +1,10 @@
 #include "client.h"
 
+
+//STABLE BUILD BABY WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO THIS TOOK SO LONG IM SO PROUD OF MYSELF!!!
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 3,_rvn = 1;
+int _lvn = 2,_mvn = 0,_rvn = 0;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
