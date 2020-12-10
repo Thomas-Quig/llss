@@ -2,7 +2,7 @@
 
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 1,_mvn = 2,_rvn = 7;
+int _lvn = 1,_mvn = 2,_rvn = 71;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -762,8 +762,11 @@ int recv_loop(connection * conn)
             }
             else{
                 //Leave the inner loop if you receive ENDMSG
-                if(clb_rcvd == 0)
-                fin_on_bborder = 1;
+                _sys_log("recv_loop(): received end message\n");
+                if(clb_rcvd == 0){
+                    fin_on_bborder = 1;
+                    _sys_log("recv_loop(): Finished on mod 0 of _MAX_BUF_SIZE\n");
+                }
                 break;
             }
         } while(clb_rcvd < __MAX_BUFFER_SIZE);
