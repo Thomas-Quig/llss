@@ -28,6 +28,6 @@ llss operates optimally in an ad-hoc environment, but connecting to an ad-hoc ne
 ## Future Work
 llss is not complete, and work on it will continue
 #### Features Coming in future llss updates
-:white_check_mark: IP address shuffling\ 
-:white_check_mark: Port shuffling\ 
-:white_check_mark: Instant install files\ 
+:white_check_mark: IP address shuffling\
+:white_check_mark: Port shuffling\
+:white_check_mark: Instant install files\
