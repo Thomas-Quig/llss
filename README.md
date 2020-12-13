@@ -31,3 +31,6 @@ llss is not complete, and work on it will continue
 :white_check_mark: IP address shuffling\
 :white_check_mark: Port shuffling\
 :white_check_mark: Instant install files\
+
+##Contact
+For questions or comments, please reach out to Thomas Quig via thomasquig.dev@gmail.com
