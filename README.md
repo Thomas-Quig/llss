@@ -18,10 +18,10 @@ Currently, llss requires the following
 Here is a helpful shell script to run all of those things
 ```
 #!/bin/sh
-sudo apt install gcc
-sudo apt install make
-sudo apt-get install libssl-dev
-sudo apt-get install libexplain-dev #This will be unneccesary in the near future.
+apt install gcc
+apt install make
+apt-get install libssl-dev
+apt-get install libexplain-dev #This will be unneccesary in the near future.
 ```
 llss operates optimally in an ad-hoc environment, but connecting to an ad-hoc network varies depending on device. Please refer to [my ad-hoc notes](/notes/ad-hoc.md)
 
