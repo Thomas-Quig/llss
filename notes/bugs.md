@@ -28,8 +28,10 @@ solutions I tried
     restarting arp
 
 ## random effing me over (The big error)
-    fuzzing
+    fuzzing to solve this
+    was very strange
     eric shoutout
+    https://serverfault.com/questions/40712/what-range-of-mac-addresses-can-i-safely-use-for-my-virtual-machines
 
 ## port error
 1. recvfrom changing the fonky
