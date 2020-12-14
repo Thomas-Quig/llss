@@ -4,6 +4,7 @@
 
 #define __ADV_SELF 1
 #define __ADV_OTHR 2
+#define __ADV_BOTH 3
 
 /**
 *   Changes your current mac address

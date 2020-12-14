@@ -98,5 +98,13 @@ int advance_mac(connection * conn, char *macs, int who)
         char * ip = conn -> ip;
         set_arp_cache(ip,ot_new_mac);
     }
+    else if(who == __ADV_BOTH)
+    {
+        char * ip = conn -> ip;
+        char * my_new_mac = macs;
+        char * ot_new_mac = macs + 6;
+        set_mac(_global_conf._IFACE,my_new_mac);
+        set_arp_cache(ip,ot_new_mac);
+    }
     return 0;
 }

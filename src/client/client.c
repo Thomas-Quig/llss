@@ -713,14 +713,20 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
             char response[12];
             ssize_t rf_resp = s_recv(conn,response,12);
             response[rf_resp] = '\0';
-            _sys_log("[RSP] Response receieved...\n\"%s\"\n[End Response]\n\n",response);
+            _sys_log("[RSP] Response \"%s\"\n",response);
             if(!strncmp(response,"ACK",3))
                 acked = 1;
         }
 
         if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
-            advance_mac(conn,next_macs,__ADV_SELF);
-        advance_mac(conn,next_macs,__ADV_OTHR);
+                advance_mac(conn,next_macs,__ADV_BOTH);
+            else if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
+                advance_mac(conn,next_macs,__ADV_OTHR);
+            else
+            {
+                fprintf("error: invalid advancement state, exiting");
+                return -tot_sent;
+            }
         iter++;
     }
 }
@@ -781,8 +787,14 @@ int recv_loop(connection * conn)
             //If the reliability mode is set to synchronous, advance the other host's MAC
             //Otherwise, just advance receiver (your) MAC.
             if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
-                advance_mac(conn,next_macs,__ADV_OTHR);
-            advance_mac(conn,next_macs,__ADV_SELF);
+                advance_mac(conn,next_macs,__ADV_BOTH);
+            else if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
+                advance_mac(conn,next_macs,__ADV_SELF);
+            else
+            {
+                fprintf("error: invalid advancement state, exiting");
+                return -tot_rcvd;
+            }
             
             //Advance iteration counter
             iter++;
