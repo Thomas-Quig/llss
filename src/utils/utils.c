@@ -5,7 +5,7 @@ config _global_conf =
 {/*_VERBOSE*/ 0 , /*_FUNCLIST*/ 0 , /*_SHUFFLE*/ 1 , /*_ENCRYPT*/ 1 ,
 /*_CLEANUP*/ 0 , /*_LOG_SYS*/ 0 , /*_CHECK_FILE*/ 0, 
 /*_FRAG_SIZE*/ __DEFAULT_FRAG_SIZE, /*_CSTMSEED*/ -1 ,
-/*_ADVANCE_MODE*/ __ADVANCE_ASYNC , /*_OUTPUT_FD*/ STDOUT_FILENO ,
+/*_ADVANCE_MODE*/ __ADVANCE_SYNC , /*_OUTPUT_FD*/ STDOUT_FILENO ,
 /*_DB_OUTPUT_FD*/ STDERR_FILENO, /*_IFACE*/ "wlan0"};
 
 static const char g_dh2048_pm[] = 
