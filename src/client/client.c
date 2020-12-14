@@ -703,30 +703,29 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
             break;
         }
         tot_sent += tmp_sent;
-        _sys_log("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
+        _sys_log("[SND]%d Bytes sent to %s\n",tmp_sent,conn -> ip);
         if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
             advance_mac(conn,next_macs,__ADV_SELF);
 
-        int acked = 0;
-        while(!(acked))
+        char response[13];memset(response,0);
+        ssize_t rf_resp = s_recv(conn,response,12);
+        response[rf_resp] = '\0';
+        _sys_log("[RSP] Response \"%s\"\n",response);
+        if(strncmp(response,"ACK",3))
         {
-            char response[12];
-            ssize_t rf_resp = s_recv(conn,response,12);
-            response[rf_resp] = '\0';
-            _sys_log("[RSP] Response \"%s\"\n",response);
-            if(!strncmp(response,"ACK",3))
-                acked = 1;
+            fprintf(stderr,"send_loop-error: invalid ack, exiting\n");
+            return -tot_sent;
         }
 
         if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
                 advance_mac(conn,next_macs,__ADV_BOTH);
-            else if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
-                advance_mac(conn,next_macs,__ADV_OTHR);
-            else
-            {
-                fprintf(stderr,"error: invalid advancement state, exiting\n");
-                return -tot_sent;
-            }
+        else if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
+            advance_mac(conn,next_macs,__ADV_OTHR);
+        else
+        {
+            fprintf(stderr,"send_loop-error: invalid advancement state, exiting\n");
+            return -tot_sent;
+        }
         iter++;
     }
 }
