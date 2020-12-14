@@ -724,7 +724,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
                 advance_mac(conn,next_macs,__ADV_OTHR);
             else
             {
-                fprintf("error: invalid advancement state, exiting");
+                fprintf(stderr,"error: invalid advancement state, exiting\n");
                 return -tot_sent;
             }
         iter++;
@@ -792,7 +792,7 @@ int recv_loop(connection * conn)
                 advance_mac(conn,next_macs,__ADV_SELF);
             else
             {
-                fprintf("error: invalid advancement state, exiting");
+                fprintf(stderr,"error: invalid advancement state, exiting\n");
                 return -tot_rcvd;
             }
             
