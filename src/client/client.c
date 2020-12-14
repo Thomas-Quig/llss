@@ -4,7 +4,7 @@
 //STABLE BUILD BABY WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO THIS TOOK SO LONG IM SO PROUD OF MYSELF!!!
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 2,_mvn = 1,_rvn = 0;
+int _lvn = 2,_mvn = 1,_rvn = 3;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -56,7 +56,7 @@ int client_main(int argc, char ** argv)
 
 void execute(args a)
 {
-    _sys_log("Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a._target_ip, a._port, a._mode, a._conf_path, a._out_path, a._log_path);
+    _sys_log(__VERBOSE_STD, "Arguments Parsed\n-----------------\nTarget IP: %s\nTarget Port: %i\nMode: %i\nConfig Path: \"%.8s...\"\nOutput Path: \"%.8s...\"\nLog Path: \"%.8s...\"\n-----------------\n",a._target_ip, a._port, a._mode, a._conf_path, a._out_path, a._log_path);
     switch(a._mode){
         case __CLIENT_RECV:
             recv_content(a._target_ip,a._port);
@@ -64,7 +64,7 @@ void execute(args a)
         case __CLIENT_SEND:
             if(_global_conf._CHECK_FILE && access(a._data,F_OK) != -1)
             {
-                _sys_log("File found, loading \"%32s...\"\n",a._data);
+                _sys_log(__VERBOSE_STD,"File found, loading \"%32s...\"\n",a._data);
                 send_content(a._target_ip,a._port,a._data,__SEND_FILE);
             }
             else                                                
@@ -83,7 +83,7 @@ void configure(char * conf_path)
         FILE * f = fopen(conf_path,"r");
         
         fscanf(f,"%i\n%i\n%i\n%i\n%i\n%i\n%i\n%i\n%i",&(_global_conf._VERBOSE),&(_global_conf._FUNCLIST),&(_global_conf._SHUFFLE),&(_global_conf._ENCRYPT),&(_global_conf._CLEANUP),&(_global_conf._LOG_SYS),&(_global_conf._CHECK_FILE),&(_global_conf._FRAG_SIZE),&(_global_conf._CSTMSEED));
-        _sys_log("[Config Loaded]\n---------------\nPrintDebug: %i\nFuncList: %i\nShuffle: %i\nEncryption: %i\nCleanup: %i\nSysLogs: %i\nCheckFile: %i\nFragSize: %i\nCustomSeed: %i\n---------------\n",_global_conf._VERBOSE,_global_conf._FUNCLIST,_global_conf._SHUFFLE,_global_conf._ENCRYPT,_global_conf._CLEANUP,_global_conf._LOG_SYS,_global_conf._CHECK_FILE,_global_conf._FRAG_SIZE,_global_conf._CSTMSEED);
+        _sys_log(__VERBOSE_STD, "[Config Loaded]\n---------------\nPrintDebug: %i\nFuncList: %i\nShuffle: %i\nEncryption: %i\nCleanup: %i\nSysLogs: %i\nCheckFile: %i\nFragSize: %i\nCustomSeed: %i\n---------------\n",_global_conf._VERBOSE,_global_conf._FUNCLIST,_global_conf._SHUFFLE,_global_conf._ENCRYPT,_global_conf._CLEANUP,_global_conf._LOG_SYS,_global_conf._CHECK_FILE,_global_conf._FRAG_SIZE,_global_conf._CSTMSEED);
     }
     else if(conf_path == NULL)
     {
@@ -191,7 +191,7 @@ void parse_args(args * a, int argc, char ** argv)
                     {
                         strncpy(a -> _out_path,argv[i + 1], min(strlen(argv[i + 1]),sizeof(a -> _out_path)));
                         _global_conf._OUTPUT_FD = open(a -> _out_path, O_CREAT | O_TRUNC | O_RDWR);
-                        _sys_log("Output File on FD %i\n",_global_conf._OUTPUT_FD);
+                        _sys_log(__VERBOSE_STD, "Output file opened on FD %i\n",_global_conf._OUTPUT_FD);
                         if(_global_conf._OUTPUT_FD == -1)
                             perror("OUTPUT-Open");
                     }
@@ -263,7 +263,7 @@ void parse_args(args * a, int argc, char ** argv)
                     break;
                 case 'v':
                     _global_conf._VERBOSE = 1;
-                    _sys_log("Verbose has been enabled\n");
+                    _sys_log(__VERBOSE_STD,"Verbose has been enabled\n");
                     break;
                 case 'L':
                     _global_conf._FUNCLIST = 1;
@@ -271,6 +271,13 @@ void parse_args(args * a, int argc, char ** argv)
                 case 's':
                     if(i < (argc - 1))
                         _global_conf._SHUFFLE = atoi(argv[i + 1]);
+                    else
+                        goto error;
+                    i += 1;
+                    break;
+                case 't':
+                    if(i < (argc - 1))
+                        _global_conf._SEND_DELAY = atoi(argv[i + 1]);
                     else
                         goto error;
                     i += 1;
@@ -564,6 +571,7 @@ void print_help(){
     printf(" * Help, Version, and Wizard will display depending on which is first in argv[], so if -w is first you get wizard, if -v version etc.\n");
     printf("\nIf you find a bug/vulnerability, please let me know! by emailing thomasquig.dev@gmail.com or through GitHub\n");
     printf("\n--------------------------------------llss arguments--------------------------------------\n");
+    printf("-a <mode>\t Mode of MAC address advancement, 0 for Synchronized (FAAB), 1 for Asynchronous (FAAA)\n");
     printf("-c <path>\t Path to the configuration file. This OVERRIDES any other configuration settings set in the arguments\n");
     printf("-C <1/0>\t Enable mac address cleanup at the end of program execution. This is off by default.\n");
     printf("-e\t\t Enable or disable encryption. Enabled by default\n");
@@ -573,10 +581,10 @@ void print_help(){
     printf("-I <iface>\t The interface to shuffle MAC addresses on. Ensure that the network you are on allows for Static IP's and no DHCP\n");
     printf("-l <path>\t Log file, all _sys_log calls will be sent to this file\n");
     printf("-o <path>\t Output file, all non _sys_log call output will be sent to the output file at <path>\n");
-    printf("-p <port>\t The port you will be sending to / receiving from. Be aware that this runs atoi(3), so any noninteger is undefined behaviour.\n");
+    printf("-p <port>\t The port you will be sending to / receiving from. Be aware that this runs atoi(3), so any noninteger is undefined behaviour.\n\t\t\tIf no port is specified, llss will run on its default port (7755)\n");
     printf("-h\t\t Display this help message.\n");
     printf("-V\t\t Print version information\n");
-    printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. This is required for -l to have any content.\n");
+    printf("-v\t\t Verbose mode, enabling this will output all debu _sys_log messages. -v can also be set with an = immediately following it\n\t\t\t v=1 will display basic messages v=2 will display function list.\n");
     printf("-w\t\t Enter the wizard, OVERRIDES ANY INFORMATION / CONFIGURATION SETTINGS\n");
     printf("------------------------------------------------------------------------------------------\n\n");
     printf("--Examples--\n\nrunllsss send -i 192.168.0.2 -p 3333 \"Hello World!\"\n\tSends \"Hello World!\" to 192.168.0.2:3333 in 1 packet\n\n");
@@ -599,7 +607,7 @@ void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
     //Initial setup has a 1/100th second delay so receiver can establish an open port.
-    usleep(100000);
+    //usleep(100000);
 
     if(conn == NULL)
     {
@@ -618,7 +626,7 @@ void send_content(char * ip, int port, char * arg, int mode)
         }
         else
         {
-            _sys_log("Sending file \"%s\" to %s\n",arg,conn -> ip);
+            _sys_log(__VERBOSE_STD,"Sending file \"%s\" to %s\n",arg,conn -> ip);
             //http://www.fundza.com/c4serious/fileIO_reading_all/index.html
             fseek(infile, 0L, SEEK_END);
             long file_size = ftell(infile);
@@ -626,7 +634,7 @@ void send_content(char * ip, int port, char * arg, int mode)
             long tot_bytes_sent = 0;
             while(tot_bytes_sent < file_size)
             {
-                _sys_log("send_content(%li/%li)\n",tot_bytes_sent,file_size);
+                _sys_log(__VERBOSE_STD,"Content Sent: (%li/%li)\n",tot_bytes_sent,file_size);
                 size_t content_size = min(__MAX_BUFFER_SIZE,file_size - tot_bytes_sent);
 
                 if(content_size > __MAX_BUFFER_SIZE - 16 && _global_conf._ENCRYPT){
@@ -675,24 +683,24 @@ void send_content(char * ip, int port, char * arg, int mode)
         return;
     }
     s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
-    usleep(10000);
+    //usleep(10000);
     char endbuf[13];memset(endbuf,0,13);
     if(s_recv(conn,endbuf,12) == -1){
         perror("s_recv-end");
         return;       
     }
-    _sys_log("Received final packet\"%s\", process complete.\n" ,endbuf);
+    _sys_log(__VERBOSE_STD,"Received final packet\"%s\", process complete.\n" ,endbuf);
 }
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
-    _sys_log("send_loop(%p,%p,%du)\n",conn,content,content_size);
+    _sys_log(__VERBOSE_FUNC,"send_loop(%p,%p,%du)\n",conn,content,content_size);
 
     size_t tot_sent = 0;
     int iter = 0;
     char next_macs[12]; memset(next_macs,0,12);
     while(tot_sent < content_size)
     {
-        _sys_log("\n\n[Iter %i, %u/%u]\n",iter,tot_sent,content_size);
+        _sys_log(__VERBOSE_STD,"\n\n[Iter %i, %u/%u]\n",iter,tot_sent,content_size);
         get_next_macs(__CLIENT_SEND,next_macs);
 
         ssize_t tmp_sent = 0;
@@ -704,14 +712,14 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
             break;
         }
         tot_sent += tmp_sent;
-        _sys_log("[SND]%d Bytes sent to %s\n",tmp_sent,conn -> ip);
+        _sys_log(__VERBOSE_STD,"[SND]%d Bytes sent to %s\n",tmp_sent,conn -> ip);
         if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
             advance_mac(conn,next_macs,__ADV_SELF);
 
         char response[13];memset(response,0,13);
         ssize_t rf_resp = s_recv(conn,response,12);
         response[rf_resp] = '\0';
-        _sys_log("[RSP] Response \"%s\"\n",response);
+        _sys_log(__VERBOSE_STD,"[RSP] Response \"%s\"\n",response);
         if(strncmp(response,"ACK",3))
         {
             fprintf(stderr,"send_loop-error: invalid ack, exiting\n");
@@ -746,7 +754,7 @@ void recv_content(char * ip, int port)
 
 int recv_loop(connection * conn)
 {
-    _sys_log("recv_loop(%p)\n",conn);
+    _sys_log(__VERBOSE_FUNC,"recv_loop(%p)\n",conn);
     ssize_t tot_rcvd = 0;
     int rcv_data = 1;
     while (rcv_data)
@@ -756,7 +764,7 @@ int recv_loop(connection * conn)
         int iter = 0;
         int fin_on_bborder = 0;
         do{
-            _sys_log("\n\n[Iter %i]\n",iter);
+            _sys_log(__VERBOSE_STD,"\n\n[Iter %i]\n",iter);
             
             //Initialize vars within loop
             ssize_t bytes_rcvd = 0, bytes_rspd = 0;
@@ -769,7 +777,7 @@ int recv_loop(connection * conn)
             
             //Receieve the current fragment of data.
             bytes_rcvd = s_recv(conn,rcv_buf,_global_conf._FRAG_SIZE);
-            _sys_log("recv_loop(%i): Received %d bytes\n",iter,bytes_rcvd);
+            _sys_log(__VERBOSE_STD,"recv_loop(): Received %d bytes\n",iter,bytes_rcvd);
             if(bytes_rcvd == -1){ 
                 perror("s_recv"); return -tot_rcvd;
             }
@@ -808,10 +816,10 @@ int recv_loop(connection * conn)
             }
             else{
                 //Leave the inner loop if you receive ENDMSG
-                _sys_log("recv_loop(): received end message (%i)\n",clb_rcvd);
+                _sys_log(__VERBOSE_STD,"recv_loop(): received end message (%i)\n",clb_rcvd);
                 if(clb_rcvd == 0){
                     fin_on_bborder = 1;
-                    _sys_log("recv_loop(): Finished on mod 0 of _MAX_BUF_SIZE\n");
+                    _sys_log(__VERBOSE_STD,"recv_loop(): Finished on mod 0 of _MAX_BUF_SIZE\n");
                 }
                 break;
             }
@@ -822,7 +830,6 @@ int recv_loop(connection * conn)
 
         //Add your current large buffer rcvd (min(__MAX_BUFFER_SIZE))
         tot_rcvd += clb_rcvd;
-        _sys_log("clb_rcvd: %i\n",clb_rcvd);
         //Check if decryption is needed additionally ensure that the final message sent wasnt on the border of a __MAX_BUF_SIZE
         if(_global_conf._ENCRYPT && !fin_on_bborder)
         {
@@ -831,7 +838,6 @@ int recv_loop(connection * conn)
             
             int plaintext_size = decrypt(cur_large_buf,clb_rcvd,conn -> secret, conn -> secret + 16, plaintext);
             ssize_t w_ret = write(_global_conf._OUTPUT_FD,plaintext,plaintext_size);
-            _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,plaintext,plaintext_size,w_ret);
             if(w_ret == -1){
                 perror("wret_write:"); return -tot_rcvd;
             }
@@ -841,7 +847,7 @@ int recv_loop(connection * conn)
             //Writing to _OUTPUT_FD instead of STDOUT allows for file writes using the exact same methods.
             //That is why I went through the painstakingly long process of allowing it. It's clean.
             ssize_t w_ret = write(_global_conf._OUTPUT_FD,cur_large_buf,clb_rcvd);
-            _sys_log("write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,cur_large_buf,tot_rcvd,w_ret);
+            _sys_log(__VERBOSE_STD,"write(%i,\"%.8s...\",%u) = %d\n",_global_conf._OUTPUT_FD,cur_large_buf,tot_rcvd,w_ret);
             if(w_ret == -1){
                 perror("wret_write:"); return -tot_rcvd;
             }
@@ -852,7 +858,7 @@ int recv_loop(connection * conn)
 
 void cleanup(char * orig_mac, char * ip)
 {
-    _sys_log("cleanup(%s,%s)\n",format_mac(orig_mac),ip);
+    _sys_log(__VERBOSE_FUNC,"cleanup(%s,%s)\n",format_mac(orig_mac),ip);
 	set_mac(_global_conf._IFACE,orig_mac);
 	char cmd[64];
 	sprintf(cmd,"arp -d %s",ip);

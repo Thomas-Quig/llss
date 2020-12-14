@@ -4,7 +4,7 @@
 config _global_conf = 
 {/*_VERBOSE*/ 0 , /*_FUNCLIST*/ 0 , /*_SHUFFLE*/ 1 , /*_ENCRYPT*/ 1 ,
 /*_CLEANUP*/ 0 , /*_LOG_SYS*/ 0 , /*_CHECK_FILE*/ 0, 
-/*_FRAG_SIZE*/ __DEFAULT_FRAG_SIZE, /*_CSTMSEED*/ -1 ,
+/*_FRAG_SIZE*/ __DEFAULT_FRAG_SIZE, /*_CSTMSEED*/ -1 , /*_SEND_DELAY*/ 10000,
 /*_ADVANCE_MODE*/ __ADVANCE_SYNC , /*_OUTPUT_FD*/ STDOUT_FILENO ,
 /*_DB_OUTPUT_FD*/ STDERR_FILENO, /*_IFACE*/ "wlan0"};
 
@@ -20,15 +20,14 @@ static const char g_dh2048_pm[] =
 
 ssize_t s_send(connection * conn, char * data, size_t size)
 {
-    _sys_log("s_send(%p,\"%.8s...\",%du)\n",conn,data,size);
+    _sys_log(__VERBOSE_FUNC,"s_send(%p,\"%.8s...\",%du)\n",conn,data,size);
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     (conn -> s_addr).sin_family = AF_INET; 
     (conn -> s_addr).sin_port = htons(conn -> port);
     (conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
-    //(conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
-    //if(conn -> mode == __CLIENT_SEND)
-    usleep(10000);
+
+    usleep(_global_conf._SEND_DELAY);
     ssize_t retval = sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
     close(conn -> fd);
@@ -37,7 +36,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
 
 ssize_t s_recv(connection * conn, char * data, size_t size)
 {
-    _sys_log("s_recv(%p,%p,%du)\n",conn,data,size);
+    _sys_log(__VERBOSE_FUNC,"s_recv(%p,%p,%du)\n",conn,data,size);
     //return recv(conn -> fd, data, size - 1, MSG_WAITALL);
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
@@ -89,21 +88,16 @@ connection * establish_connection(char * addr, int port, int mode)
 	return ret;
 }
 
-int _sys_log(const char * format,...)
+int _sys_log(int type, const char * format,...)
 {
-    va_list args;
-    va_start(args, format);
-    //struct timespec spec;
-    //clock_gettime(CLOCK_REALTIME, &spec);
-    //long ms = spec.tv_nsec / 1000 + spec.tv_sec;
-    //dprintf(_global_conf._DB_OUTPUT_FD,"[%u] ",ms);
-    if(_global_conf._VERBOSE)
+    if((_global_conf._VERBOSE && type == __VERBOSE_STD)|| (_global_conf._FUNCLIST && type == __VERBOSE_FUNC))
     {
+        va_list args;
+        va_start(args, format);
         int result = vdprintf(_global_conf._DB_OUTPUT_FD, format,args);
         va_end(args);
         return result;
     }
-    va_end(args);
     return 0;
 }
 
@@ -127,7 +121,7 @@ int boolify(char * input)
 // Based on https://wiki.openssl.org/index.php/Diffie_Hellman
 char * estab_shared_secret(connection * conn, int mode)
 {
-    _sys_log("estab_shared_secret(%p,%i)\n",conn,mode);
+    _sys_log(__VERBOSE_FUNC,"estab_shared_secret(%p,%i)\n",conn,mode);
     //char * ret = malloc(32);
     //strncpy(ret,"0123456789ABCDEF0123456789ABCDEF",32);
     //return ret;
@@ -160,8 +154,6 @@ char * estab_shared_secret(connection * conn, int mode)
     if(keysize == -1) handleErrors(__LINE__);
     char * ohost = malloc(keysize);  
     int len;
-    _sys_log("key_size: %i\n",keysize);
-    //Yes this is repetitive code I dont give a shit how else do i do it.
     
     if(mode == __CLIENT_SEND)
     {
@@ -192,13 +184,6 @@ char * estab_shared_secret(connection * conn, int mode)
 
     if(0 > (secret_size = DH_compute_key(secret, pubkey, privkey))) handleErrors(__LINE__);
 
-    /* Do something with the shared secret */
-    /* Note secret_size may be less than DH_size(privkey) */
-    /*_sys_log("The shared secret(%i) is:",secret_size);
-    for(int i = 0; i < secret_size; i++)
-        _sys_log("%.2x",secret[i]);*/
-    //BIO_dump_fp(stdout, secret, secret_size);
-
     return secret;
 
     dh_error:
@@ -212,7 +197,7 @@ char * estab_shared_secret(connection * conn, int mode)
 int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
             unsigned char *iv, unsigned char *ciphertext)
 {
-    _sys_log("encrypt(%p, %i, %p, %p, %p)\n",plaintext,plaintext_len, key, iv, ciphertext);
+    _sys_log(__VERBOSE_FUNC,"encrypt(%p, %i, %p, %p, %p)\n",plaintext,plaintext_len, key, iv, ciphertext);
     EVP_CIPHER_CTX *ctx;
 
     int len;
@@ -258,7 +243,7 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
             unsigned char *iv, unsigned char *plaintext)
 {
-    _sys_log("decrypt(%p, %i, %p, %p, %p)\n",ciphertext,ciphertext_len, key, iv, plaintext);
+    _sys_log(__VERBOSE_FUNC,"decrypt(%p, %i, %p, %p, %p)\n",ciphertext,ciphertext_len, key, iv, plaintext);
     EVP_CIPHER_CTX *ctx;
 
     int len;

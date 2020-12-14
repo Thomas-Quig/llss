@@ -9,6 +9,9 @@
 #define __ADVANCE_SYNC 0
 #define __ADVANCE_ASYNC 1
 
+#define __VERBOSE_STD 1
+#define __VERBOSE_FUNC 2
+
 
 
 #define max(a,b) \
@@ -61,20 +64,22 @@ typedef struct _connection{
  * @param _OUTPUT_FD fd of where the received output goes.
  * @param _DB_OUTPUT_FD fd of where debug output goes.
  * @param _CSTMSEED a custom seed for MAC address shuffling, suggested if using unencrypted. Default is -1 which signifies no custom seed has been set.
+ * @param _SEND_DELAY The send delay in microseconds
  * @param _FRAG_SIZE the fragmentation size, default 1024
  * @param _IFACE the interface to run this on
  **/
 typedef struct _config{
-    int _VERBOSE;            //False by default
-    int _FUNCLIST;         //False by default
-    int _SHUFFLE;          //True by default
-    int _ENCRYPT;          //True by default
-    int _CLEANUP;          //True by default
-    int _LOG_SYS;          //False by default
+    int  _VERBOSE;            //False by default
+    int  _FUNCLIST;         //False by default
+    int  _SHUFFLE;          //True by default
+    int  _ENCRYPT;          //True by default
+    int  _CLEANUP;          //True by default
+    int  _LOG_SYS;          //False by default
     int  _CHECK_FILE;        //False by default
     
     int  _FRAG_SIZE;        //Sending fragmentation size
     int  _CSTMSEED;         //-1 By default
+    int  _SEND_DELAY;       //10000 by default
     int  _ADVANCE_MODE;    //1 By default
 
     int  _OUTPUT_FD;        //STDOUT_FILENO By default
@@ -124,4 +129,4 @@ ssize_t save_config(char * fname);
 void printConnection(connection * conn);
 
 void handleErrors();
-int _sys_log(const char * format,...);
+int _sys_log(int type, const char * format,...);
