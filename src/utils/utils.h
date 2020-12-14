@@ -6,8 +6,8 @@
 #define __CLIENT_RECV 2
 
 #define __DEFAULT_FRAG_SIZE 1024
-#define __RELIABLE_SYNC 1
-#define __RELIABLE_ASYNC 2
+#define __ADVANCE_SYNC 0
+#define __ADVANCE_ASYNC 1
 
 
 
@@ -41,7 +41,6 @@ typedef struct _connection{
     struct sockaddr_in s_addr;
     socklen_t s_len;
     char secret[32];
-    int data_size;
 } connection;
 
 
@@ -76,7 +75,7 @@ typedef struct _config{
     
     int  _FRAG_SIZE;        //Sending fragmentation size
     int  _CSTMSEED;         //-1 By default
-    int  _RELIABLE_MODE;    //1 By default
+    int  _ADVANCE_MODE;    //1 By default
 
     int  _OUTPUT_FD;        //STDOUT_FILENO By default
     int  _DB_OUTPUT_FD;     //STDOUT_FILENO by default

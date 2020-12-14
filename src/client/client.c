@@ -159,6 +159,16 @@ void parse_args(args * a, int argc, char ** argv)
 
             char c = arg[1];
             switch (c){
+                case 'a':
+                    if(i < (argc - 1)){
+                        _global_conf._ADVANCE_MODE = atoi(argv[i + 1]);
+                        if(_global_conf._ADVANCE_MODE != __ADVANCE_ASYNC && _global_conf._ADVANCE_MODE != __ADVANCE_SYNC)
+                            _global_conf._ADVANCE_MODE = __ADVANCE_SYNC;
+                    }
+                    else
+                        goto error;
+                    i += 1;
+                    break;
                 case 'I':
                     if(i < (argc - 1))
                         strncpy((_global_conf._IFACE),argv[i + 1],min(strlen(argv[i + 1]),sizeof(_global_conf._IFACE)));
@@ -694,7 +704,8 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         }
         tot_sent += tmp_sent;
         _sys_log("[SND]%d Bytes sent to %s\n\n",tmp_sent,conn -> ip);
-        advance_mac(conn,next_macs,__ADV_SELF);
+        if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
+            advance_mac(conn,next_macs,__ADV_SELF);
 
         int acked = 0;
         while(!(acked))
@@ -706,6 +717,9 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
             if(!strncmp(response,"ACK",3))
                 acked = 1;
         }
+
+        if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
+            advance_mac(conn,next_macs,__ADV_SELF);
         advance_mac(conn,next_macs,__ADV_OTHR);
         iter++;
     }
@@ -755,7 +769,7 @@ int recv_loop(connection * conn)
             }
             
             //If Reliability is set to asynchronous, advance the sender's MAC address
-            if(_global_conf._RELIABLE_MODE == __RELIABLE_ASYNC)
+            if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
                 advance_mac(conn,next_macs,__ADV_OTHR);
                 
             memset(resp_buf,0,12);
@@ -766,7 +780,7 @@ int recv_loop(connection * conn)
 
             //If the reliability mode is set to synchronous, advance the other host's MAC
             //Otherwise, just advance receiver (your) MAC.
-            if(_global_conf._RELIABLE_MODE == __RELIABLE_SYNC)
+            if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
                 advance_mac(conn,next_macs,__ADV_OTHR);
             advance_mac(conn,next_macs,__ADV_SELF);
             
