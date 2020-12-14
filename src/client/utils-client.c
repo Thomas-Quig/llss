@@ -13,7 +13,7 @@ int set_mac(char * iface, char * newMac)
     s = socket(AF_INET, SOCK_DGRAM, 0);
     assert(s != -1);
     memset(&(ifr.ifr_name),0,IF_NAMESIZE);
-    strncpy(ifr.ifr_name, "wlan0",min(strlen(iface),5));
+    strncpy(ifr.ifr_name,iface,min(strlen(iface),5));
     for(int i = 0; i < 6; i++)
         ifr.ifr_hwaddr.sa_data[i] = newMac[i];
 
