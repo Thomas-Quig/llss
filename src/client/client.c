@@ -707,7 +707,7 @@ size_t send_loop(connection * conn, char * content, size_t content_size){
         if(_global_conf._ADVANCE_MODE == __ADVANCE_ASYNC)
             advance_mac(conn,next_macs,__ADV_SELF);
 
-        char response[13];memset(response,0);
+        char response[13];memset(response,0,13);
         ssize_t rf_resp = s_recv(conn,response,12);
         response[rf_resp] = '\0';
         _sys_log("[RSP] Response \"%s\"\n",response);
