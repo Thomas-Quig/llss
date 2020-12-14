@@ -675,6 +675,7 @@ void send_content(char * ip, int port, char * arg, int mode)
         return;
     }
     s_send(conn,"[ENDMSG]",min(_global_conf._FRAG_SIZE,8));
+    usleep(10000);
     char endbuf[13];memset(endbuf,0,13);
     if(s_recv(conn,endbuf,12) == -1){
         perror("s_recv-end");

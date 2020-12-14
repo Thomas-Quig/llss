@@ -22,7 +22,7 @@ int set_mac(char * iface, char * newMac)
         perror("sm-IOCTL");
         return EXIT_FAILURE;
 	  }
-    
+    close(s);
 }
 
 
@@ -81,30 +81,18 @@ int advance_mac(connection * conn, char *macs, int who)
     _sys_log("advance_mac(%p,%p,%i)\n",conn,macs,who);
     if(who == __ADV_SELF)
     {
-        //close(conn -> fd);
         set_mac(_global_conf._IFACE,my_new_mac);
-        //conn -> fd = socket(AF_INET, SOCK_DGRAM, 0);
-        /**if(conn -> mode == __CLIENT_RECV)
-        {
-            (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
-            if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
-            {
-                perror("advance-bind");
-            }
-        }**/
     }
     else if(who == __ADV_OTHR)
     {
-        char * ip = conn -> ip;
-        set_arp_cache(ip,ot_new_mac);
+        set_arp_cache(conn -> ip,ot_new_mac);
     }
     else if(who == __ADV_BOTH)
     {
-        char * ip = conn -> ip;
         char * my_new_mac = macs;
         char * ot_new_mac = macs + 6;
         set_mac(_global_conf._IFACE,my_new_mac);
-        set_arp_cache(ip,ot_new_mac);
+        set_arp_cache(conn -> ip,ot_new_mac);
     }
     return 0;
 }

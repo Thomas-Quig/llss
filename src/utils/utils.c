@@ -51,6 +51,7 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
     ssize_t retval = recvfrom(conn -> fd, data, size, 
 		MSG_WAITALL, (struct sockaddr *) &(conn -> s_addr),&(conn ->s_len));
     close(conn -> fd);
+    conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     return retval;
 }
 
