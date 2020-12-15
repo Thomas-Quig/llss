@@ -24,7 +24,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     (conn -> s_addr).sin_family = AF_INET;
-    if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
+    if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC && (conn -> secret)[0] != 0) //There is a 1 in 256 chance that this causes a non-starter, fix it later
         (conn -> s_addr).sin_port = htons((random() % 16348) + 1025);
     else
         (conn -> s_addr).sin_port = htons(conn -> port);
@@ -43,7 +43,7 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
-    if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
+    if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC && (conn -> secret)[0] != 0)
         (conn -> s_addr).sin_port = htons((random() % 16348) + 1025);
     else
         (conn -> s_addr).sin_port = htons(conn -> port);
