@@ -23,8 +23,11 @@ ssize_t s_send(connection * conn, char * data, size_t size)
     _sys_log(__VERBOSE_FUNC,"s_send(%p,\"%.8s...\",%du,%i)\n",conn,data,size,conn -> port);
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
-    (conn -> s_addr).sin_family = AF_INET; 
-    (conn -> s_addr).sin_port = htons(conn -> port);
+    (conn -> s_addr).sin_family = AF_INET;
+    if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
+        (conn -> s_addr).sin_port = htons((random() % 16348) + 1025);
+    else
+        (conn -> s_addr).sin_port = htons(conn -> port);
     (conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
 
     usleep(_global_conf._SEND_DELAY * 1000);
@@ -40,7 +43,10 @@ ssize_t s_recv(connection * conn, char * data, size_t size)
     close(conn -> fd);
     conn -> fd = socket(AF_INET,SOCK_DGRAM,0);
     (conn -> s_addr).sin_addr.s_addr = INADDR_ANY;
-    (conn -> s_addr).sin_port = htons(conn -> port);
+    if(_global_conf._ADVANCE_MODE == __ADVANCE_SYNC)
+        (conn -> s_addr).sin_port = htons((random() % 16348) + 1025);
+    else
+        (conn -> s_addr).sin_port = htons(conn -> port);
     if(bind(conn -> fd,(const struct sockaddr *)&(conn -> s_addr),conn -> s_len) == -1)
     {
         perror("rcv-bind");
