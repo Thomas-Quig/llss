@@ -626,7 +626,7 @@ void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
     //Initial setup has a 1/100th second delay so receiver can establish an open port.
-    usleep(_global_conf._SEND_DELAY * 2 * 1000);
+    usleep(_global_conf._SEND_DELAY * 10 * 1000);
     if(conn == NULL)
     {
         printf("Error: Connection could not be established\n");
