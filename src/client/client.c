@@ -1,10 +1,8 @@
 #include "client.h"
 
-
-//STABLE BUILD BABY WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO THIS TOOK SO LONG IM SO PROUD OF MYSELF!!!
 static char s_target_ip[16];
 static char s_orig_mac[6];
-int _lvn = 2,_mvn = 1,_rvn = 4;
+int _lvn = 2,_mvn = 1,_rvn = 5;
 void sig_handler(int signo)
 {
     if (signo == SIGINT)
@@ -78,6 +76,7 @@ void execute(args a)
 
 void configure(char * conf_path)
 {
+    _sys_log(__VERBOSE_FUNC,"configure(\"%s\")\n",conf_path);
     if(conf_path != NULL && access(conf_path, F_OK) != -1)
     {
         FILE * f = fopen(conf_path,"r");
@@ -154,10 +153,11 @@ void parse_args(args * a, int argc, char ** argv)
         char * arg = argv[i];
         if(arg[0] == '-')
         {
-            if(strlen(argv[i]) > 2)
+            if(strlen(arg) > 2 && arg[2] != '=')
                 goto error;
 
             char c = arg[1];
+            _sys_log(__VERBOSE_STD,"Parsed -%c\n",c);
             switch (c){
                 case 'a':
                     if(i < (argc - 1)){
@@ -262,8 +262,27 @@ void parse_args(args * a, int argc, char ** argv)
                     exit(EXIT_SUCCESS);
                     break;
                 case 'v':
-                    _global_conf._VERBOSE = 1;
-                    _sys_log(__VERBOSE_STD,"Verbose has been enabled\n");
+                    if(arg[2] == '=')
+                    {
+                        int v_set = atoi(arg + 3);
+                        if(v_set == 1)
+                            _global_conf._VERBOSE = 1;
+                        else if(v_set == 2)
+                        {
+                            _global_conf._VERBOSE = 1;
+                            _global_conf._FUNCLIST = 1;
+                        }
+                        else if(v_set == 0)
+                        {
+                            _global_conf._VERBOSE = 0;
+                            _global_conf._FUNCLIST = 0;
+                        }
+                    }
+                    else
+                    {
+                        _global_conf._VERBOSE = 1;
+                    }
+                    _sys_log(__VERBOSE_STD,"Verbosity set at level %i\n",_global_conf._VERBOSE + _global_conf._FUNCLIST);
                     break;
                 case 'L':
                     _global_conf._FUNCLIST = 1;

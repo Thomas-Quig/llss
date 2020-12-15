@@ -4,7 +4,7 @@
 config _global_conf = 
 {/*_VERBOSE*/ 0 , /*_FUNCLIST*/ 0 , /*_SHUFFLE*/ 1 , /*_ENCRYPT*/ 1 ,
 /*_CLEANUP*/ 0 , /*_LOG_SYS*/ 0 , /*_CHECK_FILE*/ 0, 
-/*_FRAG_SIZE*/ __DEFAULT_FRAG_SIZE, /*_CSTMSEED*/ -1 , /*_SEND_DELAY*/ 10000,
+/*_FRAG_SIZE*/ __DEFAULT_FRAG_SIZE, /*_CSTMSEED*/ -1 , /*_SEND_DELAY*/ 10,
 /*_ADVANCE_MODE*/ __ADVANCE_SYNC , /*_OUTPUT_FD*/ STDOUT_FILENO ,
 /*_DB_OUTPUT_FD*/ STDERR_FILENO, /*_IFACE*/ "wlan0"};
 
@@ -27,7 +27,7 @@ ssize_t s_send(connection * conn, char * data, size_t size)
     (conn -> s_addr).sin_port = htons(conn -> port);
     (conn -> s_addr).sin_addr.s_addr = inet_addr(conn -> ip);
 
-    usleep(_global_conf._SEND_DELAY);
+    usleep(_global_conf._SEND_DELAY * 1000);
     ssize_t retval = sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
     close(conn -> fd);
