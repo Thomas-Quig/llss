@@ -626,8 +626,7 @@ void send_content(char * ip, int port, char * arg, int mode)
 {
     connection * conn = establish_connection(ip,port,__CLIENT_SEND);
     //Initial setup has a 1/100th second delay so receiver can establish an open port.
-    //usleep(100000);
-
+    usleep(_global_conf._SEND_DELAY * 2 * 1000);
     if(conn == NULL)
     {
         printf("Error: Connection could not be established\n");
@@ -713,7 +712,6 @@ void send_content(char * ip, int port, char * arg, int mode)
 
 size_t send_loop(connection * conn, char * content, size_t content_size){
     _sys_log(__VERBOSE_FUNC,"send_loop(%p,%p,%du)\n",conn,content,content_size);
-
     size_t tot_sent = 0;
     int iter = 0;
     char next_macs[12]; memset(next_macs,0,12);

@@ -65,6 +65,7 @@ typedef struct _connection{
  * @param _DB_OUTPUT_FD fd of where debug output goes.
  * @param _CSTMSEED a custom seed for MAC address shuffling, suggested if using unencrypted. Default is -1 which signifies no custom seed has been set.
  * @param _SEND_DELAY The send delay in microseconds
+ * 
  * @param _FRAG_SIZE the fragmentation size, default 1024
  * @param _IFACE the interface to run this on
  **/

@@ -30,7 +30,6 @@ ssize_t s_send(connection * conn, char * data, size_t size)
     usleep(_global_conf._SEND_DELAY * 1000);
     ssize_t retval = sendto(conn -> fd, (const char *)(data), size, MSG_CONFIRM,
             (const struct sockaddr *) &(conn -> s_addr),conn -> s_len);
-    close(conn -> fd);
     return retval;
 }
 
