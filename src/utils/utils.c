@@ -84,6 +84,7 @@ connection * establish_connection(char * addr, int port, int mode)
 
     //If you arent encrypting, then you aren't being super duper secure, so just srand with the port.
     if(_global_conf._ENCRYPT){
+        memset(ret -> secret,32,0);
         strncpy(ret -> secret,estab_shared_secret(ret,mode),32);
         srand(atoi(ret -> secret));
     }
